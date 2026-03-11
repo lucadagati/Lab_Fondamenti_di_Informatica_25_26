@@ -1,0 +1,20 @@
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# File generati durante il laboratorio (gli studenti li creano localmente)
+referto.txt
+referto.enc
+referto_decifrato.txt
+referto_debole.enc
+chiave_privata.pem
+chiave_pubblica.pem
+messaggio.txt
+messaggio.enc
+messaggio_decifrato.txt
+firma.bin
+test_decifrato.txt
+test_sbagliato.txt
