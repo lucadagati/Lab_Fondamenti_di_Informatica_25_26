@@ -13,6 +13,19 @@ Questo repository contiene i laboratori su **crittografia e sicurezza informatic
 
 ## Struttura del repository
 
+```mermaid
+flowchart TD
+    ROOT[Lab_Biomed]
+    ROOT --> README[README.md - presentazione]
+    ROOT --> LAB1[01-crittografia-chiavi]
+    ROOT --> LAB2[02-README.md - placeholder]
+
+    LAB1 --> L1README[README.md - guida e installazione]
+    LAB1 --> L1PWD[passwords.txt]
+    LAB1 --> L1SCRIPT[brute_force_demo.sh]
+    LAB1 --> L1SOL[soluzioni/]
+```
+
 ```
 Lab_Biomed/
 ├── README.md                    ← Sei qui: presentazione

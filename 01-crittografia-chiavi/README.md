@@ -4,6 +4,34 @@
 
 Primo laboratorio su crittografia e sicurezza: generazione chiavi, crittografia simmetrica (AES) e asimmetrica (RSA), firma digitale, crittoanalisi (brute force, dictionary attack). In questa guida trovi **l’installazione dei tool** e **spiegazioni dettagliate** di ogni comando e di tutte le opzioni usate.
 
+### Flusso del laboratorio
+
+```mermaid
+flowchart LR
+    subgraph P1["Parte 1"]
+        A[Referto.txt]
+    end
+    subgraph P2["Parte 2"]
+        B[Chiave simmetrica]
+        C[AES: cifra/decifra]
+    end
+    subgraph P3["Parte 3"]
+        D[Coppia RSA]
+        E[Cifra con pub / Decifra con priv]
+    end
+    subgraph P4["Parte 4"]
+        F[Firma digitale]
+        G[Verifica integrità]
+    end
+    subgraph P5["Parte 5"]
+        H[Attacco dictionary]
+    end
+    subgraph P6["Parte 6"]
+        I[Approccio ibrido]
+    end
+    A --> B --> C --> D --> E --> F --> G --> H --> I
+```
+
 ---
 
 # Installazione dei tool
@@ -283,6 +311,22 @@ oppure crea il file con Notepad e salvalo in `01-crittografia-chiavi`. Per visua
 
 Una sola chiave (derivata dalla password) per cifrare e decifrare; veloce, adatta a grandi volumi; il problema è la distribuzione sicura della chiave.
 
+```mermaid
+flowchart LR
+    subgraph Simmetrica["Crittografia simmetrica (AES)"]
+        direction LR
+        P[Testo in chiaro] -->|"stessa chiave"| E[Cifratura]
+        E --> C[Testo cifrato]
+        C -->|"stessa chiave"| D[Decifratura]
+        D --> P2[Testo in chiaro]
+    end
+    K[(Chiave segreta)]
+    K --> E
+    K --> D
+```
+
+*Una sola chiave* viene usata sia per cifrare sia per decifrare. Chi deve decifrare deve conoscere la stessa chiave (o la password da cui si deriva).
+
 ## 2.1 Cifrare il referto con AES
 
 ### Comando
@@ -358,6 +402,22 @@ Inserisci una **password sbagliata**.
 # Parte 3 – Crittografia a chiave asimmetrica (RSA)
 
 Due chiavi: pubblica (condivisibile) e privata (segreta). Utile per scambio chiavi, autenticazione, firma digitale. Più lenta della simmetrica.
+
+```mermaid
+flowchart LR
+    subgraph Generazione["Generazione chiavi"]
+        GEN[genpkey] --> PRIV[Chiave privata .pem]
+        PRIV -->|rsa -pubout| PUB[Chiave pubblica .pem]
+    end
+    subgraph Cifratura["Cifrare messaggio"]
+        M[Messaggio] -->|chiave pubblica| ENC[Cifratura]
+        ENC --> C[Testo cifrato]
+        C -->|chiave privata| DEC[Decifratura]
+        DEC --> M2[Messaggio]
+    end
+```
+
+*Chi cifra* usa la **chiave pubblica** (tutti possono averla). *Solo il titolare della chiave privata* può decifrare. La chiave privata non viene mai condivisa.
 
 ## 3.1 Generare la chiave privata RSA
 
@@ -454,6 +514,23 @@ cat messaggio_decifrato.txt
 
 La firma garantisce **autenticità** (chi ha firmato), **integrità** (il file non è stato modificato) e **non ripudio**.
 
+```mermaid
+flowchart LR
+    subgraph Firma["Firmare (mittente)"]
+        F1[File referto.txt] --> H[Hash SHA-256]
+        H --> S[Firma con chiave privata]
+        S --> SIG[firma.bin]
+    end
+    subgraph Verifica["Verificare (destinatario)"]
+        F2[File referto.txt] --> H2[Hash SHA-256]
+        SIG2[firma.bin] --> V[Verifica con chiave pubblica]
+        H2 --> V
+        V --> OK[Verified OK / Failure]
+    end
+```
+
+Il **mittente** calcola l’hash del file e lo “firma” con la chiave privata → si ottiene `firma.bin`. Il **destinatario** ricalcola l’hash del file e verifica la firma con la chiave pubblica: se il file è stato modificato, la verifica fallisce.
+
 ## 4.1 Firmare il referto
 
 ### Comando
@@ -508,6 +585,19 @@ Se vuoi riportare `referto.txt` allo stato originale, ricrealo con il comando de
 # Parte 5 – Criptoanalisi e attacchi (brute force / dictionary)
 
 Obiettivo: capire che la sicurezza dipende dalla **forza della chiave**; password deboli possono essere individuate con un attacco a dizionario.
+
+```mermaid
+flowchart LR
+    subgraph Attacco["Attacco a dizionario"]
+        F[referto_debole.enc] --> S[Script]
+        D[passwords.txt] --> S
+        S -->|"prova ogni password"| O{Decifra?}
+        O -->|No| S
+        O -->|Sì| T[PASSWORD TROVATA]
+    end
+```
+
+Lo script prova ogni voce del dizionario come password; quando la decifratura ha successo, la password è stata individuata. L’algoritmo (AES) è sicuro; il punto debole è la **password debole**.
 
 ## 5.1 Cifrare con una password debole
 
@@ -574,6 +664,32 @@ La password debole è stata recuperata senza conoscere la chiave. Con una passwo
 # Parte 6 – Approccio ibrido (discussione)
 
 Nei sistemi reali (TLS, PGP, ecc.) si combina simmetrica e asimmetrica: si genera una chiave simmetrica casuale; il file viene cifrato con AES; la chiave simmetrica viene cifrata con la chiave pubblica del destinatario; il destinatario usa la chiave privata per recuperare la chiave simmetrica e decifra il file. Così si ha velocità (simmetrica) e scambio sicuro della chiave (asimmetrica).
+
+```mermaid
+sequenceDiagram
+    participant M as Mittente
+    participant D as Destinatario
+
+    Note over M: 1. Genera chiave simmetrica K (casuale)
+    Note over M: 2. Cifra il file con AES e K
+    M->>D: File cifrato (AES)
+    Note over M: 3. Cifra K con chiave pubblica di D
+    M->>D: Chiave K cifrata (RSA)
+
+    Note over D: 4. Decifra K con la propria chiave privata
+    Note over D: 5. Decifra il file con K (AES)
+```
+
+| Passo | Chi | Azione |
+|-------|-----|--------|
+| 1 | Mittente | Genera chiave simmetrica **K** (casuale) |
+| 2 | Mittente | Cifra il **file** con AES usando K |
+| 3 | Mittente | Cifra **K** con la chiave **pubblica** del destinatario (RSA) |
+| 4 | Destinatario | Invia file cifrato + K cifrata |
+| 5 | Destinatario | Decifra **K** con la propria chiave **privata** (RSA) |
+| 6 | Destinatario | Decifra il **file** con K (AES) |
+
+Risultato: il file grande viaggia cifrato con AES (veloce); la chiave K viaggia cifrata con RSA (scambio sicuro).
 
 ---
 

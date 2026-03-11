@@ -1,3 +1,6 @@
+# .gitignore viene committato e pubblicato: è la prassi.
+# Definisce cosa NON versionare; tutti i collaboratori condividono le stesse regole.
+
 # macOS
 .DS_Store
 
