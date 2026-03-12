@@ -264,7 +264,8 @@ Se vedi un numero di versione (es. `OpenSSL 3.x.x`), puoi procedere con il labor
 |-----------------|-------------|
 | `README.md` | Questa guida (installazione + comandi spiegati) |
 | `passwords.txt` | Dizionario per l’esercizio di attacco a dizionario |
-| `brute_force_demo.sh` | Script bash per provare le password su un file cifrato |
+| `brute_force_demo.sh` | Script per attacco a **dizionario** (liste di password) |
+| `brute_force_numeric.sh` | Script per **brute force numerico** (prova tutte le combinazioni 0000…9999, senza dizionario) |
 | `soluzioni/` | Note per il docente |
 
 ---
@@ -645,9 +646,28 @@ Il primo argomento è il file cifrato, il secondo il file con la lista di passwo
 
 **Risultato atteso:** output con “PASSWORD TROVATA: 1234” e prime righe del referto decifrato.
 
-## 5.4 Cosa osservare
+## 5.4 Brute force senza dizionario (solo cifre)
+
+Lo script **brute_force_numeric.sh** prova **tutte** le combinazioni numeriche (0000…9999 per 4 cifre) **senza dizionario** — vero brute force sullo spazio numerico.
+
+```bash
+chmod +x brute_force_numeric.sh
+./brute_force_numeric.sh referto_debole.enc
+./brute_force_numeric.sh referto_debole.enc 4
+```
+
+Primo argomento: file cifrato. Secondo (opzionale): numero di cifre (default 4 → 10.000 tentativi). Limite didattico: max 6 cifre. **Risultato atteso:** "PASSWORD TROVATA (brute force): 1234".
+
+## 5.5 Cosa osservare
 
 La password debole è stata recuperata senza conoscere la chiave. Con una password lunga e casuale un attacco a dizionario non avrebbe successo; un brute force completo sarebbe impraticabile. Conclusione: l’algoritmo (AES) è sicuro; il punto debole è la **scelta della password**.
+
+### Confronto attacco a dizionario vs brute force numerico
+
+| Metodo | Cosa fa | Quando è utile |
+|--------|---------|----------------|
+| **Dictionary** (`brute_force_demo.sh`) | Prova solo le password in una lista (es. `passwords.txt`) | Password comuni o deboli |
+| **Brute force numerico** (`brute_force_numeric.sh`) | Prova tutte le combinazioni di N cifre (0000…9999) | Password solo numeriche, lunghezza nota o piccola |
 
 ### Stima tempi di brute force (riferimento)
 
@@ -714,7 +734,8 @@ Eseguire in ordine dalla directory **`01-crittografia-chiavi`**:
 | 13 | `openssl dgst -sha256 -verify ... referto.txt` | `Verified OK` |
 | 14 | Modificare `referto.txt` e verificare di nuovo | `Verification Failure` |
 | 15 | `openssl enc ... -out referto_debole.enc -pass pass:1234` | Creato `referto_debole.enc` |
-| 16 | `./brute_force_demo.sh` | Output “PASSWORD TROVATA: 1234” |
+| 16 | `./brute_force_demo.sh` | Output PASSWORD TROVATA: 1234 |
+| 17 | `./brute_force_numeric.sh referto_debole.enc 4` | (Opz.) Brute force numerico senza dizionario |
 
 *PowerShell:* usa `Get-Content file.txt` al posto di `cat`; per lo script della Parte 5 usa WSL o Git Bash.
 
