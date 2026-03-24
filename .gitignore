@@ -21,3 +21,10 @@ messaggio_decifrato.txt
 firma.bin
 test_decifrato.txt
 test_sbagliato.txt
+
+# Lab 2 – Python / Jupyter (ambienti locali degli studenti)
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/

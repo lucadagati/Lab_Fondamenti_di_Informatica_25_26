@@ -1,0 +1,5 @@
+Caffè;2.50
+Trasporto;5.00
+Caffè;1.80
+Pranzo;12.00
+Trasporto;5.00

@@ -1,0 +1,5 @@
+# Formato: domanda | A | B | C | lettera_corretta (A/B/C)
+# Le righe che iniziano con # sono ignorate dall'parser che implementerai
+Qual è la capitale d'Italia? | Milano | Roma | Napoli | B
+2^3 vale? | 6 | 8 | 9 | B
+Quanti bit ha un byte? | 4 | 8 | 16 | B

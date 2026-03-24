@@ -1,0 +1,13 @@
+# Ambiente Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.Python
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Editor / OS
+.DS_Store
+Thumbs.db
