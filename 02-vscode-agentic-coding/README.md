@@ -68,6 +68,105 @@ Se sei interessato solo ai livelli 0-2 (script), puoi anche saltare questo punto
 
 ---
 
+## 1.4 Installare Python (se non è presente) - per piattaforma
+
+### macOS
+
+1. Controlla se Python è già installato:
+   ```bash
+   python3 --version
+   ```
+2. Se non c’è, installa Python con Homebrew:
+   ```bash
+   brew install python
+   ```
+3. Verifica di nuovo:
+   ```bash
+   python3 --version
+   ```
+
+> Consiglio: se usi Homebrew, resta più facile mantenere comandi come `python3` e `pip`.
+
+### Windows
+
+1. Scarica e installa Python da https://www.python.org/downloads/ (scegli l’installer per Python 3).
+2. Durante l’installazione, spunta l’opzione **“Add Python to PATH”**.
+3. Verifica:
+   ```bash
+   python --version
+   ```
+   In alternativa puoi provare:
+   ```bash
+   py --version
+   ```
+
+### Linux (Debian/Ubuntu)
+
+1. Installa Python e strumenti base:
+   ```bash
+   sudo apt update
+   sudo apt install -y python3 python3-venv python3-pip
+   ```
+2. Verifica:
+   ```bash
+   python3 --version
+   ```
+
+---
+
+## 1.5 Installare e avviare Jupyter (in locale)
+
+Se hai creato il virtualenv (sezione 1.2) e hai installato:
+```bash
+pip install -r requirements-jupyter.txt
+```
+
+poi puoi avviare:
+
+### JupyterLab (consigliato)
+```bash
+jupyter lab
+```
+
+### Jupyter Notebook (alternativa)
+```bash
+jupyter notebook
+```
+
+Se vuoi avviarlo senza aprire il browser (utile quando lavori su desktop/headless):
+```bash
+jupyter lab --no-browser
+```
+
+Per i laboratori di questo repo, i notebook si trovano in `jupyter/` e il dataset in `data/`.
+
+---
+
+## 1.6 Uso da tablet/iPad (due approcci)
+
+### Approccio A (consigliato): iPad come “schermo/client”, Jupyter gira sul PC
+
+Funziona bene perché non serve “VS Code su iPad”: basta il browser.
+
+1. Avvia Jupyter **sul tuo PC** (che ha Python e dipendenze).
+2. Nella finestra/terminal del PC, Jupyter ti stampa un URL (spesso con un token).
+3. Apri quell’URL dal browser su iPad (Safari/Chrome).
+4. Lavora sulle celle, esegui, e se salvi l’`.ipynb` sul PC i cambiamenti restano.
+
+Nota: usa la stessa rete (Wi‑Fi) oppure la condivisione corretta se lavori in remoto. Non disattivare la sicurezza del token.
+
+### Approccio B: app Jupyter su iPad (nota operativa)
+
+Se vuoi eseguire notebook direttamente sull’iPad, serve un’app che:
+- apra file `.ipynb`,
+- supporti l’esecuzione di Python/Jupyter.
+
+In quel caso:
+1. apri/importa il notebook da `jupyter/`,
+2. verifica che l’app possa eseguire un kernel Python,
+3. installa/usa le librerie richieste (se supportato dall’app),
+4. in caso di mancanza librerie, conviene tornare all’approccio A.
+
 ## 2) Aprire e usare l'ambiente in VS Code / Cursor
 
 1. In VS Code/Cursor: `File -> Apri cartella` e scegli `02-vscode-agentic-coding/`.
