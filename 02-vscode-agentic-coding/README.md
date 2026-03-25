@@ -454,14 +454,34 @@ Spiega da dove parte il working directory quando eseguo il notebook in VS Code e
 
 ---
 
-## 5) Consegna (per il docente)
+## 5) Lab extra biomedico: mini-triage da dati pazienti (con prompt)
+
+Se hai finito i livelli 0–5 (o vuoi un “progettino vero” legato al settore biomedico), fai questo lab aggiuntivo.
+
+L’obiettivo è costruire un piccolo programma che:
+- carica un file CSV con dati fittizi di pazienti,
+- calcola BMI (Body Mass Index),
+- assegna una categoria di priorità basata su età, frequenza cardiaca e pressione sistolica,
+- stampa un report leggibile.
+
+Trovi i file e i prompt pronti in:
+`02-vscode-agentic-coding/biomedico_progettino_triage/`
+
+In sintesi:
+1. Apri il folder in VS Code/Cursor.
+2. Usa i prompt presenti nel suo `README.md` per far implementare all’agente funzioni specifiche.
+3. Completa i TODO e verifica con lo script `verify.py`.
+
+---
+
+## 6) Consegna (studenti)
 
 Consegna un breve testo (PDF o markdown) con:
 1. ambiente usato (editor + estensioni, versione Python),
-2. quali livelli hai completato,
-3. per ogni livello: 1 prompt esemplare + 1 difficoltà + come l'hai risolta,
-4. 1 caso in cui l'AI ha suggerito qualcosa di sbagliato/rischioso (se non succede, scrivi come avresti verificato),
-5. riflessione (max 10-15 righe) su quando l'agente aiuta e quando ostacola.
+2. quali parti hai completato (livelli 0–5 e/o lab extra biomedico),
+3. per ogni parte: 1 prompt esemplare + 1 difficoltà + come l'hai risolta,
+4. un esempio in cui l’AI ha suggerito qualcosa di sbagliato/rischioso oppure come l’hai verificato,
+5. riflessione (max 10-15 righe) su quando l’agente aiuta e quando ostacola.
 
 ---
 
