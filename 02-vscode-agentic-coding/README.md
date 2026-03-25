@@ -71,7 +71,7 @@ Se sei interessato solo ai livelli 0-2 (script), puoi anche saltare questo punto
 ## 2) Aprire e usare l'ambiente in VS Code / Cursor
 
 1. In VS Code/Cursor: `File -> Apri cartella` e scegli `02-vscode-agentic-coding/`.
-2. Apri il terminale: `Ctrl+`` su Mac `Cmd+`` `.
+2. Apri il terminale: ``Ctrl+` `` su Mac ``Cmd+` ``.
 3. Installa/usa l'estensione **Jupyter** (se richiesta dal tuo editor).
 4. Apri:
    - un file `.py` in `esercizi/` oppure `progetti_piccoli/`
