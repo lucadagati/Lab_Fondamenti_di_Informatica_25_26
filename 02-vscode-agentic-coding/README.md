@@ -1,76 +1,378 @@
-# Lab 2 – VS Code, coding assistito e percorso fino a Jupyter
+# Lab 2 - VS Code, prompting e coding in modalità agentica (fino a Jupyter)
 
-**Fondamenti di Informatica per Ingegneria Biomedica** – UniMe – A.A. 2025/26 – **Luca D’Agati**
-
-Secondo laboratorio: uso di **Visual Studio Code** (o editor equivalente) con assistente in **modalità agentica** (es. Cursor Agent, GitHub Copilot Chat su più file), e percorso graduale **da script semplici a notebook Jupyter** con dati tabellari.
-
-**Repository del corso:** [github.com/lucadagati/Lab_Fondamenti_di_Informatica_25_26](https://github.com/lucadagati/Lab_Fondamenti_di_Informatica_25_26)
+**Fondamenti di Informatica per Ingegneria Biomedica** - UniMe - A.A. 2025/26 - **Luca D'Agati**  
+**Repository del corso:** [lucadagati/Lab_Fondamenti_di_Informatica_25_26](https://github.com/lucadagati/Lab_Fondamenti_di_Informatica_25_26)
 
 ---
 
-## Cosa trovi in questa cartella
+Questo è il documento **di riferimento** del Lab 2. Contiene:
+1. installazione dei tool (quanto serve),
+2. workflow agentico ripetibile,
+3. esempi di **prompt** (copia/incolla),
+4. come eseguire i file e come verificare.
 
-| Elemento | Descrizione |
-|----------|-------------|
-| [`laboratorio_vscode_agentic.md`](laboratorio_vscode_agentic.md) | Guida completa: obiettivi, livelli 0→5, Jupyter, consegna |
-| `esercizi/` | Livello 0 – esercizi su singolo file `.py` |
-| `progetti_piccoli/` | Livelli 1–2 – micro-progetti e modulo multi-file |
-| `jupyter/` | Livelli 3–5 – notebook `.ipynb` |
-| `data/` | CSV di esempio per pandas |
-| `requirements-jupyter.txt` | Dipendenze opzionali per i notebook (pandas, matplotlib, …) |
+Se usi un assistente in “modalità agentica”, l'idea è che tu gli dia un compito con vincoli e lui proponga modifiche e/o celle; poi **tu** verifichi eseguendo.
 
 ---
 
-## Flusso consigliato
+## 0) Cosa trovi in questa cartella
 
-```mermaid
-flowchart LR
-    subgraph L0["Livello 0"]
-        A[esercizi/]
-    end
-    subgraph L1["Livelli 1-2"]
-        B[progetti_piccoli/]
-    end
-    subgraph L3["Livelli 3-5"]
-        C[jupyter/]
-    end
-    A --> B --> C
+| Cartella/File | Uso nel laboratorio |
+|---|---|
+| `esercizi/` | Livello 0: script semplici a file singolo |
+| `progetti_piccoli/` | Livelli 1-2: progetti piccoli e multi-file |
+| `jupyter/` | Livelli 3-5: notebook (`.ipynb`) con dataset |
+| `data/` | Dataset CSV usato dai notebook |
+| `requirements-jupyter.txt` | Dipendenze Python opzionali per i notebook |
+
+---
+
+## 1) Setup step-by-step (installazione tool)
+
+### 1.1 Controlla Python
+
+Nel terminale integrato di VS Code/Cursor esegui:
+
+```bash
+python3 --version
 ```
 
-Apri in VS Code / Cursor **questa cartella** (`02-vscode-agentic-coding`) come workspace e segui il file [`laboratorio_vscode_agentic.md`](laboratorio_vscode_agentic.md) dall’inizio, oppure il sottoinsieme di livelli assegnato dal docente.
+Se `python3` non esiste, prova:
 
----
+```bash
+python --version
+```
 
-## Installazione rapida (solo parte Jupyter)
+Per il resto useremo `python3` come comando.
 
-Dalla root di **questa cartella** (`02-vscode-agentic-coding`):
+### 1.2 (Consigliato) Crea un ambiente virtuale
+
+Dentro `02-vscode-agentic-coding/`:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
+```
+
+> Su Windows: `.venv\Scripts\activate`
+
+### 1.3 Installa (solo) ciò che serve per Jupyter
+
+Sempre dentro `02-vscode-agentic-coding/`:
+
+```bash
 pip install -r requirements-jupyter.txt
 ```
 
-Su Windows: `.venv\Scripts\activate` al posto di `source .venv/bin/activate`.
-
-In VS Code: estensione **Jupyter** (Microsoft), poi apri i file in `jupyter/`.
+Se sei interessato solo ai livelli 0-2 (script), puoi anche saltare questo punto.
 
 ---
 
-## Collegamento al Lab 1
+## 2) Aprire e usare l'ambiente in VS Code / Cursor
 
-Il [Lab 1](../01-crittografia-chiavi/README.md) usa principalmente **OpenSSL** da terminale. Il Lab 2 introduce **Python**, editor con AI e (opzionalmente) **Jupyter**: strumenti diversi, stessa attenzione a **non eseguire comandi** che non capisci e a **verificare** quanto suggerito dagli assistenti automatici.
-
----
-
-## Per aggiornare il README principale del repository
-
-Nel file `README.md` alla radice del repo [Lab_Fondamenti_di_Informatica_25_26](https://github.com/lucadagati/Lab_Fondamenti_di_Informatica_25_26):
-
-1. Sostituire il placeholder `02-README.md` con la cartella `02-vscode-agentic-coding/` nel diagramma e nell’albero dei file.
-2. Nella tabella “Elenco laboratori”, aggiungere la riga del Lab 2 con link a questa guida.
-3. Rimuovere o archiviare `02-README.md` se non serve più.
+1. In VS Code/Cursor: `File -> Apri cartella` e scegli `02-vscode-agentic-coding/`.
+2. Apri il terminale: `Ctrl+`` su Mac `Cmd+`` `.
+3. Installa/usa l'estensione **Jupyter** (se richiesta dal tuo editor).
+4. Apri:
+   - un file `.py` in `esercizi/` oppure `progetti_piccoli/`
+   - oppure un notebook in `jupyter/`.
 
 ---
 
-*Materiale didattico – Fondamenti di Informatica per Ingegneria Biomedica – Università degli Studi di Messina – A.A. 2025/26 – Docente: Luca D’Agati*
+## 3) Workflow agentico “da seguire sempre” (prompting didattico)
+
+Usa questo ciclo 4-step quando lavori con l'assistente. Anche se l'assistente è “agentic”, tu non devi saltare la verifica.
+
+1. **Piano**: chiedi come risolvere (senza cambiare subito il codice).
+2. **Implementa con vincoli**: chiedi modifiche mirate con regole chiare.
+3. **Esegui e controlla**: prova con input semplici e controlla l'output.
+4. **Debug/Correzione**: se fallisce, chiedi solo il fix minimo e fai riferimento all'errore osservato.
+
+### 3.1 Prompt template (copia/incolla)
+
+#### A) Piano + checklist
+
+```text
+Sei un tutor. Proponimi un piano in 5 punti per completare [OBIETTIVO].
+Vincoli:
+- [VINCOLI DI LINGUAGGIO/LIBRERIE]
+Output atteso: [OUTPUT ATTESO]
+Cosa verifico in terminale: [COMANDO TEST]
+Se manca info, fai 1 domanda sola.
+Non scrivere codice finche non confermo il piano.
+```
+
+#### B) Implementazione con vincoli
+
+```text
+Ok, implementa seguendo il piano.
+Regole:
+- Modifica SOLO i file necessari: [FILE/I].
+- Usa solo [LIBRERIE] se indicato.
+- Messaggi all'utente in italiano.
+- Aggiungi funzioni piccole e leggibili.
+- Non introdurre dipendenze esterne.
+Prima di rispondere, dimmi come verifico e quali input usare.
+```
+
+#### C) Debug assistito (quando l'esecuzione fallisce)
+
+```text
+Mi risulta un errore quando eseguo: [COMANDO].
+Output di errore (copialo qui):
+[INCIDE QUI L'OUTPUT DEL TERMINALE]
+Correggi con il fix minimo.
+Non cambiare l'obiettivo.
+Spiega in 2 righe cosa era sbagliato e come lo verifichi.
+```
+
+---
+
+## 4) Percorso “da zero a hero” (livelli 0 -> 5)
+
+Qui trovi, per ogni livello:
+- cosa fare,
+- prompt suggeriti,
+- vincoli,
+- come verificare.
+
+### Livello 0 - script singolo file (`esercizi/`)
+
+#### Esercizio 0.1 - Da specifica a programma
+
+**File:** `esercizi/es01_scaffold.py`  
+**Obiettivo:** chiedere quanti numeri inserire, leggerli e stampare media aritmetica, minimo e massimo.
+
+**Prompt iniziale (copia/incolla):**
+
+```text
+Completa `esercizi/es01_scaffold.py`.
+Obiettivo: chiedere all'utente n (intero positivo), leggere n numeri e stampare:
+- media aritmetica
+- minimo
+- massimo
+Vincoli:
+- Solo Python 3, libreria standard
+- Messaggi in italiano
+Output di esempio da verificare:
+Input: n=3, valori 10, 20, 30
+Atteso: media 20.0, min 10, max 30
+```
+
+**Verifica (terminal):**
+
+```bash
+cd esercizi
+printf "3\n10\n20\n30\n" | python3 es01_scaffold.py
+```
+
+#### Esercizio 0.2 - Refactoring (senza cambiare comportamento)
+
+**File:** `esercizi/es02_refactor_messy.py`
+
+**Prompt:**
+
+```text
+Rifattorizza `esercizi/es02_refactor_messy.py` per renderlo più leggibile:
+- nomi più chiari
+- funzioni piccole (se utili)
+- commenti solo dove servono
+Vincolo: non cambiare output con input equivalenti.
+```
+
+**Verifica:**
+
+```bash
+cd esercizi
+printf "5\n2\n4\n6\n8\n10\n" | python3 es02_refactor_messy.py
+```
+
+#### Esercizio 0.3 - Debug assistito (bisestili)
+
+**File:** `esercizi/es03_buggy.py`  
+**Obiettivo:** correggere la regola anno bisestile.
+
+**Prompt:**
+
+```text
+In `esercizi/es03_buggy.py` la funzione per l'anno bisestile è sbagliata.
+Trova l'errore e correggi.
+Regola corretta:
+- bisestile se divisibile per 4
+- eccetto se divisibile per 100
+- salvo se divisibile per 400
+Per favore:
+- prima proponi la diagnosi (senza riscrivere tutto)
+- poi fai il fix minimo
+```
+
+**Verifica:**
+
+```bash
+cd esercizi
+printf "1900\n" | python3 es03_buggy.py
+printf "2024\n" | python3 es03_buggy.py
+printf "2000\n" | python3 es03_buggy.py
+```
+
+#### Esercizio 0.4 - Prompt e vincoli (nuovo file)
+
+**Crea:** `esercizi/es04_mio.py`
+
+**Richiesta:**
+- funzione `conta_vocali(s: str) -> int` che conta le vocali italiane (a,e,i,o,u; maiuscole/minuscole),
+- `if __name__ == "__main__":` che legge una riga e stampa il risultato,
+- vincolo: niente regex, solo cicli e `if`.
+
+**Prompt iniziale:**
+
+```text
+Crea `esercizi/es04_mio.py`.
+Richiesta:
+- funzione `conta_vocali(s: str) -> int` che conta le vocali italiane
+- main: legge una riga da tastiera e stampa il numero di vocali
+Vincoli:
+- Solo libreria standard
+- Non usare regex (niente re)
+- Solo cicli e if
+```
+
+**Verifica rapida:**
+
+```bash
+cd esercizi
+printf "Ciao Mondo\n" | python3 es04_mio.py
+```
+
+---
+
+### Livelli 1-2 - progettini in `progetti_piccoli/`
+
+#### Esercizio 1 - Convertitore valute
+
+**File:** `progetti_piccoli/cambio_valuta.py`
+
+**Prompt:**
+
+```text
+Completa `progetti_piccoli/cambio_valuta.py`.
+Vincoli:
+- Usa un tasso costante definito nello scheletro (in alto nel file)
+- Implementa `eur_to_usd(eur)` e `usd_to_eur(usd)`
+- Crea un menu a ciclo che permette conversioni ripetute
+Vincolo extra: niente librerie esterne, solo Python standard.
+```
+
+**Verifica:**
+
+```bash
+python3 progetti_piccoli/cambio_valuta.py
+```
+
+#### Esercizio 2 - Quiz da file
+
+**File:** `progetti_piccoli/quiz_da_file.py` + `progetti_piccoli/domande_quiz.txt`
+
+**Prompt:**
+
+```text
+Completa `progetti_piccoli/quiz_da_file.py`:
+- parsing del file `domande_quiz.txt` (formato: domanda | A | B | C | lettera_corretta)
+- ignora righe che iniziano con '#'
+- input utente case-insensitive per A/B/C
+- conteggio punteggio e output finale
+Vincolo: se una riga è invalida, gestiscila senza crash.
+```
+
+**Verifica:** esegui e controlla che con il file fornito il punteggio sia coerente.
+
+---
+
+### Livello 2 - progetto multi-file (`progetti_piccoli/spese_modulo/`)
+
+Struttura:
+- `utilita_io.py`: parsing e aggregazione (funzioni pure, niente `input()`).
+- `main.py`: I/O (legge `spese_esempio.txt`, stampa risultati).
+
+**Esecuzione:**
+
+```bash
+cd progetti_piccoli/spese_modulo
+python3 main.py
+```
+
+**Prompt implementazione (da dare all'agente):**
+
+```text
+Completa `progetti_piccoli/spese_modulo/utilita_io.py`:
+1) `parse_riga_spesa(linea)`:
+   - formato: descrizione;importo
+   - ritorna None se vuota o invalida
+2) `totale_per_categoria(righe)`:
+   - somma importi per descrizione
+Vincoli:
+- `utilita_io.py` NON deve usare input() né stampare a schermo.
+
+Poi completa `main.py` per:
+- leggere `spese_esempio.txt`
+- stampare totale generale e totali per voce.
+
+Verifica attesa:
+- "Caffè" somma 2.50 + 1.80
+- "Trasporto" somma 5.00 + 5.00
+```
+
+---
+
+### Livelli 3-5 - Jupyter (`jupyter/`)
+
+#### Regola d'oro
+Esegui sempre dall'alto verso il basso e dopo modifiche usa:
+- `Kernel -> Restart & Run All` (quando serve).
+
+#### Notebook disponibili
+- `jupyter/00_prima_notebook.ipynb` (Markdown vs codice, mini-esercizio)
+- `jupyter/01_playground_numeri.ipynb` (calcoli in celle)
+- `jupyter/02_dati_tabella.ipynb` (pandas + colonna derivata + grafico)
+- `jupyter/03_mini_analisi_vendite.ipynb` (hero: domande, 2 figure, sintesi)
+
+#### Prompt didattici per le celle
+
+Se una cella ha `# TODO`, usa:
+
+```text
+Completa SOLO la parte con `# TODO` in questa cella.
+Non cambiare il resto del notebook.
+Se aggiungi una funzione, spiegala in una cella Markdown separata.
+```
+
+Se il notebook fallisce per percorsi file:
+
+```text
+Il notebook non trova `../data/vendite_esempio.csv`.
+Spiega da dove parte il working directory quando eseguo il notebook in VS Code e dimmi come correggere il percorso relativo.
+```
+
+---
+
+## 5) Consegna (per il docente)
+
+Consegna un breve testo (PDF o markdown) con:
+1. ambiente usato (editor + estensioni, versione Python),
+2. quali livelli hai completato,
+3. per ogni livello: 1 prompt esemplare + 1 difficoltà + come l'hai risolta,
+4. 1 caso in cui l'AI ha suggerito qualcosa di sbagliato/rischioso (se non succede, scrivi come avresti verificato),
+5. riflessione (max 10-15 righe) su quando l'agente aiuta e quando ostacola.
+
+---
+
+## 6) Regole di laboratorio (etichetta e sicurezza)
+
+- Non incollare password, token o dati personali nei prompt.
+- Non accettare comandi di terminale se non capisci cosa fanno.
+- Tratta il codice generato come bozza: correttezza e comprensione restano tue responsabilità.
+
+---
+
+*Materiale didattico - Fondamenti di Informatica per Ingegneria Biomedica - Università degli Studi di Messina - A.A. 2025/26 - Docente: Luca D'Agati*
+
