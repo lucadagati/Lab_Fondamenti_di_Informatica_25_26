@@ -192,11 +192,13 @@ Usa questo ciclo 4-step quando lavori con l'assistente. Anche se l'assistente è
 #### A) Piano + checklist
 
 ```text
-Sei un tutor. Proponimi un piano in 5 punti per completare [OBIETTIVO].
+Sei un tutor. Proponimi un piano in 5 punti per completare l’esercizio richiesto.
 Vincoli:
-- [VINCOLI DI LINGUAGGIO/LIBRERIE]
-Output atteso: [OUTPUT ATTESO]
-Cosa verifico in terminale: [COMANDO TEST]
+ - Usa solo libreria standard (se non diversamente richiesto).
+ - Messaggi all'utente in italiano.
+ - Crea soluzioni semplici, leggibili e verificabili.
+Output atteso: descrivi esattamente cosa deve stampare/eseguire il programma.
+Cosa verifico in terminale: indica un comando di test (con input) che produce l'output atteso.
 Se manca info, fai 1 domanda sola.
 Non scrivere codice finche non confermo il piano.
 ```
@@ -206,8 +208,7 @@ Non scrivere codice finche non confermo il piano.
 ```text
 Ok, implementa seguendo il piano.
 Regole:
-- Modifica SOLO i file necessari: [FILE/I].
-- Usa solo [LIBRERIE] se indicato.
+- Modifica SOLO i file necessari per completare l'obiettivo.
 - Messaggi all'utente in italiano.
 - Aggiungi funzioni piccole e leggibili.
 - Non introdurre dipendenze esterne.
@@ -217,9 +218,9 @@ Prima di rispondere, dimmi come verifico e quali input usare.
 #### C) Debug assistito (quando l'esecuzione fallisce)
 
 ```text
-Mi risulta un errore quando eseguo: [COMANDO].
+Mi risulta un errore quando eseguo il comando che mi hai suggerito (oppure lanciando lo script).
 Output di errore (copialo qui):
-[INCIDE QUI L'OUTPUT DEL TERMINALE]
+INC0LLA QUI L'OUTPUT DEL TERMINALE
 Correggi con il fix minimo.
 Non cambiare l'obiettivo.
 Spiega in 2 righe cosa era sbagliato e come lo verifichi.
