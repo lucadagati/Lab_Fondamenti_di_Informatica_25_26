@@ -1,48 +1,33 @@
-# Lab 3 - MATLAB: strutture di controllo con difficolta progressiva
+# Lab 3 - MATLAB: strutture di controllo
 
-**Fondamenti di Informatica per Ingegneria Biomedica** - UniMe - A.A. 2025/26 - **Luca D'Agati**
+**Fondamenti di Informatica per Ingegneria Biomedica** - UniMe - A.A. 2025/26
 
-Questo laboratorio e pensato per essere svolto in autonomia dagli studenti, con una progressione:
-- esercizio,
-- hint graduali,
-- confronto con soluzione.
-
----
-
-## 1) Obiettivi didattici
-
-Alla fine del lab dovresti saper:
-1. usare `if / elseif / else` per decisioni condizionali,
-2. usare `for` e `while` per iterare su dati e validare input,
-3. usare `switch / case` per selezione multipla,
-4. combinare strutture (annidamenti) in mini-problemi biomedici.
+Questo laboratorio e pronto per gli studenti: ogni esercizio include:
+- consegna,
+- hint,
+- diagramma di flusso (Mermaid),
+- file soluzione.
 
 ---
 
-## 2) Setup rapido (MATLAB o Octave)
+## 1) Setup MATLAB
 
-### MATLAB
 1. Installa MATLAB (licenza universitaria o trial).
 2. Apri MATLAB.
 3. Imposta `Current Folder` su `03-matlab-strutture-controllo`.
 
-### GNU Octave (alternativa)
-1. Installa Octave.
-2. Apri Octave.
-3. Vai nella cartella `03-matlab-strutture-controllo`.
-
 ---
 
-## 3) Come eseguire
+## 2) Come eseguire i file
 
-Dalla Command Window:
+Esempio (esercizio 1):
 
 ```matlab
 cd esercizi
 es01_bmi_classificazione
 ```
 
-Per vedere la soluzione corrispondente:
+Per vedere la soluzione:
 
 ```matlab
 cd ../soluzioni
@@ -51,171 +36,250 @@ es01_bmi_classificazione_sol
 
 ---
 
-## 4) Mappa difficolta (progressiva)
+## 3) Struttura cartelle
 
-| Livello | Esercizi | Focus | Difficolta |
-|---|---|---|---|
-| Base | 1-3 | `if`, `for`, `while` | Bassa |
-| Intermedio | 4-7 | `switch`, annidamenti, pattern numerici | Media |
-| Avanzato | 8-10 | combinazioni di controlli su dati biomedici | Medio-alta |
+- `esercizi/` -> file con `TODO`
+- `soluzioni/` -> soluzioni complete
 
 ---
 
-## 5) Diagrammi di flusso (Mermaid)
-
-### 5.1 Struttura condizionale (`if / elseif / else`)
-
-```mermaid
-flowchart TD
-    A[Leggi input] --> B{Condizione 1?}
-    B -- Si --> C[Azione 1]
-    B -- No --> D{Condizione 2?}
-    D -- Si --> E[Azione 2]
-    D -- No --> F[Azione alternativa]
-    C --> G[Fine]
-    E --> G
-    F --> G
-```
-
-### 5.2 Ciclo di validazione (`while`)
-
-```mermaid
-flowchart TD
-    A[Leggi valore] --> B{Valore valido?}
-    B -- No --> C[Messaggio errore]
-    C --> D[Leggi nuovo valore]
-    D --> B
-    B -- Si --> E[Continua programma]
-```
-
-### 5.3 Ciclo su vettore (`for`)
-
-```mermaid
-flowchart TD
-    A[Inizializza i=1 e accumulatore] --> B{i <= N?}
-    B -- Si --> C[Elabora elemento i]
-    C --> D[i = i + 1]
-    D --> B
-    B -- No --> E[Stampa risultato]
-```
-
----
-
-## 6) Esercizi guidati (testo + hint + soluzione)
+## 4) Esercizi
 
 ## Esercizio 1 - Classificazione BMI (`if/elseif/else`)
+
 - **File:** `esercizi/es01_bmi_classificazione.m`
-- **Richiesta:** calcola BMI e stampa categoria.
-- **Hint 1:** leggi `peso` e `altezza` con `input`.
-- **Hint 2:** `bmi = peso / (altezza^2)`.
-- **Hint 3:** soglie in ordine: 18.5, 25, 30.
+- **Consegna:** leggere peso/altezza, calcolare BMI e stampare categoria.
+- **Hint:** soglie in ordine (`18.5`, `25`, `30`) con `if/elseif/else`.
 - **Soluzione:** `soluzioni/es01_bmi_classificazione_sol.m`
-
-## Esercizio 2 - Media e massimo BPM (`for`)
-- **File:** `esercizi/es02_media_bpm_for.m`
-- **Richiesta:** su un vettore BPM, calcola media e massimo.
-- **Hint 1:** usa `somma = 0`, `massimo = -inf`.
-- **Hint 2:** `for i = 1:length(bpm)`.
-- **Hint 3:** aggiorna massimo con un `if`.
-- **Soluzione:** `soluzioni/es02_media_bpm_for_sol.m`
-
-## Esercizio 3 - Validazione SpO2 (`while`)
-- **File:** `esercizi/es03_input_valido_while.m`
-- **Richiesta:** accetta input solo tra 0 e 100.
-- **Hint 1:** leggi valore iniziale prima del `while`.
-- **Hint 2:** condizione: `spo2 < 0 || spo2 > 100`.
-- **Hint 3:** nel ciclo, richiedi nuovo valore.
-- **Soluzione:** `soluzioni/es03_input_valido_while_sol.m`
-
-## Esercizio 4 - Priorita triage (`switch`)
-- **File:** `esercizi/es04_priorita_switch.m`
-- **Richiesta:** mappa codici 1/2/3 in Alta/Media/Bassa.
-- **Hint 1:** usa `switch codice`.
-- **Hint 2:** aggiungi sempre `otherwise`.
-- **Soluzione:** `soluzioni/es04_priorita_switch_sol.m`
-
-## Esercizio 5 - Conteggio ipertensione (for annidati)
-- **File:** `esercizi/es05_conta_ipertensione.m`
-- **Richiesta:** conta valori sistolici `>= 140` in una matrice.
-- **Hint 1:** doppio ciclo su righe/colonne.
-- **Hint 2:** incrementa contatore con `if`.
-- **Soluzione:** `soluzioni/es05_conta_ipertensione_sol.m`
-
-## Esercizio 6 - Istogramma categorie BMI (for + if)
-- **File:** `esercizi/es06_istogramma_bmi.m`
-- **Richiesta:** dato un vettore di BMI, conta quanti pazienti per categoria.
-- **Hint 1:** quattro contatori separati.
-- **Hint 2:** usa `if/elseif/else` in un ciclo `for`.
-- **Soluzione:** `soluzioni/es06_istogramma_bmi_sol.m`
-
-## Esercizio 7 - Giorno stabile FC (while + condizione composta)
-- **File:** `esercizi/es07_stabilita_fc.m`
-- **Richiesta:** trova il primo indice dove 3 valori consecutivi di FC sono tra 60 e 100.
-- **Hint 1:** usa `while i <= length(fc)-2`.
-- **Hint 2:** condizione composta su `fc(i)`, `fc(i+1)`, `fc(i+2)`.
-- **Soluzione:** `soluzioni/es07_stabilita_fc_sol.m`
-
-## Esercizio 8 - Alert pressione per paziente (for annidato + switch)
-- **File:** `esercizi/es08_alert_pressione.m`
-- **Richiesta:** per ogni paziente calcola quante misure fuori range e stampa livello alert.
-- **Hint 1:** prima conta le anomalie per paziente.
-- **Hint 2:** converti conteggio in livello (0,1,>=2) con `switch true` o `if`.
-- **Soluzione:** `soluzioni/es08_alert_pressione_sol.m`
-
-## Esercizio 9 - Rilevazione picchi ECG semplificata (for)
-- **File:** `esercizi/es09_picchi_ecg.m`
-- **Richiesta:** conta picchi locali in un segnale (valore maggiore dei vicini e sopra soglia).
-- **Hint 1:** scorri da `2` a `length(x)-1`.
-- **Hint 2:** condizione: `x(i)>x(i-1) && x(i)>x(i+1) && x(i)>soglia`.
-- **Soluzione:** `soluzioni/es09_picchi_ecg_sol.m`
-
-## Esercizio 10 - Mini score rischio combinato (if + for + while)
-- **File:** `esercizi/es10_score_rischio_combinato.m`
-- **Richiesta:** valida input per n pazienti, calcola score e stampa classe rischio per ciascuno.
-- **Hint 1:** usa `while` per validare età non negativa.
-- **Hint 2:** score con regole incrementali (`if` multipli).
-- **Hint 3:** ciclo `for` su pazienti.
-- **Soluzione:** `soluzioni/es10_score_rischio_combinato_sol.m`
-
----
-
-## 7) Diagramma flusso esempio (Esercizio 10)
 
 ```mermaid
 flowchart TD
-    A[Inizio paziente i] --> B[Leggi eta, bpm, sistolica]
-    B --> C{Input valido?}
-    C -- No --> B
-    C -- Si --> D[score=0]
-    D --> E{eta >= 65?}
-    E -- Si --> F[score += 2]
-    E -- No --> G[continua]
-    F --> H{bpm >= 100?}
-    G --> H
-    H -- Si --> I[score += 1]
-    H -- No --> J[continua]
-    I --> K{sistolica >= 140?}
-    J --> K
-    K -- Si --> L[score += 2]
-    K -- No --> M[classifica rischio]
-    L --> M
-    M --> N[Stampa risultato]
+    A[Leggi peso e altezza] --> B[Calcola BMI]
+    B --> C{BMI < 18.5?}
+    C -- Si --> D[Stampa Sottopeso]
+    C -- No --> E{BMI < 25?}
+    E -- Si --> F[Stampa Normopeso]
+    E -- No --> G{BMI < 30?}
+    G -- Si --> H[Stampa Sovrappeso]
+    G -- No --> I[Stampa Obesita]
 ```
 
 ---
 
-## 8) Consegna studenti
+## Esercizio 2 - Media e massimo BPM (`for`)
+
+- **File:** `esercizi/es02_media_bpm_for.m`
+- **Consegna:** su un vettore BPM, calcolare media e massimo.
+- **Hint:** usa `somma`, `massimo`, ciclo `for`.
+- **Soluzione:** `soluzioni/es02_media_bpm_for_sol.m`
+
+```mermaid
+flowchart TD
+    A[Inizializza somma e massimo] --> B[for i da 1 a N]
+    B --> C[Leggi bpm(i)]
+    C --> D[Somma = Somma + bpm(i)]
+    D --> E{bpm(i) > massimo?}
+    E -- Si --> F[Aggiorna massimo]
+    E -- No --> G[Continua]
+    F --> G
+    G --> H[Fine ciclo]
+    H --> I[Calcola media]
+    I --> J[Stampa media e massimo]
+```
+
+---
+
+## Esercizio 3 - Validazione SpO2 (`while`)
+
+- **File:** `esercizi/es03_input_valido_while.m`
+- **Consegna:** accettare input solo tra `0` e `100`.
+- **Hint:** `while spo2 < 0 || spo2 > 100`.
+- **Soluzione:** `soluzioni/es03_input_valido_while_sol.m`
+
+```mermaid
+flowchart TD
+    A[Leggi SpO2] --> B{SpO2 valida 0..100?}
+    B -- No --> C[Mostra errore]
+    C --> D[Leggi nuovo valore]
+    D --> B
+    B -- Si --> E[Stampa valore accettato]
+```
+
+---
+
+## Esercizio 4 - Codice priorita (`switch`)
+
+- **File:** `esercizi/es04_priorita_switch.m`
+- **Consegna:** mappare `1/2/3` in `Alta/Media/Bassa`.
+- **Hint:** usa `switch` e `otherwise`.
+- **Soluzione:** `soluzioni/es04_priorita_switch_sol.m`
+
+```mermaid
+flowchart TD
+    A[Leggi codice] --> B{switch codice}
+    B -->|1| C[Stampa Alta]
+    B -->|2| D[Stampa Media]
+    B -->|3| E[Stampa Bassa]
+    B -->|altro| F[Stampa codice non valido]
+```
+
+---
+
+## Esercizio 5 - Conteggio ipertensione (for annidati)
+
+- **File:** `esercizi/es05_conta_ipertensione.m`
+- **Consegna:** in una matrice, contare i valori `>= 140`.
+- **Hint:** due cicli `for` e contatore.
+- **Soluzione:** `soluzioni/es05_conta_ipertensione_sol.m`
+
+```mermaid
+flowchart TD
+    A[contatore = 0] --> B[for ogni riga]
+    B --> C[for ogni colonna]
+    C --> D{valore >= 140?}
+    D -- Si --> E[contatore = contatore + 1]
+    D -- No --> F[continua]
+    E --> F
+    F --> G[prossimo elemento]
+    G --> H[Fine cicli]
+    H --> I[Stampa contatore]
+```
+
+---
+
+## Esercizio 6 - Istogramma categorie BMI
+
+- **File:** `esercizi/es06_istogramma_bmi.m`
+- **Consegna:** contare quanti BMI in ogni categoria.
+- **Hint:** 4 contatori e `if/elseif/else` nel `for`.
+- **Soluzione:** `soluzioni/es06_istogramma_bmi_sol.m`
+
+```mermaid
+flowchart TD
+    A[Inizializza 4 contatori] --> B[for su tutti i BMI]
+    B --> C{BMI < 18.5?}
+    C -- Si --> D[Incrementa sottopeso]
+    C -- No --> E{BMI < 25?}
+    E -- Si --> F[Incrementa normopeso]
+    E -- No --> G{BMI < 30?}
+    G -- Si --> H[Incrementa sovrappeso]
+    G -- No --> I[Incrementa obesita]
+    D --> J[Elemento successivo]
+    F --> J
+    H --> J
+    I --> J
+    J --> K[Stampa i 4 conteggi]
+```
+
+---
+
+## Esercizio 7 - Primo tratto stabile FC
+
+- **File:** `esercizi/es07_stabilita_fc.m`
+- **Consegna:** trovare il primo indice con 3 valori consecutivi in range `60..100`.
+- **Hint:** `while` con indice e `break` quando trovi la prima tripla valida.
+- **Soluzione:** `soluzioni/es07_stabilita_fc_sol.m`
+
+```mermaid
+flowchart TD
+    A[i=1, indice=-1] --> B{i <= N-2?}
+    B -- No --> C[Stampa indice]
+    B -- Si --> D{fc(i),fc(i+1),fc(i+2) nel range?}
+    D -- Si --> E[indice = i]
+    E --> C
+    D -- No --> F[i = i + 1]
+    F --> B
+```
+
+---
+
+## Esercizio 8 - Alert pressione per paziente
+
+- **File:** `esercizi/es08_alert_pressione.m`
+- **Consegna:** per ogni paziente contare le misure `>= 140` e stampare livello alert.
+- **Hint:** annida due `for`; poi mappa anomalie in `Basso/Medio/Alto`.
+- **Soluzione:** `soluzioni/es08_alert_pressione_sol.m`
+
+```mermaid
+flowchart TD
+    A[for ogni paziente] --> B[anomalie = 0]
+    B --> C[for ogni misura]
+    C --> D{misura >= 140?}
+    D -- Si --> E[anomalie++]
+    D -- No --> F[continua]
+    E --> F
+    F --> G[Fine misure paziente]
+    G --> H{anomalie = 0 / 1 / >=2}
+    H --> I[Stampa alert]
+    I --> J[Paziente successivo]
+```
+
+---
+
+## Esercizio 9 - Picchi ECG semplificati
+
+- **File:** `esercizi/es09_picchi_ecg.m`
+- **Consegna:** contare picchi locali sopra soglia.
+- **Hint:** ciclo da `2` a `N-1`; confronta con vicini.
+- **Soluzione:** `soluzioni/es09_picchi_ecg_sol.m`
+
+```mermaid
+flowchart TD
+    A[n_picchi = 0] --> B[for i = 2 .. N-1]
+    B --> C{x(i) > x(i-1) e x(i) > x(i+1)?}
+    C -- No --> D[continua]
+    C -- Si --> E{x(i) > soglia?}
+    E -- Si --> F[n_picchi++]
+    E -- No --> D
+    F --> D
+    D --> G[Fine ciclo]
+    G --> H[Stampa n_picchi]
+```
+
+---
+
+## Esercizio 10 - Score rischio combinato
+
+- **File:** `esercizi/es10_score_rischio_combinato.m`
+- **Consegna:** per `n` pazienti, validare input, calcolare score e classe rischio.
+- **Hint:** `while` per età valida, `if` per score incrementale, `for` sui pazienti.
+- **Soluzione:** `soluzioni/es10_score_rischio_combinato_sol.m`
+
+```mermaid
+flowchart TD
+    A[Leggi n pazienti] --> B[for p=1..n]
+    B --> C[Leggi eta]
+    C --> D{eta valida?}
+    D -- No --> C
+    D -- Si --> E[Leggi bpm e sistolica]
+    E --> F[score = 0]
+    F --> G{eta >= 65?}
+    G -- Si --> H[score += 2]
+    G -- No --> I[continua]
+    H --> J{bpm >= 100?}
+    I --> J
+    J -- Si --> K[score += 1]
+    J -- No --> L[continua]
+    K --> M{sistolica >= 140?}
+    L --> M
+    M -- Si --> N[score += 2]
+    M -- No --> O[classifica rischio]
+    N --> O
+    O --> P[Stampa risultato paziente]
+```
+
+---
+
+## 5) Consegna studenti
 
 Consegna:
 1. file completati in `esercizi/`,
-2. output (screenshot o testo) di almeno 6 esercizi, includendo almeno 2 tra 8-10,
-3. breve riflessione (8-10 righe): differenza pratica tra `for` e `while` in questo lab.
+2. output (screenshot o testo) di almeno 6 esercizi,
+3. breve riflessione (8-10 righe): differenza pratica tra `for` e `while`.
 
 ---
 
-## 9) Supporto AI (facoltativo)
-
-Prompt consigliato:
+## 6) Supporto AI (facoltativo)
 
 ```text
 Completa il file MATLAB corrente rispettando i TODO.
