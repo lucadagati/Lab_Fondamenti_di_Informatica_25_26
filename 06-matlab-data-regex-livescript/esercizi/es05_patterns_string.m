@@ -1,9 +1,15 @@
-% Esercizio 5 - Patterns: estrazione da stringhe
-% Obiettivo: estrarre nome e valore da stringhe tipo 'bpm:101', 'spo2:94'
+% Esercizio 5 - Patterns: parsing stringhe formattate
+% Obiettivo: estrarre coppie chiave-valore da stringhe tipo 'bpm:101'.
 
 righe = ["bpm:101", "spo2:94", "eta:67", "bad_format"];
 
-% TODO: usare pattern per separare chiave e numero
-% TODO: ignorare righe non valide
-% TODO: creare struct o table con risultati
+% TODO 1: definisci pattern valido con lettersPattern/digitsPattern
 
+% TODO 2: inizializza contenitori vuoti per chiavi e valori
+
+% TODO 3: ciclo sulle righe
+%   - se la riga non rispetta il pattern: salta (continue)
+%   - altrimenti separa con split(':')
+%   - salva chiave e valore
+
+% TODO 4: crea table(chiavi,valori) e visualizza
