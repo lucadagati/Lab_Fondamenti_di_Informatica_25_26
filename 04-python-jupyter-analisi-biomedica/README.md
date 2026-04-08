@@ -67,105 +67,167 @@ python3 esercizi/es01_filtra_rischio.py
 
 ## 4) Esercizi e diagrammi di flusso
 
-## Esercizio 1 - Classifica voto (`if/elif/else`)
+Ogni esercizio ha due diagrammi:
+- **Jupyter**: flusso tipico in celle
+- **Python script**: flusso tipico in `main()`/funzioni
+
+## Esercizio 1 - Classifica voto
+**Jupyter**
 ```mermaid
 flowchart TD
-    A[Leggi voto] --> B{voto < 18?}
-    B -- Si --> C[Insufficiente]
-    B -- No --> D{voto <= 24?}
-    D -- Si --> E[Sufficiente]
-    D -- No --> F{voto <= 29?}
-    F -- Si --> G[Buono]
-    F -- No --> H[Ottimo]
+    A[Cella input esempi voto] --> B[Cella funzione classifica]
+    B --> C[Cella test su lista voti]
+    C --> D[Output classi]
 ```
-
-## Esercizio 2 - Somma, media, massimo (`for`)
+**Python script**
 ```mermaid
 flowchart TD
-    A[Inizializza somma e massimo] --> B[Ciclo for]
-    B --> C[Aggiorna somma]
-    C --> D{Nuovo massimo?}
-    D --> E[Fine ciclo]
-    E --> F[Calcola media]
-    F --> G[Stampa risultati]
+    A[Leggi voto] --> B{if/elif/else}
+    B --> C[Determina classe]
+    C --> D[Stampa risultato]
 ```
 
-## Esercizio 3 - Validazione input (`while`)
+## Esercizio 2 - Somma, media, massimo
+**Jupyter**
 ```mermaid
 flowchart TD
-    A[Leggi n] --> B{n positivo?}
-    B -- No --> C[Richiedi di nuovo]
-    C --> B
-    B -- Si --> D[Stampa 1..n con while]
+    A[Cella lista numeri] --> B[Cella ciclo for]
+    B --> C[Cella calcolo media]
+    C --> D[Output finale]
+```
+**Python script**
+```mermaid
+flowchart TD
+    A[Inizializza variabili] --> B[Ciclo for]
+    B --> C[Aggiorna somma e massimo]
+    C --> D[Calcola media]
+    D --> E[Stampa]
 ```
 
-## Esercizio 4 - Conteggio vocali (stringhe)
+## Esercizio 3 - While e validazione
+**Jupyter**
+```mermaid
+flowchart TD
+    A[Cella n iniziale] --> B[Cella while validazione]
+    B --> C[Cella while stampa 1..n]
+```
+**Python script**
+```mermaid
+flowchart TD
+    A[Input n] --> B{n positivo?}
+    B -- No --> A
+    B -- Si --> C[While da 1 a n]
+    C --> D[Output]
+```
+
+## Esercizio 4 - Stringhe e vocali
+**Jupyter**
+```mermaid
+flowchart TD
+    A[Cella frase] --> B[Cella funzione conta_vocali]
+    B --> C[Cella stampa risultato]
+```
+**Python script**
 ```mermaid
 flowchart TD
     A[Leggi frase] --> B[Scorri caratteri]
-    B --> C{Vocale?}
-    C -- Si --> D[Incrementa contatore]
-    C -- No --> E[Continua]
-    D --> E
-    E --> F[Stampa totale]
+    B --> C{e vocale?}
+    C --> D[Incrementa contatore]
+    D --> E[Stampa totale]
 ```
 
-## Esercizio 5 - Ordinamento tuple
+## Esercizio 5 - Tuple e ordinamento
+**Jupyter**
 ```mermaid
 flowchart TD
-    A[Lista di tuple] --> B[Ordina per secondo elemento]
-    B --> C[Mostra lista ordinata]
+    A[Cella tuple] --> B[Cella sorted key]
+    B --> C[Output ordinato]
+```
+**Python script**
+```mermaid
+flowchart TD
+    A[Lista tuple] --> B[sorted con key]
+    B --> C[Stampa lista]
 ```
 
-## Esercizio 6 - Dizionario frequenze
+## Esercizio 6 - Dizionari frequenze
+**Jupyter**
 ```mermaid
 flowchart TD
-    A[Leggi testo] --> B[Scorri caratteri]
-    B --> C{Spazio?}
-    C -- Si --> B
-    C -- No --> D[Aggiorna dizionario]
-    D --> E[Stampa frequenze]
+    A[Cella testo] --> B[Cella loop frequenze]
+    B --> C[Cella stampa dizionario]
+```
+**Python script**
+```mermaid
+flowchart TD
+    A[Leggi testo] --> B[Loop caratteri]
+    B --> C[Aggiorna dict]
+    C --> D[Stampa]
 ```
 
-## Esercizio 7 - Filtri su lista
+## Esercizio 7 - List comprehension
+**Jupyter**
 ```mermaid
 flowchart TD
-    A[Lista iniziale] --> B[Filtra valori >= 10]
-    B --> C[Calcola quadrati]
-    C --> D[Stampa liste]
+    A[Cella lista] --> B[Cella filtro]
+    B --> C[Cella quadrati]
+    C --> D[Output]
+```
+**Python script**
+```mermaid
+flowchart TD
+    A[Lista iniziale] --> B[List comprehension filtro]
+    B --> C[List comprehension quadrati]
+    C --> D[Stampa]
 ```
 
 ## Esercizio 8 - Funzione con tuple return
+**Jupyter**
 ```mermaid
 flowchart TD
-    A[Lista numeri] --> B[Inizializza min e max]
-    B --> C[Ciclo elementi]
-    C --> D[Aggiorna min/max]
-    D --> E[Restituisci tupla]
+    A[Cella funzione min_max] --> B[Cella test lista]
+    B --> C[Output min e max]
+```
+**Python script**
+```mermaid
+flowchart TD
+    A[Definisci min_max] --> B[Loop su valori]
+    B --> C[Aggiorna min/max]
+    C --> D[Return tupla]
+    D --> E[Stampa in main]
 ```
 
-## Esercizio 9 - Menu con while
+## Esercizio 9 - Menu while
+**Jupyter**
 ```mermaid
 flowchart TD
-    A[Mostra menu] --> B[Leggi scelta]
-    B --> C{1 / 2 / 0 / altro}
-    C -->|1| D[Calcola quadrato]
-    C -->|2| E[Calcola cubo]
-    C -->|0| F[Esci]
-    C -->|altro| G[Messaggio errore]
+    A[Cella scelte simulate] --> B[Cella if/elif]
+    B --> C[Output operazioni]
+```
+**Python script**
+```mermaid
+flowchart TD
+    A[Mostra menu] --> B[Input scelta]
+    B --> C{1/2/0/altro}
+    C --> D[Azione]
     D --> A
-    E --> A
-    G --> A
 ```
 
 ## Esercizio 10 - Analisi parole
+**Jupyter**
 ```mermaid
 flowchart TD
-    A[Leggi frase] --> B[Split in parole]
-    B --> C[Conta frequenze]
-    C --> D[Calcola totale parole]
-    D --> E[Trova parola top]
-    E --> F[Stampa report]
+    A[Cella frase] --> B[Cella frequenze parole]
+    B --> C[Cella parola top]
+    C --> D[Report]
+```
+**Python script**
+```mermaid
+flowchart TD
+    A[Input frase] --> B[Split parole]
+    B --> C[Aggiorna dict frequenze]
+    C --> D[Calcola totale e top]
+    D --> E[Stampa report]
 ```
 
 ---
