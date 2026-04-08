@@ -75,10 +75,10 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[Inizializza somma e massimo] --> B[for i da 1 a N]
-    B --> C[Leggi bpm(i)]
-    C --> D[Somma = Somma + bpm(i)]
-    D --> E{bpm(i) > massimo?}
+    A[Inizializza somma e massimo] --> B[Ciclo for su vettore]
+    B --> C[Leggi valore corrente]
+    C --> D[Aggiorna somma]
+    D --> E{Valore maggiore del massimo?}
     E -- Si --> F[Aggiorna massimo]
     E -- No --> G[Continua]
     F --> G
@@ -136,7 +136,7 @@ flowchart TD
 flowchart TD
     A[contatore = 0] --> B[for ogni riga]
     B --> C[for ogni colonna]
-    C --> D{valore >= 140?}
+    C --> D{Valore sopra soglia?}
     D -- Si --> E[contatore = contatore + 1]
     D -- No --> F[continua]
     E --> F
@@ -182,9 +182,9 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[i=1, indice=-1] --> B{i <= N-2?}
+    A[Inizializza indice] --> B{Ci sono almeno tre valori?}
     B -- No --> C[Stampa indice]
-    B -- Si --> D{fc(i),fc(i+1),fc(i+2) nel range?}
+    B -- Si --> D{Tre valori consecutivi nel range?}
     D -- Si --> E[indice = i]
     E --> C
     D -- No --> F[i = i + 1]
@@ -204,12 +204,12 @@ flowchart TD
 flowchart TD
     A[for ogni paziente] --> B[anomalie = 0]
     B --> C[for ogni misura]
-    C --> D{misura >= 140?}
-    D -- Si --> E[anomalie++]
+    C --> D{Misura sopra soglia?}
+    D -- Si --> E[Aumenta conteggio anomalie]
     D -- No --> F[continua]
     E --> F
     F --> G[Fine misure paziente]
-    G --> H{anomalie = 0 / 1 / >=2}
+    G --> H{Classifica numero anomalie}
     H --> I[Stampa alert]
     I --> J[Paziente successivo]
 ```
@@ -225,11 +225,11 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[n_picchi = 0] --> B[for i = 2 .. N-1]
-    B --> C{x(i) > x(i-1) e x(i) > x(i+1)?}
+    A[n_picchi = 0] --> B[Ciclo for dal secondo al penultimo]
+    B --> C{Picco locale rispetto ai vicini?}
     C -- No --> D[continua]
-    C -- Si --> E{x(i) > soglia?}
-    E -- Si --> F[n_picchi++]
+    C -- Si --> E{Valore sopra soglia?}
+    E -- Si --> F[Aumenta conteggio picchi]
     E -- No --> D
     F --> D
     D --> G[Fine ciclo]
@@ -247,20 +247,20 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[Leggi n pazienti] --> B[for p=1..n]
+    A[Leggi numero pazienti] --> B[Ciclo for sui pazienti]
     B --> C[Leggi eta]
     C --> D{eta valida?}
     D -- No --> C
     D -- Si --> E[Leggi bpm e sistolica]
     E --> F[score = 0]
-    F --> G{eta >= 65?}
+    F --> G{Eta sopra soglia?}
     G -- Si --> H[score += 2]
     G -- No --> I[continua]
-    H --> J{bpm >= 100?}
+    H --> J{FC sopra soglia?}
     I --> J
     J -- Si --> K[score += 1]
     J -- No --> L[continua]
-    K --> M{sistolica >= 140?}
+    K --> M{Pressione sopra soglia?}
     L --> M
     M -- Si --> N[score += 2]
     M -- No --> O[classifica rischio]
