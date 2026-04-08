@@ -1,32 +1,17 @@
-from pathlib import Path
-import csv
-
+"""Soluzione esercizio 3."""
 
 def main() -> None:
-    csv_path = Path(__file__).parent.parent / "data" / "vitali_pazienti.csv"
+    n = int(input("Inserisci un intero positivo: "))
 
-    with csv_path.open(newline="", encoding="utf-8") as f:
-        rows = list(csv.DictReader(f))
+    # Validazione con while
+    while n <= 0:
+        print("Valore non valido.")
+        n = int(input("Inserisci un intero positivo: "))
 
-    # Somme iniziali
-    somma_bpm = 0
-    somma_spo2 = 0
-    somma_sistolica = 0
-
-    for r in rows:
-        somma_bpm += int(r["bpm"])
-        somma_spo2 += int(r["spo2"])
-        somma_sistolica += int(r["sistolica"])
-
-    n = len(rows)
-
-    media_bpm = somma_bpm / n
-    media_spo2 = somma_spo2 / n
-    media_sistolica = somma_sistolica / n
-
-    print(f"Media bpm: {media_bpm:.2f}")
-    print(f"Media spo2: {media_spo2:.2f}")
-    print(f"Media sistolica: {media_sistolica:.2f}")
+    i = 1
+    while i <= n:
+        print(i)
+        i += 1
 
 
 if __name__ == "__main__":

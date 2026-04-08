@@ -1,26 +1,23 @@
-from pathlib import Path
-import csv
+"""Soluzione esercizio 8."""
 
+def min_max(valori: list[int]) -> tuple[int, int]:
+    minimo = valori[0]
+    massimo = valori[0]
 
-def classe_pressione(sistolica: int) -> str:
-    # Classificazione molto semplice su 3 classi
-    if sistolica < 130:
-        return "Normale"
-    if sistolica < 140:
-        return "Pre-ipertensione"
-    return "Ipertensione"
+    for v in valori:
+        if v < minimo:
+            minimo = v
+        if v > massimo:
+            massimo = v
+
+    return minimo, massimo
 
 
 def main() -> None:
-    csv_path = Path(__file__).parent.parent / "data" / "vitali_pazienti.csv"
-
-    with csv_path.open(newline="", encoding="utf-8") as f:
-        rows = list(csv.DictReader(f))
-
-    for r in rows:
-        sistolica = int(r["sistolica"])
-        classe = classe_pressione(sistolica)
-        print(r["id"], classe)
+    nums = [4, 19, 2, 8, 11]
+    mn, mx = min_max(nums)
+    print("Minimo:", mn)
+    print("Massimo:", mx)
 
 
 if __name__ == "__main__":

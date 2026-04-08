@@ -1,9 +1,14 @@
+"""Esercizio 9: menu testuale con while e match/if."""
+
 def main() -> None:
-    # TODO: creare menu testuale con while
-    # 1) conteggio pazienti a rischio
-    # 2) media bpm
-    # 0) esci
-    raise NotImplementedError
+    while True:
+        print("1) Quadrato")
+        print("2) Cubo")
+        print("0) Esci")
+        scelta = input("Scelta: ").strip()
+
+        # TODO: gestisci le opzioni 1/2/0 e input non validi
+        raise NotImplementedError
 
 
 if __name__ == "__main__":

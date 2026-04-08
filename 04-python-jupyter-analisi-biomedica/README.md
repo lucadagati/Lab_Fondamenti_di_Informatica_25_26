@@ -1,12 +1,20 @@
-# Lab 4 - Python in Jupyter (ambiente del Lab 2)
+# Lab 4 - Programmazione Python: prima Jupyter, poi script `.py`
 
-Questo laboratorio e **interamente basato su Jupyter** e riusa l'ambiente del Lab 2.
+Questo laboratorio e orientato alle basi di programmazione:
+- strutture di controllo (`if`, `for`, `while`)
+- stringhe
+- liste
+- tuple
+- dizionari
+- funzioni
 
-Contiene 10 esercizi, ciascuno in un notebook dedicato.
+L'ordine consigliato e:
+1. **Jupyter** (`jupyter/`)
+2. **Python script** (`esercizi/`)
 
 ---
 
-## 1) Setup (stesso ambiente del Lab 2)
+## 1) Setup (riuso ambiente del Lab 2)
 
 ```bash
 cd 02-vscode-agentic-coding
@@ -20,171 +28,77 @@ Su Windows: `.venv\\Scripts\\activate`.
 
 ---
 
-## 2) Avvio Jupyter
+## 2) Parte A - Jupyter (prima)
+
+Avvio:
 
 ```bash
 jupyter lab
 ```
 
-Apri la cartella `jupyter/` e completa i notebook `es01` ... `es10`.
+Notebook esercizi (`jupyter/`):
+- `es01_filtra_rischio.ipynb` -> classifica voto con `if/elif/else`
+- `es02_score_clinico.ipynb` -> somma/media/massimo con `for`
+- `es03_medie_parametri.ipynb` -> validazione con `while`
+- `es04_conta_ipertesi.ipynb` -> stringhe e conteggio vocali
+- `es05_top3_score.ipynb` -> tuple e ordinamento
+- `es06_febbre_ipossia.ipynb` -> dizionari (frequenze)
+- `es07_fascia_eta.ipynb` -> list comprehension
+- `es08_classi_pressione.ipynb` -> funzioni con ritorno tuple
+- `es09_menu_interattivo.ipynb` -> menu con `while`/`if`
+- `es10_report_finale.ipynb` -> analisi parole (stringhe + dizionario)
 
-Le soluzioni complete in formato notebook sono in `jupyter_soluzioni/`.
+Notebook soluzioni (`jupyter_soluzioni/`):
+- `es01_filtra_rischio_sol.ipynb`
+- `es02_score_clinico_sol.ipynb`
+- `es03_medie_parametri_sol.ipynb`
+- `es04_conta_ipertesi_sol.ipynb`
+- `es05_top3_score_sol.ipynb`
+- `es06_febbre_ipossia_sol.ipynb`
+- `es07_fascia_eta_sol.ipynb`
+- `es08_classi_pressione_sol.ipynb`
+- `es09_menu_interattivo_sol.ipynb`
+- `es10_report_finale_sol.ipynb`
 
 ---
 
-## 3) Dataset
+## 3) Parte B - Python `.py` (dopo)
 
-- `data/vitali_pazienti.csv`
+Stessi temi dei notebook, ma in formato script.
 
-Campi principali:
-- `eta`, `bpm`, `spo2`, `sistolica`, `diastolica`, `temperatura`
+Esercizi:
+- `esercizi/es01_filtra_rischio.py`
+- `esercizi/es02_score_clinico.py`
+- `esercizi/es03_media_parametri.py`
+- `esercizi/es04_conta_ipertesi.py`
+- `esercizi/es05_ordinamento_score.py`
+- `esercizi/es06_flag_febbre_ipossia.py`
+- `esercizi/es07_filtra_eta_range.py`
+- `esercizi/es08_classifica_pressione.py`
+- `esercizi/es09_controllo_input_menu.py`
+- `esercizi/es10_report_finale.py`
 
----
+Soluzioni:
+- `soluzioni/es01_filtra_rischio_sol.py`
+- `soluzioni/es02_score_clinico_sol.py`
+- `soluzioni/es03_media_parametri_sol.py`
+- `soluzioni/es04_conta_ipertesi_sol.py`
+- `soluzioni/es05_ordinamento_score_sol.py`
+- `soluzioni/es06_flag_febbre_ipossia_sol.py`
+- `soluzioni/es07_filtra_eta_range_sol.py`
+- `soluzioni/es08_classifica_pressione_sol.py`
+- `soluzioni/es09_controllo_input_menu_sol.py`
+- `soluzioni/es10_report_finale_sol.py`
 
-## 4) Esercizi Jupyter
+Esecuzione esempio:
 
-## Esercizio 1 - Filtro pazienti a rischio
-- **Notebook:** `jupyter/es01_filtra_rischio.ipynb`
-- **Consegna:** identificare pazienti a rischio.
-- **Hint:** crea `flag_rischio` con condizione OR.
-
-```mermaid
-flowchart TD
-    A[Carica CSV] --> B[Valuta regole rischio]
-    B --> C[Filtra righe a rischio]
-    C --> D[Mostra ID]
-```
-
-## Esercizio 2 - Score clinico
-- **Notebook:** `jupyter/es02_score_clinico.ipynb`
-- **Consegna:** calcolare score per ogni paziente.
-- **Hint:** somma punti per ogni regola clinica.
-
-```mermaid
-flowchart TD
-    A[Carica CSV] --> B[Calcola score riga per riga]
-    B --> C[Assegna classe rischio]
-    C --> D[Stampa tabella]
-```
-
-## Esercizio 3 - Medie dei parametri vitali
-- **Notebook:** `jupyter/es03_medie_parametri.ipynb`
-- **Consegna:** calcolare medie di bpm, spo2, sistolica.
-- **Hint:** usa media di colonna (`mean`).
-
-```mermaid
-flowchart TD
-    A[Carica CSV] --> B[Seleziona colonne]
-    B --> C[Calcola medie]
-    C --> D[Stampa risultati]
-```
-
-## Esercizio 4 - Conteggio ipertesi
-- **Notebook:** `jupyter/es04_conta_ipertesi.ipynb`
-- **Consegna:** contare pazienti con sistolica alta.
-- **Hint:** filtro booleano su soglia.
-
-```mermaid
-flowchart TD
-    A[Carica CSV] --> B[Applica filtro sistolica]
-    B --> C[Conta righe]
-    C --> D[Stampa conteggio]
-```
-
-## Esercizio 5 - Top 3 score rischio
-- **Notebook:** `jupyter/es05_top3_score.ipynb`
-- **Consegna:** ordinare pazienti per score e mostrare top 3.
-- **Hint:** `sort_values` su colonna score.
-
-```mermaid
-flowchart TD
-    A[Calcola score] --> B[Ordina decrescente]
-    B --> C[Prendi prime 3 righe]
-    C --> D[Mostra risultato]
-```
-
-## Esercizio 6 - Febbre + ipossia
-- **Notebook:** `jupyter/es06_febbre_ipossia.ipynb`
-- **Consegna:** trovare pazienti con febbre e spo2 bassa.
-- **Hint:** usa condizione con AND.
-
-```mermaid
-flowchart TD
-    A[Carica CSV] --> B[Condizione febbre]
-    B --> C[Condizione ipossia]
-    C --> D[Intersezione condizioni]
-    D --> E[Mostra ID]
-```
-
-## Esercizio 7 - Fascia eta 50-75
-- **Notebook:** `jupyter/es07_fascia_eta.ipynb`
-- **Consegna:** filtrare pazienti con eta nel range richiesto.
-- **Hint:** confronto doppio su colonna eta.
-
-```mermaid
-flowchart TD
-    A[Carica CSV] --> B[Filtra eta min]
-    B --> C[Filtra eta max]
-    C --> D[Mostra pazienti]
-```
-
-## Esercizio 8 - Classificazione pressione
-- **Notebook:** `jupyter/es08_classi_pressione.ipynb`
-- **Consegna:** assegnare classe pressione a ogni paziente.
-- **Hint:** funzione di mapping su `sistolica`.
-
-```mermaid
-flowchart TD
-    A[Leggi sistolica] --> B{Soglia 1}
-    B --> C[Classe 1]
-    B --> D{Soglia 2}
-    D --> E[Classe 2]
-    D --> F[Classe 3]
-```
-
-## Esercizio 9 - Menu interattivo notebook
-- **Notebook:** `jupyter/es09_menu_interattivo.ipynb`
-- **Consegna:** creare mini menu con input utente.
-- **Hint:** ciclo `while` con scelta `1/2/0`.
-
-```mermaid
-flowchart TD
-    A[Mostra menu] --> B[Leggi scelta]
-    B --> C{Scelta}
-    C -->|1| D[Azione 1]
-    C -->|2| E[Azione 2]
-    C -->|0| F[Esci]
-    C -->|Altro| G[Errore]
-    D --> A
-    E --> A
-    G --> A
-```
-
-## Esercizio 10 - Report clinico finale
-- **Notebook:** `jupyter/es10_report_finale.ipynb`
-- **Consegna:** report con totale, rischio alto e paziente con score massimo.
-- **Hint:** combina aggregazioni + ordinamento.
-
-```mermaid
-flowchart TD
-    A[Carica CSV] --> B[Calcola score]
-    B --> C[Conta rischio alto]
-    C --> D[Trova score massimo]
-    D --> E[Stampa report]
+```bash
+python3 esercizi/es01_filtra_rischio.py
 ```
 
 ---
 
-## 5) Notebook soluzioni
+## 4) Dataset
 
-- `jupyter_soluzioni/es01_filtra_rischio_sol.ipynb`
-- `jupyter_soluzioni/es02_score_clinico_sol.ipynb`
-- `jupyter_soluzioni/es03_medie_parametri_sol.ipynb`
-- `jupyter_soluzioni/es04_conta_ipertesi_sol.ipynb`
-- `jupyter_soluzioni/es05_top3_score_sol.ipynb`
-- `jupyter_soluzioni/es06_febbre_ipossia_sol.ipynb`
-- `jupyter_soluzioni/es07_fascia_eta_sol.ipynb`
-- `jupyter_soluzioni/es08_classi_pressione_sol.ipynb`
-- `jupyter_soluzioni/es09_menu_interattivo_sol.ipynb`
-- `jupyter_soluzioni/es10_report_finale_sol.ipynb`
+`data/vitali_pazienti.csv` e mantenuto nel repo per compatibilita con i laboratori precedenti, ma in questo Lab 4 il focus e sulla programmazione generale.
 

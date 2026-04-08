@@ -1,19 +1,16 @@
-from pathlib import Path
-import csv
+"""Soluzione esercizio 4."""
+
+def conta_vocali(testo: str) -> int:
+    count = 0
+    for ch in testo.lower():
+        if ch in "aeiou":
+            count += 1
+    return count
 
 
 def main() -> None:
-    csv_path = Path(__file__).parent.parent / "data" / "vitali_pazienti.csv"
-
-    with csv_path.open(newline="", encoding="utf-8") as f:
-        rows = list(csv.DictReader(f))
-
-    contatore = 0
-    for r in rows:
-        if int(r["sistolica"]) >= 140:
-            contatore += 1
-
-    print("Pazienti con sistolica >= 140:", contatore)
+    s = input("Inserisci una frase: ")
+    print("Vocali:", conta_vocali(s))
 
 
 if __name__ == "__main__":

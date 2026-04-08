@@ -1,42 +1,27 @@
-from pathlib import Path
-import csv
+"""Soluzione esercizio 10."""
 
+def analizza_parole(frase: str) -> dict[str, int]:
+    freq: dict[str, int] = {}
 
-def score(r: dict) -> int:
-    s = 0
-    if int(r["eta"]) >= 70:
-        s += 2
-    if int(r["bpm"]) >= 100:
-        s += 1
-    if int(r["spo2"]) < 95:
-        s += 2
-    if int(r["sistolica"]) >= 140:
-        s += 2
-    if float(r["temperatura"]) >= 37.5:
-        s += 1
-    return s
+    # split su spazi + minuscole
+    for parola in frase.lower().split():
+        if parola not in freq:
+            freq[parola] = 0
+        freq[parola] += 1
+
+    return freq
 
 
 def main() -> None:
-    csv_path = Path(__file__).parent.parent / "data" / "vitali_pazienti.csv"
+    frase = input("Inserisci frase: ")
+    freq = analizza_parole(frase)
 
-    with csv_path.open(newline="", encoding="utf-8") as f:
-        rows = list(csv.DictReader(f))
+    totale_parole = sum(freq.values())
+    parola_top = max(freq, key=freq.get) if freq else ""
 
-    totale = len(rows)
-
-    rischio_alto = 0
-    for r in rows:
-        if score(r) >= 6:
-            rischio_alto += 1
-
-    top = max(rows, key=score)
-
-    print("Report finale")
-    print("============")
-    print("Totale pazienti:", totale)
-    print("Rischio alto (score >= 6):", rischio_alto)
-    print("ID score massimo:", top["id"], "score", score(top))
+    print("Totale parole:", totale_parole)
+    if parola_top:
+        print("Parola piu frequente:", parola_top, "->", freq[parola_top])
 
 
 if __name__ == "__main__":

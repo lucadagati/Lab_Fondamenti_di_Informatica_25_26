@@ -1,10 +1,10 @@
-from pathlib import Path
-import csv
-
+"""Esercizio 7: liste e list comprehension."""
 
 def main() -> None:
-    csv_path = Path(__file__).parent.parent / "data" / "vitali_pazienti.csv"
-    # TODO: stampare ID pazienti con 50 <= eta <= 75
+    valori = [12, 5, 18, 21, 4, 30, 9]
+
+    # TODO: crea una lista con soli valori >= 10
+    # TODO: stampa lista risultante
     raise NotImplementedError
 
 

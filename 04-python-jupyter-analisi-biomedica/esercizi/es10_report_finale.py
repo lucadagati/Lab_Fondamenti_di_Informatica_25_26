@@ -1,13 +1,13 @@
-from pathlib import Path
-import csv
+"""Esercizio 10: mini-progetto (stringhe + dizionari + funzioni)."""
+
+def analizza_parole(frase: str) -> dict[str, int]:
+    # TODO: restituisci frequenza parole (case-insensitive)
+    raise NotImplementedError
 
 
 def main() -> None:
-    csv_path = Path(__file__).parent.parent / "data" / "vitali_pazienti.csv"
-    # TODO: stampare report finale con:
-    # - totale pazienti
-    # - numero rischio alto (score >= 6)
-    # - id con score massimo
+    frase = input("Inserisci frase: ")
+    # TODO: stampa numero parole totali e parola più frequente
     raise NotImplementedError
 
 

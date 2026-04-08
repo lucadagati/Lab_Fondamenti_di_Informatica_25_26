@@ -1,10 +1,13 @@
-from pathlib import Path
-import csv
+"""Esercizio 4: stringhe (normalizzazione e conteggio)."""
+
+def conta_vocali(testo: str) -> int:
+    # TODO: conta a/e/i/o/u (maiuscole e minuscole)
+    raise NotImplementedError
 
 
 def main() -> None:
-    csv_path = Path(__file__).parent.parent / "data" / "vitali_pazienti.csv"
-    # TODO: contare pazienti con sistolica >= 140
+    s = input("Inserisci una frase: ")
+    # TODO: stampa numero vocali
     raise NotImplementedError
 
 

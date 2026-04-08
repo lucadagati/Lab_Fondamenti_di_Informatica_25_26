@@ -1,20 +1,21 @@
-from pathlib import Path
-import csv
+"""Soluzione esercizio 6."""
+
+def frequenze_caratteri(testo: str) -> dict[str, int]:
+    freq: dict[str, int] = {}
+
+    for ch in testo.lower():
+        if ch == " ":
+            continue
+        if ch not in freq:
+            freq[ch] = 0
+        freq[ch] += 1
+
+    return freq
 
 
 def main() -> None:
-    csv_path = Path(__file__).parent.parent / "data" / "vitali_pazienti.csv"
-
-    with csv_path.open(newline="", encoding="utf-8") as f:
-        rows = list(csv.DictReader(f))
-
-    print("Pazienti con febbre e ipossia:")
-    for r in rows:
-        febbre = float(r["temperatura"]) >= 37.5
-        ipossia = int(r["spo2"]) < 95
-
-        if febbre and ipossia:
-            print("-", r["id"])
+    s = input("Inserisci testo: ")
+    print(frequenze_caratteri(s))
 
 
 if __name__ == "__main__":

@@ -1,15 +1,10 @@
-from pathlib import Path
-import csv
-
-
-def score(p: dict) -> int:
-    # TODO: stessa logica score esercizio 2
-    raise NotImplementedError
-
+"""Esercizio 5: tuple (ordinamento per secondo elemento)."""
 
 def main() -> None:
-    csv_path = Path(__file__).parent.parent / "data" / "vitali_pazienti.csv"
-    # TODO: ordinare pazienti per score decrescente e stampare top 3
+    coppie = [("Luca", 3), ("Anna", 1), ("Marta", 2)]
+
+    # TODO: ordina le tuple per il numero (secondo elemento)
+    # TODO: stampa la lista ordinata
     raise NotImplementedError
 
 

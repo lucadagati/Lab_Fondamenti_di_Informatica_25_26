@@ -1,10 +1,10 @@
-from pathlib import Path
-import csv
-
+"""Esercizio 3: ciclo while e validazione input."""
 
 def main() -> None:
-    csv_path = Path(__file__).parent.parent / "data" / "vitali_pazienti.csv"
-    # TODO: calcolare media di bpm, spo2 e sistolica
+    n = int(input("Inserisci un intero positivo: "))
+
+    # TODO: ripeti la richiesta finché n <= 0
+    # TODO: stampa i numeri da 1 a n usando while
     raise NotImplementedError
 
 

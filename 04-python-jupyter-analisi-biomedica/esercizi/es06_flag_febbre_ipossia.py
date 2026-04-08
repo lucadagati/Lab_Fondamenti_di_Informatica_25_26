@@ -1,10 +1,13 @@
-from pathlib import Path
-import csv
+"""Esercizio 6: dizionari e frequenze di caratteri."""
+
+def frequenze_caratteri(testo: str) -> dict[str, int]:
+    # TODO: restituisci un dizionario char->conteggio (ignora spazi)
+    raise NotImplementedError
 
 
 def main() -> None:
-    csv_path = Path(__file__).parent.parent / "data" / "vitali_pazienti.csv"
-    # TODO: stampare ID pazienti con temperatura >= 37.5 e spo2 < 95
+    s = input("Inserisci testo: ")
+    # TODO: stampa il dizionario frequenze
     raise NotImplementedError
 
 

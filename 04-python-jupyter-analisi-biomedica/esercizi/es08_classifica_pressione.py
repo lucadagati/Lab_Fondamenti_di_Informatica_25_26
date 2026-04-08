@@ -1,15 +1,13 @@
-from pathlib import Path
-import csv
+"""Esercizio 8: funzioni + tuple return."""
 
-
-def classe_pressione(sistolica: int) -> str:
-    # TODO: Normale (<130), Pre-ipertensione (130-139), Ipertensione (>=140)
+def min_max(valori: list[int]) -> tuple[int, int]:
+    # TODO: restituisci minimo e massimo
     raise NotImplementedError
 
 
 def main() -> None:
-    csv_path = Path(__file__).parent.parent / "data" / "vitali_pazienti.csv"
-    # TODO: stampare id e classe pressione
+    nums = [4, 19, 2, 8, 11]
+    # TODO: usa min_max e stampa risultato
     raise NotImplementedError
 
 
