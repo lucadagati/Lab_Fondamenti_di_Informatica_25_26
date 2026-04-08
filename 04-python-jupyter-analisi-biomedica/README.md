@@ -86,11 +86,11 @@ flowchart TD
 **Python script**
 ```mermaid
 flowchart TD
-    A[Input voto] --> B{voto < 18?}
+    A[Input voto] --> B{Controllo soglia 18}
     B -- Si --> C[classe=Insufficiente]
-    B -- No --> D{voto <= 24?}
+    B -- No --> D{Controllo soglia 24}
     D -- Si --> E[classe=Sufficiente]
-    D -- No --> F{voto <= 29?}
+    D -- No --> F{Controllo soglia 29}
     F -- Si --> G[classe=Buono]
     F -- No --> H[classe=Ottimo]
     C --> I[Stampa classe]
@@ -114,13 +114,13 @@ flowchart TD
 ```mermaid
 flowchart TD
     A[Inizializza somma e massimo] --> B[Ciclo for su numeri]
-    B --> C[Somma += valore]
-    C --> D{valore > massimo?}
+    B --> C[Aggiorna somma]
+    C --> D{Valore maggiore del massimo}
     D -- Si --> E[aggiorna massimo]
     D -- No --> F[continua]
     E --> F
     F --> G[Fine ciclo]
-    G --> H[media = somma / n]
+    G --> H[Calcola media]
     H --> I[Stampa risultati]
 ```
 
@@ -137,11 +137,11 @@ flowchart TD
 **Python script**
 ```mermaid
 flowchart TD
-    A[Input n] --> B{n > 0?}
+    A[Input n] --> B{Numero positivo}
     B -- No --> A
     B -- Si --> C[i=1]
-    C --> D{i <= n?}
-    D -- Si --> E[stampa i e i=i+1]
+    C --> D{Indice entro limite}
+    D -- Si --> E[Stampa i e incrementa]
     E --> D
     D -- No --> F[Fine]
 ```
@@ -159,10 +159,10 @@ flowchart TD
 **Python script**
 ```mermaid
 flowchart TD
-    A[Input frase] --> B[frase.lower()]
+    A[Input frase] --> B[Converti in minuscolo]
     B --> C[Ciclo caratteri]
-    C --> D{carattere in aeiou?}
-    D -- Si --> E[contatore += 1]
+    C --> D{Carattere e vocale}
+    D -- Si --> E[Incrementa contatore]
     D -- No --> F[continua]
     E --> F
     F --> G[Stampa contatore]
@@ -200,9 +200,9 @@ flowchart TD
     A[Input testo] --> B[Ciclo su caratteri]
     B --> C{spazio?}
     C -- Si --> B
-    C -- No --> D{chiave presente?}
-    D -- No --> E[inserisci chiave=0]
-    D -- Si --> F[incrementa frequenza]
+    C -- No --> D{Chiave gia presente}
+    D -- No --> E[Inizializza frequenza]
+    D -- Si --> F[Incrementa frequenza]
     E --> F
     F --> G[Stampa dizionario]
 ```
@@ -238,9 +238,9 @@ flowchart TD
 ```mermaid
 flowchart TD
     A[Definisci min e max iniziali] --> B[Ciclo su valori]
-    B --> C{valore < min?}
+    B --> C{Valore minore del minimo}
     C -- Si --> D[aggiorna min]
-    C -- No --> E{valore > max?}
+    C -- No --> E{Valore maggiore del massimo}
     D --> E
     E -- Si --> F[aggiorna max]
     E -- No --> G[continua]
@@ -262,8 +262,8 @@ flowchart TD
 flowchart TD
     A[Mostra menu] --> B[Input scelta]
     B --> C{scelta}
-    C -->|1| D[leggi n e stampa n^2]
-    C -->|2| E[leggi n e stampa n^3]
+    C -->|1| D[Leggi n e stampa quadrato]
+    C -->|2| E[Leggi n e stampa cubo]
     C -->|0| F[break]
     C -->|altro| G[stampa errore]
     D --> A
@@ -285,11 +285,11 @@ flowchart TD
 **Python script**
 ```mermaid
 flowchart TD
-    A[Input frase] --> B[parole = frase.lower().split()]
+    A[Input frase] --> B[Dividi frase in parole]
     B --> C[Ciclo su parole]
     C --> D[Aggiorna dizionario frequenze]
-    D --> E[totale = somma frequenze]
-    E --> F[top = max frequenze]
+    D --> E[Calcola totale parole]
+    E --> F[Trova parola piu frequente]
     F --> G[Stampa report]
 ```
 
