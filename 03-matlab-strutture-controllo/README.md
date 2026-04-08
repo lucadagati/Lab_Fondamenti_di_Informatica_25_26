@@ -277,19 +277,3 @@ Consegna:
 2. output (screenshot o testo) di almeno 6 esercizi,
 3. breve riflessione (8-10 righe): differenza pratica tra `for` e `while`.
 
----
-
-## 6) Supporto AI (facoltativo)
-
-```text
-Completa il file MATLAB corrente rispettando i TODO.
-Vincoli:
-- usa solo le strutture richieste dall'esercizio
-- non cambiare nomi variabili gia presenti
-- non usare toolbox esterni
-Alla fine indica:
-1) come eseguire il file
-2) un input di test
-3) output atteso
-```
-

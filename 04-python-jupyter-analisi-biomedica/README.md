@@ -1,11 +1,8 @@
-# Lab 4 - Python con Jupyter (ambiente del Lab 2)
+# Lab 4 - Python in Jupyter (ambiente del Lab 2)
 
-Questo laboratorio riusa l'ambiente Python/Jupyter del Lab 2 e contiene **10 esercizi**.
-Ogni esercizio include:
-- consegna,
-- hint,
-- diagramma di flusso Mermaid,
-- file soluzione.
+Questo laboratorio e **interamente basato su Jupyter** e riusa l'ambiente del Lab 2.
+
+Contiene 10 esercizi, ciascuno in un notebook dedicato.
 
 ---
 
@@ -23,189 +20,154 @@ Su Windows: `.venv\\Scripts\\activate`.
 
 ---
 
-## 2) Struttura
+## 2) Avvio Jupyter
 
-- `data/vitali_pazienti.csv`
-- `esercizi/`
-- `soluzioni/`
-- `jupyter/`
+```bash
+jupyter lab
+```
+
+Apri la cartella `jupyter/` e completa i notebook `es01` ... `es10`.
 
 ---
 
-## 3) Esercizi Python
+## 3) Dataset
+
+- `data/vitali_pazienti.csv`
+
+Campi principali:
+- `eta`, `bpm`, `spo2`, `sistolica`, `diastolica`, `temperatura`
+
+---
+
+## 4) Esercizi Jupyter
 
 ## Esercizio 1 - Filtro pazienti a rischio
-- **File:** `esercizi/es01_filtra_rischio.py`
-- **Consegna:** stampa gli ID dei pazienti a rischio.
-- **Hint:** usa `csv.DictReader` + funzione booleana `paziente_a_rischio`.
-- **Soluzione:** `soluzioni/es01_filtra_rischio_sol.py`
+- **Notebook:** `jupyter/es01_filtra_rischio.ipynb`
+- **Consegna:** identificare pazienti a rischio.
+- **Hint:** crea `flag_rischio` con condizione OR.
 
 ```mermaid
 flowchart TD
-    A[Carica CSV] --> B[Scorri pazienti]
-    B --> C{Rischio?}
-    C -- Si --> D[Stampa ID]
-    C -- No --> E[Prossimo paziente]
-    D --> E
+    A[Carica CSV] --> B[Valuta regole rischio]
+    B --> C[Filtra righe a rischio]
+    C --> D[Mostra ID]
 ```
 
-## Esercizio 2 - Score clinico e classe rischio
-- **File:** `esercizi/es02_score_clinico.py`
-- **Consegna:** calcola score e classe per ogni paziente.
-- **Hint:** funzione `score_clinico` + `classe_rischio`.
-- **Soluzione:** `soluzioni/es02_score_clinico_sol.py`
+## Esercizio 2 - Score clinico
+- **Notebook:** `jupyter/es02_score_clinico.ipynb`
+- **Consegna:** calcolare score per ogni paziente.
+- **Hint:** somma punti per ogni regola clinica.
 
 ```mermaid
 flowchart TD
-    A[Carica CSV] --> B[Per ogni paziente]
-    B --> C[Calcola score]
-    C --> D[Assegna classe]
-    D --> E[Stampa riga report]
+    A[Carica CSV] --> B[Calcola score riga per riga]
+    B --> C[Assegna classe rischio]
+    C --> D[Stampa tabella]
 ```
 
-## Esercizio 3 - Medie parametri vitali
-- **File:** `esercizi/es03_media_parametri.py`
-- **Consegna:** calcola medie di `bpm`, `spo2`, `sistolica`.
-- **Hint:** somma colonne e dividi per numero righe.
-- **Soluzione:** `soluzioni/es03_media_parametri_sol.py`
+## Esercizio 3 - Medie dei parametri vitali
+- **Notebook:** `jupyter/es03_medie_parametri.ipynb`
+- **Consegna:** calcolare medie di bpm, spo2, sistolica.
+- **Hint:** usa media di colonna (`mean`).
 
 ```mermaid
 flowchart TD
-    A[Carica CSV] --> B[Inizializza somme]
-    B --> C[Scorri righe]
-    C --> D[Aggiorna somme]
-    D --> E[Calcola medie]
-    E --> F[Stampa medie]
+    A[Carica CSV] --> B[Seleziona colonne]
+    B --> C[Calcola medie]
+    C --> D[Stampa risultati]
 ```
 
-## Esercizio 4 - Conteggio pazienti ipertesi
-- **File:** `esercizi/es04_conta_ipertesi.py`
-- **Consegna:** conta pazienti con `sistolica >= 140`.
-- **Hint:** contatore + `if` nel ciclo.
-- **Soluzione:** `soluzioni/es04_conta_ipertesi_sol.py`
+## Esercizio 4 - Conteggio ipertesi
+- **Notebook:** `jupyter/es04_conta_ipertesi.ipynb`
+- **Consegna:** contare pazienti con sistolica alta.
+- **Hint:** filtro booleano su soglia.
 
 ```mermaid
 flowchart TD
-    A[Carica CSV] --> B[contatore = 0]
-    B --> C[Scorri pazienti]
-    C --> D{Sistolica alta?}
-    D -- Si --> E[contatore += 1]
-    D -- No --> F[continua]
-    E --> F
-    F --> G[Stampa contatore]
+    A[Carica CSV] --> B[Applica filtro sistolica]
+    B --> C[Conta righe]
+    C --> D[Stampa conteggio]
 ```
 
-## Esercizio 5 - Ordinamento per score
-- **File:** `esercizi/es05_ordinamento_score.py`
-- **Consegna:** ordina pazienti per score decrescente e stampa top 3.
-- **Hint:** `sorted(..., key=..., reverse=True)`.
-- **Soluzione:** `soluzioni/es05_ordinamento_score_sol.py`
+## Esercizio 5 - Top 3 score rischio
+- **Notebook:** `jupyter/es05_top3_score.ipynb`
+- **Consegna:** ordinare pazienti per score e mostrare top 3.
+- **Hint:** `sort_values` su colonna score.
 
 ```mermaid
 flowchart TD
-    A[Carica CSV] --> B[Calcola score per paziente]
-    B --> C[Ordina per score desc]
-    C --> D[Prendi primi 3]
-    D --> E[Stampa top 3]
+    A[Calcola score] --> B[Ordina decrescente]
+    B --> C[Prendi prime 3 righe]
+    C --> D[Mostra risultato]
 ```
 
-## Esercizio 6 - Flag febbre + ipossia
-- **File:** `esercizi/es06_flag_febbre_ipossia.py`
-- **Consegna:** stampa ID con `temperatura >= 37.5` e `spo2 < 95`.
-- **Hint:** condizione con `and`.
-- **Soluzione:** `soluzioni/es06_flag_febbre_ipossia_sol.py`
+## Esercizio 6 - Febbre + ipossia
+- **Notebook:** `jupyter/es06_febbre_ipossia.ipynb`
+- **Consegna:** trovare pazienti con febbre e spo2 bassa.
+- **Hint:** usa condizione con AND.
 
 ```mermaid
 flowchart TD
-    A[Carica CSV] --> B[Scorri pazienti]
-    B --> C{Febbre e ipossia?}
-    C -- Si --> D[Stampa ID]
-    C -- No --> E[Prossimo]
-    D --> E
+    A[Carica CSV] --> B[Condizione febbre]
+    B --> C[Condizione ipossia]
+    C --> D[Intersezione condizioni]
+    D --> E[Mostra ID]
 ```
 
-## Esercizio 7 - Filtro fascia d'eta
-- **File:** `esercizi/es07_filtra_eta_range.py`
-- **Consegna:** stampa ID con `50 <= eta <= 75`.
-- **Hint:** condizione composta con doppio confronto.
-- **Soluzione:** `soluzioni/es07_filtra_eta_range_sol.py`
+## Esercizio 7 - Fascia eta 50-75
+- **Notebook:** `jupyter/es07_fascia_eta.ipynb`
+- **Consegna:** filtrare pazienti con eta nel range richiesto.
+- **Hint:** confronto doppio su colonna eta.
 
 ```mermaid
 flowchart TD
-    A[Carica CSV] --> B[Scorri pazienti]
-    B --> C{Eta nel range?}
-    C -- Si --> D[Stampa ID]
-    C -- No --> E[Prossimo]
-    D --> E
+    A[Carica CSV] --> B[Filtra eta min]
+    B --> C[Filtra eta max]
+    C --> D[Mostra pazienti]
 ```
 
-## Esercizio 8 - Classifica pressione sistolica
-- **File:** `esercizi/es08_classifica_pressione.py`
-- **Consegna:** classifica ogni paziente in `Normale`, `Pre-ipertensione`, `Ipertensione`.
-- **Hint:** funzione separata `classe_pressione`.
-- **Soluzione:** `soluzioni/es08_classifica_pressione_sol.py`
+## Esercizio 8 - Classificazione pressione
+- **Notebook:** `jupyter/es08_classi_pressione.ipynb`
+- **Consegna:** assegnare classe pressione a ogni paziente.
+- **Hint:** funzione di mapping su `sistolica`.
 
 ```mermaid
 flowchart TD
-    A[Leggi sistolica] --> B{<130?}
-    B -- Si --> C[Normale]
-    B -- No --> D{<140?}
-    D -- Si --> E[Pre-ipertensione]
-    D -- No --> F[Ipertensione]
+    A[Leggi sistolica] --> B{Soglia 1}
+    B --> C[Classe 1]
+    B --> D{Soglia 2}
+    D --> E[Classe 2]
+    D --> F[Classe 3]
 ```
 
-## Esercizio 9 - Menu testuale con controllo input
-- **File:** `esercizi/es09_controllo_input_menu.py`
-- **Consegna:** crea menu `1/2/0` con `while`.
-- **Hint:** `while True` + `if/elif/else` + `break`.
-- **Soluzione:** `soluzioni/es09_controllo_input_menu_sol.py`
+## Esercizio 9 - Menu interattivo notebook
+- **Notebook:** `jupyter/es09_menu_interattivo.ipynb`
+- **Consegna:** creare mini menu con input utente.
+- **Hint:** ciclo `while` con scelta `1/2/0`.
 
 ```mermaid
 flowchart TD
     A[Mostra menu] --> B[Leggi scelta]
-    B --> C{Scelta valida?}
-    C -- 1 --> D[Mostra conteggio rischio]
-    C -- 2 --> E[Mostra media bpm]
-    C -- 0 --> F[Esci]
-    C -- Altro --> G[Messaggio errore]
+    B --> C{Scelta}
+    C -->|1| D[Azione 1]
+    C -->|2| E[Azione 2]
+    C -->|0| F[Esci]
+    C -->|Altro| G[Errore]
     D --> A
     E --> A
     G --> A
 ```
 
 ## Esercizio 10 - Report clinico finale
-- **File:** `esercizi/es10_report_finale.py`
-- **Consegna:** stampa totale pazienti, numero rischio alto, ID con score massimo.
-- **Hint:** funzione score + `max(..., key=...)`.
-- **Soluzione:** `soluzioni/es10_report_finale_sol.py`
+- **Notebook:** `jupyter/es10_report_finale.ipynb`
+- **Consegna:** report con totale, rischio alto e paziente con score massimo.
+- **Hint:** combina aggregazioni + ordinamento.
 
 ```mermaid
 flowchart TD
-    A[Carica CSV] --> B[Calcola score per tutti]
-    B --> C[Conta score alti]
+    A[Carica CSV] --> B[Calcola score]
+    B --> C[Conta rischio alto]
     C --> D[Trova score massimo]
-    D --> E[Stampa report finale]
+    D --> E[Stampa report]
 ```
-
----
-
-## 4) Notebook Jupyter
-
-- `jupyter/01_esplorazione_vitali.ipynb`
-- `jupyter/02_score_clinico.ipynb`
-
-Avvio:
-
-```bash
-jupyter lab
-```
-
----
-
-## 5) Consegna studenti
-
-Consegna:
-1. almeno 8 script completati su 10,
-2. notebook completati,
-3. nota breve (6-8 righe) sulle differenze tra `.py` e `.ipynb`.
 
