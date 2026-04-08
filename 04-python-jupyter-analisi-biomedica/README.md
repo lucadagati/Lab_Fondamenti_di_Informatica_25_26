@@ -170,7 +170,7 @@ flowchart TD
 
 ## Esercizio 5 - Tuple e ordinamento
 **Consegna:** ordina una lista di tuple `(nome, punteggio)` per punteggio crescente.  
-**Hint:** `sorted(..., key=lambda t: t[1])`.
+**Hint:** usa un ordinamento esplicito confrontando il secondo elemento delle tuple.
 **Jupyter**
 ```mermaid
 flowchart TD
@@ -207,9 +207,9 @@ flowchart TD
     F --> G[Stampa dizionario]
 ```
 
-## Esercizio 7 - List comprehension
+## Esercizio 7 - Filtri su lista con ciclo
 **Consegna:** da una lista numerica, crea lista filtrata (`>=10`) e lista dei quadrati dei filtrati.  
-**Hint:** usa due comprehension separate.
+**Hint:** usa cicli `for` e `append`.
 **Jupyter**
 ```mermaid
 flowchart TD
@@ -220,8 +220,8 @@ flowchart TD
 **Python script**
 ```mermaid
 flowchart TD
-    A[Lista input] --> B[comprehension filtro]
-    B --> C[comprehension quadrati]
+    A[Lista input] --> B[Ciclo filtro con append]
+    B --> C[Ciclo quadrati con append]
     C --> D[Stampa entrambe]
 ```
 

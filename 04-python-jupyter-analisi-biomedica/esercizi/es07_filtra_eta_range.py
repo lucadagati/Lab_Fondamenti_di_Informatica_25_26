@@ -1,4 +1,4 @@
-"""Esercizio 7: liste e list comprehension."""
+"""Esercizio 7: liste e filtro con ciclo for."""
 
 def main() -> None:
     valori = [12, 5, 18, 21, 4, 30, 9]
