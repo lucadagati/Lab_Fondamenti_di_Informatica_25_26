@@ -137,14 +137,26 @@ flowchart TD
 ## Esercizio 5 - Tuple e ordinamento
 **Consegna:** ordina una lista di tuple `(nome, punteggio)` per punteggio crescente.  
 **Hint:** usa un ordinamento esplicito confrontando il secondo elemento delle tuple.
-**Diagramma di flusso:**
 ```mermaid
 flowchart TD
-    A[Lista tuple] --> B[Imposta indice iniziale]
-    B --> C[Scansione per minimo residuo]
-    C --> D[Scambio elementi]
-    D --> E[Ripeti finche ordinato]
-    E --> F[Stampa lista]
+    A[Lista tuple] --> B[i = 0]
+    B --> C{i < n-1}
+    C -- No --> D[Stampa lista ordinata]
+    C -- Si --> E[min_idx = i]
+    E --> F[j = i + 1]
+    F --> G{j < n}
+    G -- No --> H{min_idx diverso da i}
+    G -- Si --> I{coppie[j][1] minore di coppie[min_idx][1]}
+    I -- Si --> J[min_idx = j]
+    I -- No --> K[nessun cambio]
+    J --> L[j = j + 1]
+    K --> L
+    L --> G
+    H -- Si --> M[Scambia coppie[i] e coppie[min_idx]]
+    H -- No --> N[nessuno scambio]
+    M --> O[i = i + 1]
+    N --> O
+    O --> C
 ```
 
 ## Esercizio 6 - Dizionari frequenze
@@ -165,12 +177,21 @@ flowchart TD
 ## Esercizio 7 - Filtri su lista con ciclo
 **Consegna:** da una lista numerica, crea lista filtrata (`>=10`) e lista dei quadrati dei filtrati.  
 **Hint:** usa cicli `for` e `append`.
-**Diagramma di flusso:**
 ```mermaid
 flowchart TD
-    A[Lista input] --> B[Ciclo filtro con append]
-    B --> C[Ciclo quadrati con append]
-    C --> D[Stampa entrambe]
+    A[Lista input] --> B[filtrati lista vuota]
+    B --> C[Ciclo su lista input]
+    C --> D{valore >= 10}
+    D -- Si --> E[Aggiungi valore a filtrati]
+    D -- No --> F[Salta valore]
+    E --> G[Elemento successivo]
+    F --> G
+    G --> H[quadrati lista vuota]
+    H --> I[Ciclo su filtrati]
+    I --> J[calcola quadrato]
+    J --> K[Aggiungi quadrato a quadrati]
+    K --> L[Elemento successivo]
+    L --> M[Stampa filtrati e quadrati]
 ```
 
 ## Esercizio 8 - Funzione con tuple return
@@ -208,15 +229,24 @@ flowchart TD
 ## Esercizio 10 - Analisi parole
 **Consegna:** conta frequenze parole in una frase, poi stampa totale parole e parola più frequente.  
 **Hint:** usa `split()`, dizionario e `max(freq, key=freq.get)`.
-**Diagramma di flusso:**
 ```mermaid
 flowchart TD
-    A[Input frase] --> B[Dividi frase in parole]
-    B --> C[Ciclo su parole]
-    C --> D[Aggiorna dizionario frequenze]
-    D --> E[Calcola totale parole]
-    E --> F[Trova parola piu frequente]
-    F --> G[Stampa report]
+    A[Input frase] --> B[Converti in minuscolo]
+    B --> C[Split in parole]
+    C --> D[freq dizionario vuoto]
+    D --> E[Ciclo su parole]
+    E --> F{Parola presente in freq}
+    F -- No --> G[Inizializza frequenza a zero]
+    F -- Si --> H[Parola gia presente]
+    G --> I[Incrementa frequenza]
+    H --> I
+    I --> J[Prossima parola]
+    J --> K[Calcola totale parole]
+    K --> L{Dizionario non vuoto}
+    L -- Si --> M[Trova parola piu frequente]
+    L -- No --> N[Parola top vuota]
+    M --> O[Stampa report]
+    N --> O
 ```
 
 ---
