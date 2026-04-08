@@ -28,6 +28,8 @@ jupyter lab
 
 Apri la cartella `jupyter/` e completa i notebook `es01` ... `es10`.
 
+Le soluzioni complete in formato notebook sono in `jupyter_soluzioni/`.
+
 ---
 
 ## 3) Dataset
@@ -170,4 +172,19 @@ flowchart TD
     C --> D[Trova score massimo]
     D --> E[Stampa report]
 ```
+
+---
+
+## 5) Notebook soluzioni
+
+- `jupyter_soluzioni/es01_filtra_rischio_sol.ipynb`
+- `jupyter_soluzioni/es02_score_clinico_sol.ipynb`
+- `jupyter_soluzioni/es03_medie_parametri_sol.ipynb`
+- `jupyter_soluzioni/es04_conta_ipertesi_sol.ipynb`
+- `jupyter_soluzioni/es05_top3_score_sol.ipynb`
+- `jupyter_soluzioni/es06_febbre_ipossia_sol.ipynb`
+- `jupyter_soluzioni/es07_fascia_eta_sol.ipynb`
+- `jupyter_soluzioni/es08_classi_pressione_sol.ipynb`
+- `jupyter_soluzioni/es09_menu_interattivo_sol.ipynb`
+- `jupyter_soluzioni/es10_report_finale_sol.ipynb`
 
