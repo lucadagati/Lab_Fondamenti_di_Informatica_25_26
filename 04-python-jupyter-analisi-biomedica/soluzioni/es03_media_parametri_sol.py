@@ -4,16 +4,29 @@ import csv
 
 def main() -> None:
     csv_path = Path(__file__).parent.parent / "data" / "vitali_pazienti.csv"
-    rows=[]
+
     with csv_path.open(newline="", encoding="utf-8") as f:
-        rows=list(csv.DictReader(f))
-    n=len(rows)
-    mbpm=sum(int(r["bpm"]) for r in rows)/n
-    mspo2=sum(int(r["spo2"]) for r in rows)/n
-    msis=sum(int(r["sistolica"]) for r in rows)/n
-    print(f"Media bpm: {mbpm:.2f}")
-    print(f"Media spo2: {mspo2:.2f}")
-    print(f"Media sistolica: {msis:.2f}")
+        rows = list(csv.DictReader(f))
+
+    # Somme iniziali
+    somma_bpm = 0
+    somma_spo2 = 0
+    somma_sistolica = 0
+
+    for r in rows:
+        somma_bpm += int(r["bpm"])
+        somma_spo2 += int(r["spo2"])
+        somma_sistolica += int(r["sistolica"])
+
+    n = len(rows)
+
+    media_bpm = somma_bpm / n
+    media_spo2 = somma_spo2 / n
+    media_sistolica = somma_sistolica / n
+
+    print(f"Media bpm: {media_bpm:.2f}")
+    print(f"Media spo2: {media_spo2:.2f}")
+    print(f"Media sistolica: {media_sistolica:.2f}")
 
 
 if __name__ == "__main__":
