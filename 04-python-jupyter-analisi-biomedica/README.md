@@ -146,13 +146,13 @@ flowchart TD
     E --> F[j = i + 1]
     F --> G{j < n}
     G -- No --> H{min_idx diverso da i}
-    G -- Si --> I{coppie[j][1] minore di coppie[min_idx][1]}
+    G -- Si --> I{Punteggio in posizione j minore del minimo corrente}
     I -- Si --> J[min_idx = j]
     I -- No --> K[nessun cambio]
     J --> L[j = j + 1]
     K --> L
     L --> G
-    H -- Si --> M[Scambia coppie[i] e coppie[min_idx]]
+    H -- Si --> M[Scambia elemento corrente con minimo trovato]
     H -- No --> N[nessuno scambio]
     M --> O[i = i + 1]
     N --> O
