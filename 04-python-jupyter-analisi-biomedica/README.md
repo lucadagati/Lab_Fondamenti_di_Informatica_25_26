@@ -137,6 +137,7 @@ flowchart TD
 ## Esercizio 5 - Tuple e ordinamento
 **Consegna:** ordina una lista di tuple `(nome, punteggio)` per punteggio crescente.  
 **Hint:** usa un ordinamento esplicito confrontando il secondo elemento delle tuple.
+**Diagramma di flusso:**
 ```mermaid
 flowchart TD
     A[Lista tuple] --> B[Imposta indice iniziale]
@@ -164,6 +165,7 @@ flowchart TD
 ## Esercizio 7 - Filtri su lista con ciclo
 **Consegna:** da una lista numerica, crea lista filtrata (`>=10`) e lista dei quadrati dei filtrati.  
 **Hint:** usa cicli `for` e `append`.
+**Diagramma di flusso:**
 ```mermaid
 flowchart TD
     A[Lista input] --> B[Ciclo filtro con append]
@@ -206,6 +208,7 @@ flowchart TD
 ## Esercizio 10 - Analisi parole
 **Consegna:** conta frequenze parole in una frase, poi stampa totale parole e parola più frequente.  
 **Hint:** usa `split()`, dizionario e `max(freq, key=freq.get)`.
+**Diagramma di flusso:**
 ```mermaid
 flowchart TD
     A[Input frase] --> B[Dividi frase in parole]
