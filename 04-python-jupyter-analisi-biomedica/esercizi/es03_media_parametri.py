@@ -1,10 +1,19 @@
-"""Esercizio 3: ciclo while e validazione input."""
+"""Esercizio 3: validazione input e conteggio con while."""
+
 
 def main() -> None:
+    # Leggiamo un valore iniziale da tastiera.
     n = int(input("Inserisci un intero positivo: "))
 
-    # TODO: ripeti la richiesta finché n <= 0
-    # TODO: stampa i numeri da 1 a n usando while
+    # TODO: valida input con while finche n <= 0
+    # while ...:
+    #     ...
+
+    # TODO: stampa i numeri da 1 a n con while
+    # i = 1
+    # while ...:
+    #     ...
+
     raise NotImplementedError
 
 

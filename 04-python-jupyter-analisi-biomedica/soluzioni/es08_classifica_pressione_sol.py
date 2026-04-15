@@ -1,44 +1,38 @@
 """Soluzione esercizio 8 con commenti didattici estesi."""
 
-# Importiamo Path per percorsi file.
-from pathlib import Path
-# Importiamo csv per lettura del dataset.
-import csv
 
+def min_max(valori: list[int]) -> tuple[int, int]:
+    # Inizializziamo minimo con il primo valore della lista.
+    minimo = valori[0]
+    # Inizializziamo massimo con lo stesso primo valore.
+    massimo = valori[0]
 
-def classe_pressione(sistolica: int) -> str:
-    # Se sistolica e sotto 130 la classe e Normale.
-    if sistolica < 130:
-        # Restituiamo classe Normale.
-        return "Normale"
-    # Se sistolica e sotto 140 la classe e Pre-ipertensione.
-    if sistolica < 140:
-        # Restituiamo classe Pre-ipertensione.
-        return "Pre-ipertensione"
-    # Negli altri casi la classe e Ipertensione.
-    return "Ipertensione"
+    # Scorriamo tutti i valori della lista.
+    for v in valori:
+        # Se il valore corrente e minore del minimo, aggiorniamo minimo.
+        if v < minimo:
+            # Nuovo minimo.
+            minimo = v
+        # Se il valore corrente e maggiore del massimo, aggiorniamo massimo.
+        if v > massimo:
+            # Nuovo massimo.
+            massimo = v
+
+    # Restituiamo la tupla (minimo, massimo).
+    return minimo, massimo
 
 
 def main() -> None:
-    # Percorso file CSV.
-    csv_path = Path(__file__).parent.parent / "data" / "vitali_pazienti.csv"
-
-    # Apertura CSV.
-    with csv_path.open(newline="", encoding="utf-8") as f:
-        # Lettura righe.
-        rows = list(csv.DictReader(f))
-
-    # Ciclo su tutte le righe per classificare ogni paziente.
-    for r in rows:
-        # Conversione sistolica in intero.
-        sistolica = int(r["sistolica"])
-        # Calcolo classe pressione.
-        classe = classe_pressione(sistolica)
-        # Stampa risultato paziente.
-        print(r["id"], classe)
+    # Definiamo lista numeri di test.
+    nums = [4, 19, 2, 8, 11]
+    # Calcoliamo minimo e massimo con la funzione dedicata.
+    mn, mx = min_max(nums)
+    # Stampiamo il minimo.
+    print("Minimo:", mn)
+    # Stampiamo il massimo.
+    print("Massimo:", mx)
 
 
-# Blocco main.
 if __name__ == "__main__":
-    # Avviamo l'esecuzione.
+    # Eseguiamo il programma.
     main()

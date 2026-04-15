@@ -1,13 +1,26 @@
-"""Esercizio 4: stringhe (normalizzazione e conteggio)."""
+"""Esercizio 4: stringhe e conteggio vocali."""
+
 
 def conta_vocali(testo: str) -> int:
-    # TODO: conta a/e/i/o/u (maiuscole e minuscole)
+    # TODO: inizializza contatore a 0
+    # count = ...
+
+    # TODO: scorri i caratteri di testo.lower()
+    # for ...:
+    #     if carattere e una vocale -> incrementa count
+
+    # TODO: restituisci il totale
     raise NotImplementedError
 
 
 def main() -> None:
-    s = input("Inserisci una frase: ")
-    # TODO: stampa numero vocali
+    # Leggiamo una frase.
+    frase = input("Inserisci una frase: ")
+
+    # TODO: richiama conta_vocali(frase)
+    # risultato = ...
+
+    # TODO: stampa il risultato
     raise NotImplementedError
 
 

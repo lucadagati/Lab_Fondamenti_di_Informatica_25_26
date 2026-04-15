@@ -1,39 +1,32 @@
 """Soluzione esercizio 1 con commenti didattici estesi."""
 
-# Importiamo Path per costruire percorsi file in modo robusto.
-from pathlib import Path
-# Importiamo csv per leggere il file CSV riga per riga.
-import csv
+
+def classifica_voto(voto: int) -> str:
+    # Se il voto e sotto 18, lo studente e insufficiente.
+    if voto < 18:
+        # Restituiamo la classe corrispondente.
+        return "Insufficiente"
+    # Se il voto e al massimo 24, classe sufficiente.
+    if voto <= 24:
+        # Restituiamo la classe corrispondente.
+        return "Sufficiente"
+    # Se il voto e al massimo 29, classe buona.
+    if voto <= 29:
+        # Restituiamo la classe corrispondente.
+        return "Buono"
+    # Nei casi restanti, voto ottimo.
+    return "Ottimo"
 
 
 def main() -> None:
-    # Costruiamo il percorso assoluto al CSV di input.
-    csv_path = Path(__file__).parent.parent / "data" / "vitali_pazienti.csv"
-
-    # Apriamo il file CSV in lettura con encoding UTF-8.
-    with csv_path.open(newline="", encoding="utf-8") as f:
-        # Convertiamo il CSV in una lista di dizionari (una riga = un dict).
-        rows = list(csv.DictReader(f))
-
-    # Stampiamo l'intestazione del report.
-    print("Pazienti a rischio:")
-
-    # Iteriamo su ogni riga (paziente).
-    for r in rows:
-        # Verifichiamo se il BPM e alto.
-        bpm_alto = int(r["bpm"]) >= 100
-        # Verifichiamo se la saturazione e bassa.
-        spo2_bassa = int(r["spo2"]) < 95
-        # Verifichiamo se la pressione sistolica e alta.
-        sistolica_alta = int(r["sistolica"]) >= 140
-
-        # Se almeno una condizione e vera, il paziente e a rischio.
-        if bpm_alto or spo2_bassa or sistolica_alta:
-            # Stampiamo l'ID del paziente a rischio.
-            print("-", r["id"])
+    # Leggiamo un voto intero da tastiera.
+    voto = int(input("Inserisci voto: "))
+    # Calcoliamo la classe del voto.
+    classe = classifica_voto(voto)
+    # Stampiamo il risultato finale.
+    print("Classe:", classe)
 
 
-# Eseguiamo main solo se il file viene lanciato direttamente.
 if __name__ == "__main__":
-    # Avviamo il programma.
+    # Avviamo l'esecuzione del programma.
     main()

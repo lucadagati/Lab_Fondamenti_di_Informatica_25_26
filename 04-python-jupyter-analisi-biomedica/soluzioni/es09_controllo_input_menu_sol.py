@@ -2,39 +2,38 @@
 
 
 def main() -> None:
-    # Iniziamo ciclo infinito del menu.
+    # Avviamo un ciclo infinito per ripetere il menu.
     while True:
-        # Mostriamo opzione quadrato.
+        # Stampiamo opzione 1.
         print("1) Quadrato")
-        # Mostriamo opzione cubo.
+        # Stampiamo opzione 2.
         print("2) Cubo")
-        # Mostriamo opzione uscita.
+        # Stampiamo opzione uscita.
         print("0) Esci")
-        # Leggiamo la scelta utente e rimuoviamo spazi esterni.
+        # Leggiamo scelta dell'utente.
         scelta = input("Scelta: ").strip()
 
-        # Caso uscita.
+        # Se l'utente sceglie 0, usciamo dal ciclo.
         if scelta == "0":
-            # Interrompiamo ciclo.
+            # Uscita menu.
             break
-        # Caso operazioni valide 1 o 2.
+        # Se la scelta e 1 o 2, eseguiamo operazione numerica.
         elif scelta in ("1", "2"):
-            # Chiediamo numero da elaborare.
+            # Chiediamo un numero all'utente.
             n = int(input("Numero: "))
-            # Se scelta 1 calcoliamo quadrato.
+            # Se scelta 1, calcoliamo quadrato.
             if scelta == "1":
-                # Stampa quadrato.
+                # Stampiamo quadrato del numero.
                 print("Quadrato:", n * n)
             else:
-                # Stampa cubo.
+                # Stampiamo cubo del numero.
                 print("Cubo:", n * n * n)
-        # Caso scelta non valida.
+        # In tutti gli altri casi, la scelta e non valida.
         else:
-            # Messaggio errore input.
+            # Messaggio per scelta non valida.
             print("Scelta non valida")
 
 
-# Entrypoint.
 if __name__ == "__main__":
-    # Avvio programma.
+    # Avviamo la funzione principale.
     main()

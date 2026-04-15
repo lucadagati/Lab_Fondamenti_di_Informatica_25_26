@@ -1,13 +1,27 @@
-"""Esercizio 6: dizionari e frequenze di caratteri."""
+"""Esercizio 6: dizionario frequenze caratteri."""
+
 
 def frequenze_caratteri(testo: str) -> dict[str, int]:
-    # TODO: restituisci un dizionario char->conteggio (ignora spazi)
+    # TODO: inizializza dizionario vuoto
+    # freq = {}
+
+    # TODO: scorri testo in minuscolo
+    #   - ignora spazi
+    #   - se carattere assente: inizializza a 0
+    #   - incrementa frequenza
+
+    # TODO: restituisci dizionario
     raise NotImplementedError
 
 
 def main() -> None:
+    # Leggiamo testo in input.
     s = input("Inserisci testo: ")
-    # TODO: stampa il dizionario frequenze
+
+    # TODO: calcola frequenze
+    # risultato = ...
+
+    # TODO: stampa risultato
     raise NotImplementedError
 
 

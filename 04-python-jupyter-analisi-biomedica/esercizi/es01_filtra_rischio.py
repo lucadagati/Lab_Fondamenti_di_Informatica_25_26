@@ -1,13 +1,23 @@
-"""Esercizio 1: if/else su numeri."""
+"""Esercizio 1: classificazione voto con if/elif/else."""
+
 
 def classifica_voto(voto: int) -> str:
-    # TODO: restituisci "Insufficiente" (<18), "Sufficiente" (18-24), "Buono" (25-29), "Ottimo" (>=30)
+    # TODO: se voto < 18 restituisci "Insufficiente"
+    # TODO: se voto <= 24 restituisci "Sufficiente"
+    # TODO: se voto <= 29 restituisci "Buono"
+    # TODO: altrimenti restituisci "Ottimo"
     raise NotImplementedError
 
 
 def main() -> None:
+    # TODO: leggi voto da input
     voto = int(input("Inserisci voto: "))
-    # TODO: stampa la classe
+
+    # TODO: calcola classe usando classifica_voto(voto)
+    # classe = ...
+
+    # TODO: stampa risultato finale
+    # print("Classe:", classe)
     raise NotImplementedError
 
 
