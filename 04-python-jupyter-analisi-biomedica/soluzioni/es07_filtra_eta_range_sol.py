@@ -1,36 +1,49 @@
-"""Soluzione esercizio 7 con commenti didattici estesi."""
+"""Soluzione esercizio 7: filtro e quadrati con cicli espliciti."""
 
 
+# Definiamo la funzione principale.
 def main() -> None:
-    # Definiamo la lista di partenza.
+    # Creiamo la lista di partenza.
     valori = [12, 5, 18, 21, 4, 30, 9]
-
-    # Inizializziamo lista vuota per i valori filtrati.
+    # Inizializziamo una lista vuota per i valori filtrati.
     filtrati = []
+    # Inizializziamo l'indice di scansione della lista originale.
+    indice = 0
 
-    # Cicliamo su tutti i valori iniziali.
-    for v in valori:
-        # Se il valore e almeno 10, lo aggiungiamo ai filtrati.
-        if v >= 10:
+    # Scorriamo tutti i valori della lista originale.
+    while indice < len(valori):
+        # Leggiamo il valore corrente.
+        valore = valori[indice]
+        # Controlliamo se il valore rispetta la soglia minima.
+        if valore >= 10:
             # Aggiungiamo il valore alla lista filtrata.
-            filtrati.append(v)
+            filtrati.append(valore)
+        # Incrementiamo l'indice per passare al prossimo valore.
+        indice = indice + 1
 
-    # Inizializziamo lista vuota per i quadrati.
+    # Inizializziamo una lista vuota per i quadrati.
     quadrati = []
+    # Inizializziamo l'indice di scansione della lista filtrata.
+    indice_filtrati = 0
 
-    # Cicliamo sui valori filtrati.
-    for v in filtrati:
+    # Scorriamo tutti i valori filtrati.
+    while indice_filtrati < len(filtrati):
+        # Leggiamo il valore filtrato corrente.
+        valore_filtrato = filtrati[indice_filtrati]
         # Calcoliamo il quadrato del valore corrente.
-        q = v * v
-        # Aggiungiamo il quadrato alla lista quadrati.
-        quadrati.append(q)
+        quadrato = valore_filtrato * valore_filtrato
+        # Aggiungiamo il quadrato alla lista dei risultati.
+        quadrati.append(quadrato)
+        # Incrementiamo l'indice della lista filtrata.
+        indice_filtrati = indice_filtrati + 1
 
-    # Stampiamo la lista filtrata.
+    # Stampiamo la lista dei valori filtrati.
     print("Filtrati:", filtrati)
-    # Stampiamo la lista dei quadrati.
+    # Stampiamo la lista dei quadrati corrispondenti.
     print("Quadrati:", quadrati)
 
 
+# Verifichiamo l'esecuzione come programma principale.
 if __name__ == "__main__":
-    # Avviamo il programma principale.
+    # Eseguiamo la funzione principale.
     main()

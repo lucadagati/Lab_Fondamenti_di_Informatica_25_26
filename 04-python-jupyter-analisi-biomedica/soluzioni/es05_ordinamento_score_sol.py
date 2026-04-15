@@ -1,49 +1,50 @@
-"""Soluzione esercizio 5 con commenti didattici estesi."""
+"""Soluzione esercizio 5: ordinamento tuple con selection sort esplicito."""
 
 
+# Definiamo la funzione principale.
 def main() -> None:
-    # Definiamo lista di tuple nel formato (nome, punteggio).
+    # Creiamo la lista di tuple nel formato (nome, punteggio).
     coppie = [("Luca", 3), ("Anna", 1), ("Marta", 2)]
-
-    # Copiamo la lista per poterla ordinare senza modificare l'originale.
+    # Copiamo la lista per lavorare su una versione separata.
     ordinate = coppie[:]
-    # Calcoliamo la lunghezza della lista.
+    # Salviamo la lunghezza della lista per non ricalcolarla continuamente.
     n = len(ordinate)
     # Inizializziamo l'indice esterno del selection sort.
     i = 0
 
-    # Continuiamo finche non arriviamo al penultimo elemento.
+    # Ripetiamo finche l'indice esterno non raggiunge il penultimo elemento.
     while i < n - 1:
-        # Supponiamo inizialmente che il minimo sia nella posizione i.
+        # Assumiamo che il minimo si trovi inizialmente nella posizione i.
         min_idx = i
-        # Inizializziamo indice interno dalla posizione successiva.
+        # Inizializziamo l'indice interno dalla posizione successiva.
         j = i + 1
 
-        # Scansione del blocco residuo per trovare il minimo.
+        # Cerchiamo il minimo nella porzione non ordinata della lista.
         while j < n:
-            # Confrontiamo i punteggi (secondo elemento della tupla).
+            # Confrontiamo il punteggio corrente con il minimo trovato finora.
             if ordinate[j][1] < ordinate[min_idx][1]:
                 # Aggiorniamo la posizione del minimo trovato.
                 min_idx = j
-            # Passiamo all'elemento successivo.
-            j += 1
+            # Passiamo all'elemento successivo della scansione interna.
+            j = j + 1
 
-        # Se il minimo trovato non e gia in posizione i, scambiamo gli elementi.
+        # Verifichiamo se e necessario eseguire uno scambio.
         if min_idx != i:
             # Salviamo temporaneamente l'elemento in posizione i.
-            tmp = ordinate[i]
-            # Portiamo il minimo in posizione i.
+            temporaneo = ordinate[i]
+            # Spostiamo il minimo trovato in posizione i.
             ordinate[i] = ordinate[min_idx]
-            # Mettiamo l'elemento temporaneo nella vecchia posizione del minimo.
-            ordinate[min_idx] = tmp
+            # Ripristiniamo l'elemento temporaneo nella posizione del minimo.
+            ordinate[min_idx] = temporaneo
 
-        # Avanziamo all'iterazione successiva dell'indice esterno.
-        i += 1
+        # Incrementiamo l'indice esterno per continuare l'ordinamento.
+        i = i + 1
 
     # Stampiamo la lista ordinata finale.
-    print(ordinate)
+    print("Ordinate:", ordinate)
 
 
+# Verifichiamo se il file e eseguito come script principale.
 if __name__ == "__main__":
-    # Avviamo il programma.
+    # Avviamo la funzione principale.
     main()

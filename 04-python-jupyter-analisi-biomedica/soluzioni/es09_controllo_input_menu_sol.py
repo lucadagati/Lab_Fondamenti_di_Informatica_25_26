@@ -1,39 +1,50 @@
-"""Soluzione esercizio 9 con commenti didattici estesi."""
+"""Soluzione esercizio 9: menu testuale con while e scelte esplicite."""
 
 
+# Definiamo la funzione principale.
 def main() -> None:
-    # Avviamo un ciclo infinito per ripetere il menu.
+    # Avviamo un ciclo infinito per il menu.
     while True:
-        # Stampiamo opzione 1.
+        # Mostriamo la prima opzione del menu.
         print("1) Quadrato")
-        # Stampiamo opzione 2.
+        # Mostriamo la seconda opzione del menu.
         print("2) Cubo")
-        # Stampiamo opzione uscita.
+        # Mostriamo l'opzione di uscita.
         print("0) Esci")
-        # Leggiamo scelta dell'utente.
+        # Leggiamo la scelta dell'utente.
         scelta = input("Scelta: ").strip()
 
-        # Se l'utente sceglie 0, usciamo dal ciclo.
+        # Controlliamo se l'utente ha scelto di uscire.
         if scelta == "0":
-            # Uscita menu.
+            # Interrompiamo il ciclo del menu.
             break
-        # Se la scelta e 1 o 2, eseguiamo operazione numerica.
-        elif scelta in ("1", "2"):
-            # Chiediamo un numero all'utente.
-            n = int(input("Numero: "))
-            # Se scelta 1, calcoliamo quadrato.
-            if scelta == "1":
-                # Stampiamo quadrato del numero.
-                print("Quadrato:", n * n)
-            else:
-                # Stampiamo cubo del numero.
-                print("Cubo:", n * n * n)
-        # In tutti gli altri casi, la scelta e non valida.
+        # Controlliamo se l'utente ha scelto quadrato.
+        elif scelta == "1":
+            # Chiediamo il numero su cui calcolare il quadrato.
+            testo_numero = input("Numero: ")
+            # Convertiamo il testo in numero intero.
+            numero = int(testo_numero)
+            # Calcoliamo il quadrato del numero.
+            risultato = numero * numero
+            # Stampiamo il risultato del quadrato.
+            print("Quadrato:", risultato)
+        # Controlliamo se l'utente ha scelto cubo.
+        elif scelta == "2":
+            # Chiediamo il numero su cui calcolare il cubo.
+            testo_numero = input("Numero: ")
+            # Convertiamo il testo in numero intero.
+            numero = int(testo_numero)
+            # Calcoliamo il cubo del numero.
+            risultato = numero * numero * numero
+            # Stampiamo il risultato del cubo.
+            print("Cubo:", risultato)
+        # Gestiamo tutte le scelte non valide.
         else:
-            # Messaggio per scelta non valida.
+            # Stampiamo un messaggio di errore.
             print("Scelta non valida")
 
 
+# Verifichiamo l'esecuzione del file come script principale.
 if __name__ == "__main__":
     # Avviamo la funzione principale.
     main()

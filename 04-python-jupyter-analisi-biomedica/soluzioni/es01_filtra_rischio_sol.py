@@ -1,32 +1,37 @@
-"""Soluzione esercizio 1 con commenti didattici estesi."""
+"""Soluzione esercizio 1: classificazione voto con commenti riga per riga."""
 
 
+# Definiamo una funzione che classifica un voto numerico.
 def classifica_voto(voto: int) -> str:
-    # Se il voto e sotto 18, lo studente e insufficiente.
+    # Controlliamo se il voto e sotto la soglia di sufficienza.
     if voto < 18:
-        # Restituiamo la classe corrispondente.
+        # Restituiamo la classe testuale per voto insufficiente.
         return "Insufficiente"
-    # Se il voto e al massimo 24, classe sufficiente.
+    # Controlliamo se il voto rientra nella fascia sufficiente.
     if voto <= 24:
-        # Restituiamo la classe corrispondente.
+        # Restituiamo la classe testuale per voto sufficiente.
         return "Sufficiente"
-    # Se il voto e al massimo 29, classe buona.
+    # Controlliamo se il voto rientra nella fascia buona.
     if voto <= 29:
-        # Restituiamo la classe corrispondente.
+        # Restituiamo la classe testuale per voto buono.
         return "Buono"
-    # Nei casi restanti, voto ottimo.
+    # Nei casi rimanenti il voto e ottimo.
     return "Ottimo"
 
 
+# Definiamo la funzione principale del programma.
 def main() -> None:
-    # Leggiamo un voto intero da tastiera.
-    voto = int(input("Inserisci voto: "))
-    # Calcoliamo la classe del voto.
+    # Chiediamo all'utente di inserire un voto.
+    testo_voto = input("Inserisci voto: ")
+    # Convertiamo il valore inserito da stringa a intero.
+    voto = int(testo_voto)
+    # Chiamiamo la funzione che produce la classe del voto.
     classe = classifica_voto(voto)
-    # Stampiamo il risultato finale.
+    # Stampiamo il risultato finale all'utente.
     print("Classe:", classe)
 
 
+# Verifichiamo che il file sia eseguito come programma principale.
 if __name__ == "__main__":
-    # Avviamo l'esecuzione del programma.
+    # Avviamo la funzione principale.
     main()

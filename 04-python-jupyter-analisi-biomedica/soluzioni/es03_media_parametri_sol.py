@@ -1,28 +1,33 @@
-"""Soluzione esercizio 3 con commenti didattici estesi."""
+"""Soluzione esercizio 3: validazione input con while e stampa sequenza."""
 
 
+# Definiamo la funzione principale.
 def main() -> None:
-    # Leggiamo il valore iniziale fornito dall'utente.
-    n = int(input("Inserisci un intero positivo: "))
+    # Chiediamo un intero positivo all'utente.
+    testo_n = input("Inserisci un intero positivo: ")
+    # Convertiamo il valore inserito in intero.
+    n = int(testo_n)
 
-    # Finche n non e positivo, continuiamo a richiederlo.
+    # Ripetiamo finche il valore non diventa positivo.
     while n <= 0:
-        # Informiamo che il valore inserito non va bene.
-        print("Valore non valido.")
-        # Richiediamo nuovamente un valore.
-        n = int(input("Inserisci un intero positivo: "))
+        # Informiamo l'utente che il dato non e valido.
+        print("Valore non valido")
+        # Chiediamo di nuovo il valore all'utente.
+        testo_n = input("Inserisci un intero positivo: ")
+        # Convertiamo nuovamente il valore in intero.
+        n = int(testo_n)
 
-    # Inizializziamo il contatore da stampare.
+    # Inizializziamo il contatore di partenza.
     i = 1
-
-    # Cicliamo finche i non supera n.
+    # Stampiamo i numeri da 1 a n.
     while i <= n:
         # Stampiamo il valore corrente del contatore.
         print(i)
-        # Incrementiamo il contatore di 1.
-        i += 1
+        # Incrementiamo il contatore di una unita.
+        i = i + 1
 
 
+# Verifichiamo l'esecuzione come script principale.
 if __name__ == "__main__":
     # Avviamo la funzione principale.
     main()

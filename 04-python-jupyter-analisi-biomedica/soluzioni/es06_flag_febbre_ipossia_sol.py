@@ -1,36 +1,45 @@
-"""Soluzione esercizio 6 con commenti didattici estesi."""
+"""Soluzione esercizio 6: frequenze caratteri con dizionario esplicito."""
 
 
+# Definiamo una funzione che calcola frequenze dei caratteri.
 def frequenze_caratteri(testo: str) -> dict[str, int]:
-    # Creiamo un dizionario vuoto per le frequenze.
-    freq: dict[str, int] = {}
+    # Inizializziamo un dizionario vuoto.
+    frequenze: dict[str, int] = {}
+    # Convertiamo il testo in minuscolo per uniformare il conteggio.
+    testo_minuscolo = testo.lower()
+    # Inizializziamo l'indice di scorrimento.
+    indice = 0
 
-    # Scorriamo ogni carattere del testo in minuscolo.
-    for ch in testo.lower():
-        # Se il carattere e uno spazio, lo ignoriamo.
-        if ch == " ":
-            # Passiamo direttamente al carattere successivo.
-            continue
-        # Se il carattere non e ancora nel dizionario, lo inizializziamo a 0.
-        if ch not in freq:
-            # Inizializzazione frequenza.
-            freq[ch] = 0
-        # Incrementiamo la frequenza del carattere corrente.
-        freq[ch] += 1
+    # Scorriamo tutti i caratteri del testo.
+    while indice < len(testo_minuscolo):
+        # Leggiamo il carattere corrente.
+        carattere = testo_minuscolo[indice]
+        # Controlliamo se il carattere e uno spazio.
+        if carattere != " ":
+            # Verifichiamo se il carattere non e ancora nel dizionario.
+            if carattere not in frequenze:
+                # Inizializziamo la frequenza del carattere a zero.
+                frequenze[carattere] = 0
+            # Incrementiamo la frequenza del carattere corrente.
+            frequenze[carattere] = frequenze[carattere] + 1
+        # Avanziamo al carattere successivo.
+        indice = indice + 1
 
-    # Restituiamo il dizionario completo delle frequenze.
-    return freq
+    # Restituiamo il dizionario delle frequenze.
+    return frequenze
 
 
+# Definiamo la funzione principale.
 def main() -> None:
-    # Leggiamo il testo dall'utente.
-    s = input("Inserisci testo: ")
-    # Calcoliamo le frequenze dei caratteri.
-    risultato = frequenze_caratteri(s)
-    # Stampiamo il dizionario risultante.
+    # Chiediamo all'utente di inserire un testo.
+    testo = input("Inserisci testo: ")
+    # Calcoliamo il dizionario delle frequenze.
+    risultato = frequenze_caratteri(testo)
+    # Stampiamo il risultato finale.
     print(risultato)
 
 
+# Verifichiamo l'esecuzione diretta del file.
 if __name__ == "__main__":
     # Avviamo la funzione principale.
     main()

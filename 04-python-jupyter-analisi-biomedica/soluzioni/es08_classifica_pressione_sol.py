@@ -1,38 +1,47 @@
-"""Soluzione esercizio 8 con commenti didattici estesi."""
+"""Soluzione esercizio 8: minimo e massimo con funzione dedicata."""
 
 
+# Definiamo una funzione che restituisce minimo e massimo.
 def min_max(valori: list[int]) -> tuple[int, int]:
-    # Inizializziamo minimo con il primo valore della lista.
+    # Inizializziamo il minimo con il primo elemento della lista.
     minimo = valori[0]
-    # Inizializziamo massimo con lo stesso primo valore.
+    # Inizializziamo il massimo con il primo elemento della lista.
     massimo = valori[0]
+    # Inizializziamo l'indice di scansione.
+    indice = 0
 
-    # Scorriamo tutti i valori della lista.
-    for v in valori:
-        # Se il valore corrente e minore del minimo, aggiorniamo minimo.
-        if v < minimo:
-            # Nuovo minimo.
-            minimo = v
-        # Se il valore corrente e maggiore del massimo, aggiorniamo massimo.
-        if v > massimo:
-            # Nuovo massimo.
-            massimo = v
+    # Scorriamo tutti gli elementi della lista.
+    while indice < len(valori):
+        # Leggiamo il valore corrente.
+        valore = valori[indice]
+        # Verifichiamo se il valore corrente e minore del minimo attuale.
+        if valore < minimo:
+            # Aggiorniamo il minimo.
+            minimo = valore
+        # Verifichiamo se il valore corrente e maggiore del massimo attuale.
+        if valore > massimo:
+            # Aggiorniamo il massimo.
+            massimo = valore
+        # Incrementiamo l'indice di scansione.
+        indice = indice + 1
 
-    # Restituiamo la tupla (minimo, massimo).
+    # Restituiamo la coppia (minimo, massimo).
     return minimo, massimo
 
 
+# Definiamo la funzione principale.
 def main() -> None:
-    # Definiamo lista numeri di test.
-    nums = [4, 19, 2, 8, 11]
-    # Calcoliamo minimo e massimo con la funzione dedicata.
-    mn, mx = min_max(nums)
-    # Stampiamo il minimo.
-    print("Minimo:", mn)
-    # Stampiamo il massimo.
-    print("Massimo:", mx)
+    # Creiamo una lista di numeri di esempio.
+    numeri = [4, 19, 2, 8, 11]
+    # Chiamiamo la funzione che calcola minimo e massimo.
+    minimo, massimo = min_max(numeri)
+    # Stampiamo il valore minimo trovato.
+    print("Minimo:", minimo)
+    # Stampiamo il valore massimo trovato.
+    print("Massimo:", massimo)
 
 
+# Verifichiamo l'esecuzione diretta del file.
 if __name__ == "__main__":
-    # Eseguiamo il programma.
+    # Avviamo il programma principale.
     main()

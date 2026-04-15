@@ -1,35 +1,41 @@
-"""Soluzione esercizio 2 con commenti didattici estesi."""
+"""Soluzione esercizio 2: somma, media e massimo con commenti riga per riga."""
 
 
+# Definiamo la funzione principale.
 def main() -> None:
-    # Definiamo la lista di numeri su cui lavorare.
+    # Creiamo la lista dei numeri da analizzare.
     numeri = [7, 3, 12, 5, 9, 12, 1]
-
-    # Inizializziamo la somma totale a zero.
+    # Inizializziamo la variabile della somma totale.
     somma = 0
     # Inizializziamo il massimo con il primo elemento della lista.
     massimo = numeri[0]
+    # Inizializziamo l'indice di scorrimento.
+    indice = 0
 
-    # Scorriamo ogni valore nella lista.
-    for n in numeri:
-        # Aggiorniamo la somma totale.
-        somma += n
-        # Se il valore corrente e maggiore del massimo, aggiorniamo massimo.
-        if n > massimo:
-            # Salviamo il nuovo massimo.
-            massimo = n
+    # Ripetiamo il ciclo finche non abbiamo letto tutta la lista.
+    while indice < len(numeri):
+        # Leggiamo il valore corrente della lista.
+        valore = numeri[indice]
+        # Aggiorniamo la somma totale aggiungendo il valore corrente.
+        somma = somma + valore
+        # Controlliamo se il valore corrente supera il massimo attuale.
+        if valore > massimo:
+            # Aggiorniamo il massimo con il nuovo valore trovato.
+            massimo = valore
+        # Incrementiamo l'indice per passare all'elemento successivo.
+        indice = indice + 1
 
-    # Calcoliamo la media dividendo somma per numero elementi.
+    # Calcoliamo la media dividendo la somma per il numero di elementi.
     media = somma / len(numeri)
-
-    # Stampiamo la somma.
+    # Stampiamo la somma calcolata.
     print("Somma:", somma)
-    # Stampiamo la media con due cifre decimali.
-    print(f"Media: {media:.2f}")
-    # Stampiamo il valore massimo.
+    # Stampiamo la media calcolata.
+    print("Media:", round(media, 2))
+    # Stampiamo il massimo trovato.
     print("Massimo:", massimo)
 
 
+# Verifichiamo che il file sia eseguito direttamente.
 if __name__ == "__main__":
-    # Avviamo il programma principale.
+    # Eseguiamo la funzione principale.
     main()
