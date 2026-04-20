@@ -12,9 +12,3 @@ xlim([0 2*pi])  % imposta i limiti degli assi
 ylim([-1.2 1.2])  % imposta i limiti degli assi
 grid on  % attiva la griglia del grafico
 legend('sin(x)', 'Location', 'northeast')  % esegue il passo corrente della pipeline
-
-% Personalizzazione assi
-ax = gca;  % assegna il risultato a ax
-ax.FontSize = 11;  % assegna il risultato a ax.FontSize
-ax.XTick = [0 pi/2 pi 3*pi/2 2*pi];  % assegna il risultato a ax.XTick
-ax.XTickLabel = {'0', 'π/2', 'π', '3π/2', '2π'};  % assegna il risultato a ax.XTickLabel

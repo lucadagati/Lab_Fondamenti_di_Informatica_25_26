@@ -12,8 +12,3 @@ anonimo = regexprep(referto, pattern_cf, '[CF RIMOSSO]');  % sostituisce pattern
 tel = '3331234567';  % assegna il risultato a tel
 formattato = regexprep(tel, '(\d{3})(\d{3})(\d{4})', '$1-$2-$3');  % sostituisce pattern nel testo
 % '333-123-4567' ($1, $2, $3 = gruppi catturati)
-
-% 4. Normalizzare date
-data = '15-03-2024';  % assegna il risultato a data
-normalizzata = regexprep(data, '(\d+)-(\d+)-(\d+)', '$3/$2/$1');  % sostituisce pattern nel testo
-% '2024/03/15'

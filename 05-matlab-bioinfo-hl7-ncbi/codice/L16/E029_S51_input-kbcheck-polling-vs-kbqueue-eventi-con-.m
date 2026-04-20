@@ -14,8 +14,3 @@ while ~response  % continua a controllare la tastiera finché non arriva una ris
             RT = secs - stimOnset;  % calcola il tempo di reazione rispetto all onset dello stimolo
             response = true;  % segnala che la risposta utile è arrivata
         elseif keyCode(escKey)  % controlla se è stato premuto escape
-            sca;  % chiude tutte le finestre Psychtoolbox aperte
-            return;  % interrompe subito la funzione corrente
-        end  % chiude il controllo sul tasto premuto
-    end  % chiude il controllo generale su keyDown
-end  % chiude il ciclo di polling

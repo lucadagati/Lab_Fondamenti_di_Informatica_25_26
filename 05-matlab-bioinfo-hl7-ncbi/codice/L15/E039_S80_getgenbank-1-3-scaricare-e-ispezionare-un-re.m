@@ -14,6 +14,3 @@ if isfield(S, 'Organism')  % verifica campo Organism
     disp(S.Organism)  % mostra organismo dalla chiave standard
 elseif isfield(S, 'SourceOrganism')  % fallback per compatibilità tra release
     disp(S.SourceOrganism)  % mostra organismo dalla chiave alternativa
-else  % nessun campo organismo noto
-    disp('Campo organismo non trovato: controllare fieldnames(S)')  % avviso diagnostico
-end  % chiude il controllo sul campo organismo

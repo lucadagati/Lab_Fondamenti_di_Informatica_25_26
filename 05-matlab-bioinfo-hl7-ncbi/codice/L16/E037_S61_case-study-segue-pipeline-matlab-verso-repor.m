@@ -14,5 +14,3 @@
         'pvc_count', n_pvc, ...  % salva il numero di PVC rilevati
         'pvc_burden_pct', pvc_burden, ...  % salva la percentuale di burden PVC
         'timestamp', datetime('now', 'TimeZone', 'Europe/Rome') ...  % aggiunge il timestamp di generazione
-        );
-end  % chiude la funzione
