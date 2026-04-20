@@ -1,42 +1,42 @@
-# L15 - Codice estratto dalle slide
+# L15 - Esempi codice (riferimento slide)
 
-Blocchi estratti: **38**
+Totale esempi: **38**
 
-- `001_slide05_code01.m` — Ripasso: tipi di dato MATLAB (double, string, table, celle)
-- `002_slide08_code01.m` — Live Script: esempio di sezioni (%%) e codice
-- `003_slide09_code01.m` — Formule LaTeX nel Live Editor e export (PDF, HTML, Word)
-- `004_slide13_code01.m` — Figure professionali: assi, legenda, tipografia e risoluzione
-- `005_slide14_code01.m` — Layout multiplo: subplot (classico)
-- `006_slide15_code01.m` — Layout multiplo: tiledlayout (R2019b+)
-- `007_slide16_code01.m` — Caso studio: visualizzare un tracciato ECG in MATLAB
-- `008_slide17_code01.m` — Export figure (1/2): saveas e exportgraphics
-- `009_slide18_code01.m` — Export figure (2/2): print e copygraphics
-- `010_slide35_code01.m` — regexp, regexpi, regexprep: panoramica e differenze
-- `011_slide36_code01.m` — Opzioni di regexp: match, token, split, posizioni
-- `012_slide39_code01.m` — Caso studio: estrarre valori da un referto di laboratorio (1/2)
-- `013_slide40_code01.m` — Caso studio: estrarre valori da un referto di laboratorio (2/2)
-- `014_slide42_code01.m` — DNA: trovare codoni (es. ATG) con le regex in MATLAB
-- `015_slide43_code01.m` — regexprep: anonimizzazione, normalizzazione e sostituzioni
-- `016_slide44_code01.m` — string array, regexpi e ciclo su più referti
-- `017_slide46_code01.m` — Pattern di base: extract su stringhe
-- `018_slide47_code01.m` — Combinare pattern (+, |, ~) con lettersPattern e digitsPattern
-- `019_slide49_code01.m` — Documentazione ufficiale: pattern e regexpPattern
-- `020_slide51_code01.m` — Bioinformatics Toolbox: verifica licenza e documentazione
-- `021_slide55_code01.m` — FASTA: formato minimale per intestazione + sequenza
-- `022_slide56_code01.m` — GenBank: record annotato con organismo e feature
-- `023_slide57_code01.m` — FASTA: creare, leggere e mostrare un record in MATLAB
-- `024_slide63_code01.m` — Traduzione in MATLAB: nt2aa e ORF (compatibile)
-- `025_slide64_code01.m` — Allineamento globale, locale e multiplo: obiettivi
-- `026_slide66_code01.m` — FASTQ (read + qualità) e BAM (allineamenti)
-- `027_slide66_code02.m` — FASTQ (read + qualità) e BAM (allineamenti)
-- `028_slide67_code01.m` — Quality control NGS: qualità per base e filtri
-- `029_slide69_code01.m` — Sequenze in MATLAB (1/2): FASTA e composizione
-- `030_slide70_code01.m` — Sequenze in MATLAB (2/2): complemento, traduzione, ORF
-- `031_slide71_code01.m` — Allineamento a coppie: nwalign e swalign
-- `032_slide72_code01.m` — Allineamento multiplo e visualizzazione
-- `033_slide74_code01.m` — getgenbank (1/3): scaricare e ispezionare un record
-- `034_slide75_code01.m` — getgenbank (2/3): controllare la sequenza e salvarla
-- `035_slide76_code01.m` — NCBI: scaricare un record con accession
-- `036_slide77_code01.m` — getgenbank (2/2): porzioni e proteine con getgenpept
-- `037_slide78_code01.m` — NCBI E-Utilities: ricerche programmatiche (1/2)
-- `038_slide79_code01.m` — NCBI E-Utilities: ricerche programmatiche (2/2)
+- `E001_S05_ripasso-tipi-di-dato-matlab-double-strin.m` — slide 5, blocco 1: Ripasso: tipi di dato MATLAB (double, string, table, celle)
+- `E002_S08_live-script-esempio-di-sezioni-e-codice.m` — slide 8, blocco 1: Live Script: esempio di sezioni (%%) e codice
+- `E003_S09_formule-latex-nel-live-editor-e-export-p.m` — slide 9, blocco 1: Formule LaTeX nel Live Editor e export (PDF, HTML, Word)
+- `E004_S13_figure-professionali-assi-legenda-tipogr.m` — slide 13, blocco 1: Figure professionali: assi, legenda, tipografia e risoluzione
+- `E005_S14_layout-multiplo-subplot-classico.m` — slide 14, blocco 1: Layout multiplo: subplot (classico)
+- `E006_S15_layout-multiplo-tiledlayout-r2019b.m` — slide 15, blocco 1: Layout multiplo: tiledlayout (R2019b+)
+- `E007_S16_caso-studio-visualizzare-un-tracciato-ec.m` — slide 16, blocco 1: Caso studio: visualizzare un tracciato ECG in MATLAB (1/2)
+- `E008_S17_caso-studio-visualizzare-un-tracciato-ec.m` — slide 17, blocco 1: Caso studio: visualizzare un tracciato ECG in MATLAB (2/2)
+- `E009_S18_export-figure-1-2-saveas-e-exportgraphic.m` — slide 18, blocco 1: Export figure (1/2): saveas e exportgraphics
+- `E010_S19_export-figure-2-2-print-e-copygraphics.m` — slide 19, blocco 1: Export figure (2/2): print e copygraphics
+- `E011_S36_regexp-regexpi-regexprep-panoramica-e-di.m` — slide 36, blocco 1: regexp, regexpi, regexprep: panoramica e differenze
+- `E012_S37_opzioni-di-regexp-match-token-split-posi.m` — slide 37, blocco 1: Opzioni di regexp: match, token, split, posizioni
+- `E013_S40_caso-studio-estrarre-valori-da-un-refert.m` — slide 40, blocco 1: Caso studio: estrarre valori da un referto di laboratorio (1/2)
+- `E014_S41_caso-studio-estrarre-valori-da-un-refert.m` — slide 41, blocco 1: Caso studio: estrarre valori da un referto di laboratorio (2/2)
+- `E015_S43_dna-trovare-codoni-es-atg-con-le-regex-i.m` — slide 43, blocco 1: DNA: trovare codoni (es. ATG) con le regex in MATLAB
+- `E016_S44_regexprep-anonimizzazione-normalizzazion.m` — slide 44, blocco 1: regexprep: anonimizzazione, normalizzazione e sostituzioni
+- `E017_S45_string-array-regexpi-e-ciclo-su-pi-refer.m` — slide 45, blocco 1: string array, regexpi e ciclo su più referti
+- `E018_S47_pattern-di-base-extract-su-stringhe.m` — slide 47, blocco 1: Pattern di base: extract su stringhe
+- `E019_S48_combinare-pattern-con-letterspattern-e-d.m` — slide 48, blocco 1: Combinare pattern (+, |, ~) con lettersPattern e digitsPattern
+- `E020_S50_documentazione-ufficiale-pattern-e-regex.m` — slide 50, blocco 1: Documentazione ufficiale: pattern e regexpPattern
+- `E021_S52_bioinformatics-toolbox-verifica-licenza-.m` — slide 52, blocco 1: Bioinformatics Toolbox: verifica licenza e documentazione
+- `E022_S56_fasta-formato-minimale-per-intestazione-.m` — slide 56, blocco 1: FASTA: formato minimale per intestazione + sequenza
+- `E023_S57_genbank-record-annotato-con-organismo-e-.m` — slide 57, blocco 1: GenBank: record annotato con organismo e feature
+- `E024_S58_fasta-creare-leggere-e-mostrare-un-recor.m` — slide 58, blocco 1: FASTA: creare, leggere e mostrare un record in MATLAB
+- `E025_S64_traduzione-in-matlab-nt2aa-e-orf-compati.m` — slide 64, blocco 1: Traduzione in MATLAB: nt2aa e ORF (compatibile)
+- `E026_S65_allineamento-globale-locale-e-multiplo-o.m` — slide 65, blocco 1: Allineamento globale, locale e multiplo: obiettivi
+- `E027_S67_fastq-read-qualit-e-bam-allineamenti.m` — slide 67, blocco 1: FASTQ (read + qualità) e BAM (allineamenti)
+- `E028_S67_fastq-read-qualit-e-bam-allineamenti.m` — slide 67, blocco 2: FASTQ (read + qualità) e BAM (allineamenti)
+- `E029_S68_quality-control-ngs-qualit-per-base-e-fi.m` — slide 68, blocco 1: Quality control NGS: qualità per base e filtri
+- `E030_S70_sequenze-in-matlab-1-2-fasta-e-composizi.m` — slide 70, blocco 1: Sequenze in MATLAB (1/2): FASTA e composizione
+- `E031_S71_sequenze-in-matlab-2-2-complemento-tradu.m` — slide 71, blocco 1: Sequenze in MATLAB (2/2): complemento, traduzione, ORF
+- `E032_S72_allineamento-a-coppie-nwalign-e-swalign.m` — slide 72, blocco 1: Allineamento a coppie: nwalign e swalign
+- `E033_S73_allineamento-multiplo-e-visualizzazione.m` — slide 73, blocco 1: Allineamento multiplo e visualizzazione
+- `E034_S75_getgenbank-1-3-scaricare-e-ispezionare-u.m` — slide 75, blocco 1: getgenbank (1/3): scaricare e ispezionare un record
+- `E035_S76_getgenbank-2-3-controllare-la-sequenza-e.m` — slide 76, blocco 1: getgenbank (2/3): controllare la sequenza e salvarla
+- `E036_S77_getgenbank-2-2-porzioni-e-proteine-con-g.m` — slide 77, blocco 1: getgenbank (2/2): porzioni e proteine con getgenpept
+- `E037_S78_ncbi-e-utilities-ricerche-programmatiche.m` — slide 78, blocco 1: NCBI E-Utilities: ricerche programmatiche (1/2)
+- `E038_S79_ncbi-e-utilities-ricerche-programmatiche.m` — slide 79, blocco 1: NCBI E-Utilities: ricerche programmatiche (2/2)
