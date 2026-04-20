@@ -21,6 +21,7 @@ flowchart TD
     ROOT --> LAB2[02-vscode-agentic-coding]
     ROOT --> LAB3[03-matlab-strutture-controllo]
     ROOT --> LAB4[04-python-jupyter-analisi-biomedica]
+    ROOT --> LAB5[05-matlab-bioinfo-hl7-ncbi]
     ROOT --> LAB6[06-matlab-data-regex-livescript]
 
     LAB1 --> L1README[README.md - guida e installazione]
@@ -36,6 +37,8 @@ flowchart TD
     LAB4 --> L4README[README.md - guida Lab 4]
     LAB4 --> L4DATA[data/]
     LAB4 --> L4NB[jupyter/]
+    LAB5 --> L5README[README.md - guida Lab 5]
+    LAB5 --> L5CODE[codice/L15 + codice/L16]
     LAB6 --> L6README[README.md - guida Lab 6]
     LAB6 --> L6EX[esercizi/]
     LAB6 --> L6SOL[soluzioni/]
@@ -66,6 +69,11 @@ Lab_Biomed/
     ├── esercizi/
     ├── soluzioni/
     └── jupyter/
+├── 05-matlab-bioinfo-hl7-ncbi/        ← Lab 5: MATLAB bioinformatica, HL7, NCBI, codice completo da slide
+│   ├── README.md
+│   └── codice/
+│       ├── L15/
+│       └── L16/
 └── 06-matlab-data-regex-livescript/   ← Lab 6: MATLAB dati, regex, live script, grafici
     ├── README.md
     ├── dati/

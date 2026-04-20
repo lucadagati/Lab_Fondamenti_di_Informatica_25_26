@@ -1,0 +1,7 @@
+<ClinicalDocument>
+  <realmCode code="IT"/>
+  <title>… referto …</title>
+  <recordTarget>… paziente …</recordTarget>
+  <author>… medico / struttura …</author>
+  <component><structuredBody>… sezioni OSS, diagnosi …</structuredBody></component>
+</ClinicalDocument>
