@@ -6,6 +6,56 @@ Repository del corso: [Lab_Fondamenti_di_Informatica_25_26](https://github.com/l
 
 ---
 
+## Cos'è SQLite e quali capacità offre
+
+**SQLite** è un **motore di database relazionale incorporato** (*embedded*): non è un programma “server” separato a cui ci si connette in rete, ma una **libreria** che gira **nello stesso processo** dell’applicazione (MATLAB, browser, app mobile, firmware, ecc.). Il database è in pratica **uno o più file sul disco** (tipicamente estensione `.db` o `.sqlite`), facili da copiare, archiviare e versionare a parte (con le dovute cautele: il file va considerato come un *artefatto* generato, non sempre adatto al controllo versioni se contiene dati sensibili).
+
+Documentazione di riferimento del progetto: [sqlite.org](https://www.sqlite.org/).
+
+### Perché è diffuso in ambito applicativo (e spesso anche clinico-informatico)
+
+- **Assenza di installazione server**: non serve installare PostgreSQL, MySQL o SQL Server per avere tabelle, chiavi e SQL; si crea un file e si interroga.
+- **Transazioni [ACID](https://www.sqlite.org/transactional.html)** (Atomicità, Coerenza, Isolamento, Durabilità): operazioni multiple possono essere raggruppate in una transazione (`BEGIN` … `COMMIT` / `ROLLBACK`) così o tutte hanno effetto o nessuna, riducendo stati intermedi inconsistenti — importante quando si aggiornano più tabelle correlate (es. anagrafica + esami).
+- **Linguaggio SQL** molto completo per un motore così compatto: `SELECT` con `JOIN`, aggregazioni (`COUNT`, `SUM`, …), `GROUP BY`, `HAVING`, sottoquery, viste (`VIEW`), indici (`CREATE INDEX`), vincoli di integrità referenziale (`FOREIGN KEY`, se abilitati con `PRAGMA foreign_keys`), trigger (`CREATE TRIGGER`) per regole automatiche o tracciamento.
+- **Leggerezza e portabilità**: lo stesso file può essere spostato tra macchine diverse (stesso schema); utile per **prototipi**, **dataset didattici**, strumenti offline o integrazione in pipeline dove un server DB sarebbe eccessivo.
+- **Affidabilità orientata alla persistenza su file**: SQLite è progettato per resistere a arresti improvvisi (crash, mancanza corrente) usando un diario di transazioni; è una scelta frequente dove serve affidabilità senza complessità operativa.
+
+### Modello dei dati e “tipi” in SQLite
+
+SQLite usa un modello **flessibile a tipi dinamici**: ogni valore ha un *tipo di storage* (NULL, INTEGER, REAL, TEXT, BLOB), ma la colonna può accettare valori di tipo diverso da quello dichiarato (a differenza di molti database più rigidi). In pratica conviene **trattare lo schema come contratto progettuale** e validare i dati in applicazione o con vincoli `CHECK`, così le query restano prevedibili.
+
+Funzionalità tipiche che userai o incontrerai:
+
+| Area | Cosa consente SQLite (in sintesi) |
+|------|-----------------------------------|
+| **Schema** | `CREATE TABLE`, `ALTER TABLE`, chiavi primarie, `UNIQUE`, `NOT NULL`, `DEFAULT`, `CHECK`, chiavi esterne (`REFERENCES`) |
+| **Query** | `SELECT`, filtri `WHERE`, ordinamenti `ORDER BY`, `LIMIT`, `OFFSET`, join multipli, espressioni, funzioni built-in (date, stringhe, matematica) |
+| **Scrittura** | `INSERT`, `UPDATE`, `DELETE`, `REPLACE`; inserimenti massivi e transazioni per performance |
+| **Indici** | Accelerare ricerche e join su colonne usate spesso nei filtri; indici parziali e espressioni in versioni recenti |
+| **Viste** | `CREATE VIEW` per incapsulare query complesse dietro un nome tabella-like |
+| **Trigger** | Automazioni su `INSERT`/`UPDATE`/`DELETE` (es. log di modifica, derivazione di campi) |
+| **Estensioni** | Molte build includono estensioni come **JSON1** (manipolazione JSON via SQL) o **FTS5** (ricerca full-text); la disponibilità dipende da come SQLite è stato compilato nel prodotto che lo incorpora |
+
+Versioni recenti di SQLite aggiungono anche costrutti SQL moderni (es. **funzioni di finestra** *window functions*, **CTE** ricorsive `WITH RECURSIVE` in scenari avanzati). Per il laboratorio ci si concentra sul nucleo: **DDL**, **SELECT** con filtri e join, **aggregazioni**, **INSERT**.
+
+### Concorrenza e limiti da tenere a mente
+
+- **Un writer alla volta**: in scenari con molte scritture simultanee da processi diversi, un server come PostgreSQL scala meglio. SQLite è ideale quando **pochi processi** scrivono (o una sola applicazione serializza le scritture) e molte letture possono procedere in parallelo (secondo modalità *journal* / WAL).
+- **Dimensione e memoria**: database molto grandi richiedono progettazione (indici, batch); per dataset da laboratorio non è un problema.
+- **Sicurezza**: il file `.db` **non è cifrato** di default; la protezione è a livello di file system (permessi, disco cifrato, backup controllati). Esistono estensioni come [SQLCipher](https://www.zetetic.net/sqlcipher/) per applicazioni che richiedono cifratura trasparente — fuori scope di questo lab.
+
+### Ruolo nel contesto biomedico / LIS (collegamento al corso)
+
+In sistemi complessi (HIS, LIS, RIS) i database server sono centrali. Tuttavia **SQLite** compare spesso come:
+
+- **cache locale** o database di app strumenti/clinici;
+- **formato di scambio** “queryabile” tra moduli (un file condiviso);
+- **motore didattico** per imparare SQL e il modello relazionale senza infrastruttura.
+
+In questo laboratorio SQLite è proprio questo: un **file relazionale** (`dati/lab07_biomed.db`) che MATLAB apre con il [Database Toolbox](https://www.mathworks.com/help/database/matlab-interface-to-sqlite.html), esegue SQL e scambia dati con le `table` del workspace — ponte naturale tra i concetti di **DBMS** visti a lezione e la **pratica in MATLAB**.
+
+---
+
 ## 1) Obiettivi
 
 - Capire **schema relazionale** minimale (chiavi, vincoli `FOREIGN KEY`, tipi di dato SQLite).
