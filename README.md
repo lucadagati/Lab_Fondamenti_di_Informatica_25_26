@@ -7,7 +7,7 @@ Università degli Studi di Messina – Anno accademico 2025/26
 
 ---
 
-Questo repository raccoglie i **laboratori** del corso. Ogni laboratorio è in una cartella numerata; all’interno trovi la guida, l’**installazione dei tool** (quando serve) e le istruzioni passo-passo. Il **Lab 1** è dedicato a crittografia e sicurezza informatica; il **Lab 2** a VS Code, coding assistito in modalità agentica e un percorso fino a **Jupyter** con Python; il **Lab 3** a **MATLAB** e strutture di controllo con esercizi, hint e soluzioni; il **Lab 4** a Python in notebook Jupyter, riusando l’ambiente predisposto nel Lab 2; il **Lab 6** a MATLAB su file formattati, RegEx/Patterns, Live Scripts e grafici.
+Questo repository raccoglie i **laboratori** del corso. Ogni laboratorio è in una cartella numerata; all’interno trovi la guida, l’**installazione dei tool** (quando serve) e le istruzioni passo-passo. Il **Lab 1** è dedicato a crittografia e sicurezza informatica; il **Lab 2** a VS Code, coding assistito in modalità agentica e un percorso fino a **Jupyter** con Python; il **Lab 3** a **MATLAB** e strutture di controllo con esercizi, hint e soluzioni; il **Lab 4** a Python in notebook Jupyter, riusando l’ambiente predisposto nel Lab 2; il **Lab 5** a MATLAB bioinformatica, HL7 e NCBI; il **Lab 6** a MATLAB su file formattati, RegEx/Patterns, Live Scripts e grafici; il **Lab 7** a database relazionali con **SQLite** e interfaccia **MATLAB** (Database Toolbox).
 
 ---
 
@@ -23,6 +23,7 @@ flowchart TD
     ROOT --> LAB4[04-python-jupyter-analisi-biomedica]
     ROOT --> LAB5[05-matlab-bioinfo-hl7-ncbi]
     ROOT --> LAB6[06-matlab-data-regex-livescript]
+    ROOT --> LAB7[07-matlab-sqlite-database]
 
     LAB1 --> L1README[README.md - guida e installazione]
     LAB1 --> L1PWD[passwords.txt]
@@ -42,6 +43,11 @@ flowchart TD
     LAB6 --> L6README[README.md - guida Lab 6]
     LAB6 --> L6EX[esercizi/]
     LAB6 --> L6SOL[soluzioni/]
+    LAB7 --> L7README[README.md - guida Lab 7]
+    LAB7 --> L7SQL[sql/]
+    LAB7 --> L7CODE[codice/]
+    LAB7 --> L7EX[esercizi/]
+    LAB7 --> L7SOL[soluzioni/]
 ```
 
 ```
@@ -74,12 +80,20 @@ Lab_Biomed/
 │   └── codice/
 │       ├── L15/
 │       └── L16/
-└── 06-matlab-data-regex-livescript/   ← Lab 6: MATLAB dati, regex, live script, grafici
+├── 06-matlab-data-regex-livescript/ ← Lab 6: MATLAB dati, regex, live script, grafici
+│   ├── README.md
+│   ├── dati/
+│   ├── esercizi/
+│   ├── soluzioni/
+│   └── live_scripts/
+└── 07-matlab-sqlite-database/         ← Lab 7: SQLite, SQL, Database Toolbox da MATLAB
     ├── README.md
+    ├── sql/
     ├── dati/
+    ├── codice/
     ├── esercizi/
     ├── soluzioni/
-    └── live_scripts/
+    └── script_init_db.sh
 ```
 
 ---
@@ -92,9 +106,10 @@ Lab_Biomed/
 | 2 | [02-vscode-agentic-coding](02-vscode-agentic-coding/README.md) | VS Code (o equivalente), assistenti in modalità agentica, Python da script a notebook Jupyter |
 | 3 | [03-matlab-strutture-controllo](03-matlab-strutture-controllo/README.md) | MATLAB: script con strutture di controllo (`if`, `for`, `while`, `switch`) in formato esercizio + hint + soluzione |
 | 4 | [04-python-jupyter-analisi-biomedica](04-python-jupyter-analisi-biomedica/README.md) | Python + Jupyter per analisi di parametri vitali, riusando l’ambiente del Lab 2 |
-| 5 | *(in arrivo)* | Cartella riservata ai prossimi contenuti |
+| 5 | [05-matlab-bioinfo-hl7-ncbi](05-matlab-bioinfo-hl7-ncbi/README.md) | MATLAB: bioinformatica, HL7, NCBI; codice di riferimento dalle slide L15/L16 |
 | 6 | [06-matlab-data-regex-livescript](06-matlab-data-regex-livescript/README.md) | MATLAB: CSV/XLS/XML, RegEx/Patterns, Live Scripts, grafici ed export |
-| 7, … | *(in arrivo)* | Saranno aggiunti nella stessa struttura (es. `07-nome-lab/`) |
+| 7 | [07-matlab-sqlite-database](07-matlab-sqlite-database/README.md) | SQLite e SQL; accesso da MATLAB (`sqlite`, `fetch`, `sqlread`, `execute`, `sqlwrite`) |
+| 8, … | *(in arrivo)* | Saranno aggiunti nella stessa struttura (es. `08-nome-lab/`) |
 
 Apri la cartella del laboratorio assegnato e segui il **README** al suo interno (installazione dei tool e svolgimento).
 

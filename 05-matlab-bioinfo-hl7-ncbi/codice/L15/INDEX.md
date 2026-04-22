@@ -5,8 +5,8 @@ Totale esempi: **43**
 - `E001_S05_ripasso-tipi-di-dato-matlab-double-string-ta.m` — slide 5, blocco 1: Ripasso: tipi di dato MATLAB (double, string, table, celle)
 - `E002_S08_live-script-esempio-di-sezioni-e-codice.m` — slide 8, blocco 1: Live Script: esempio di sezioni (%%) e codice
 - `E003_S09_formule-latex-nel-live-editor-e-export-pdf-h.m` — slide 9, blocco 1: Formule LaTeX nel Live Editor e export (PDF, HTML, Word)
-- `E004_S13_figure-professionali-assi-legenda-tipografia.m` — slide 13, blocco 1: Figure professionali: assi, legenda, tipografia e risoluzione (cont. 2/2)
-- `E005_S14_figure-professionali-assi-legenda-tipografia.m` — slide 14, blocco 1: Figure professionali: assi, legenda, tipografia e risoluzione
+- `E004_S13_figure-professionali-assi-legenda-tipografia.m` — slide 13, blocco 1: Figure professionali: assi, legenda, tipografia e risoluzione
+- `E005_S14_figure-professionali-assi-legenda-tipografia.m` — slide 14, blocco 1: Figure professionali: assi, legenda, tipografia e risoluzione (cont. 2/2)
 - `E006_S15_layout-multiplo-subplot-classico.m` — slide 15, blocco 1: Layout multiplo: subplot (classico)
 - `E007_S16_layout-multiplo-tiledlayout-r2019b.m` — slide 16, blocco 1: Layout multiplo: tiledlayout (R2019b+)
 - `E008_S17_caso-studio-visualizzare-un-tracciato-ecg-in.m` — slide 17, blocco 1: Caso studio: visualizzare un tracciato ECG in MATLAB (1/2)
@@ -15,12 +15,12 @@ Totale esempi: **43**
 - `E011_S20_export-figure-2-2-print-e-copygraphics.m` — slide 20, blocco 1: Export figure (2/2): print e copygraphics
 - `E012_S37_regexp-regexpi-regexprep-panoramica-e-differ.m` — slide 37, blocco 1: regexp, regexpi, regexprep: panoramica e differenze
 - `E013_S38_opzioni-di-regexp-match-token-split-posizion.m` — slide 38, blocco 1: Opzioni di regexp: match, token, split, posizioni
-- `E014_S41_caso-studio-estrarre-valori-da-un-referto-di.m` — slide 41, blocco 1: Caso studio: estrarre valori da un referto di laboratorio (cont. 2/2)
-- `E015_S42_caso-studio-estrarre-valori-da-un-referto-di.m` — slide 42, blocco 1: Caso studio: estrarre valori da un referto di laboratorio (1/2)
-- `E016_S43_caso-studio-estrarre-valori-da-un-referto-di.m` — slide 43, blocco 1: Caso studio: estrarre valori da un referto di laboratorio (2/2)
+- `E014_S41_caso-studio-estrarre-valori-da-un-referto-di.m` — slide 41, blocco 1: Caso studio: estrarre valori da un referto di laboratorio (1/3)
+- `E015_S42_caso-studio-estrarre-valori-da-un-referto-di.m` — slide 42, blocco 1: Caso studio: estrarre valori da un referto di laboratorio (2/3)
+- `E016_S43_caso-studio-estrarre-valori-da-un-referto-di.m` — slide 43, blocco 1: Caso studio: estrarre valori da un referto di laboratorio (3/3)
 - `E017_S45_dna-trovare-codoni-es-atg-con-le-regex-in-ma.m` — slide 45, blocco 1: DNA: trovare codoni (es. ATG) con le regex in MATLAB
-- `E018_S46_regexprep-anonimizzazione-normalizzazione-e-.m` — slide 46, blocco 1: regexprep: anonimizzazione, normalizzazione e sostituzioni (cont. 2/2)
-- `E019_S47_regexprep-anonimizzazione-normalizzazione-e-.m` — slide 47, blocco 1: regexprep: anonimizzazione, normalizzazione e sostituzioni
+- `E018_S46_regexprep-anonimizzazione-normalizzazione-e-.m` — slide 46, blocco 1: regexprep: anonimizzazione, normalizzazione e sostituzioni
+- `E019_S47_regexprep-anonimizzazione-normalizzazione-e-.m` — slide 47, blocco 1: regexprep: anonimizzazione, normalizzazione e sostituzioni (cont. 2/2)
 - `E020_S48_string-array-regexpi-e-ciclo-su-pi-referti.m` — slide 48, blocco 1: string array, regexpi e ciclo su più referti
 - `E021_S50_pattern-di-base-extract-su-stringhe.m` — slide 50, blocco 1: Pattern di base: extract su stringhe
 - `E022_S51_combinare-pattern-con-letterspattern-e-digit.m` — slide 51, blocco 1: Combinare pattern (+, |, ~) con lettersPattern e digitsPattern
@@ -35,13 +35,13 @@ Totale esempi: **43**
 - `E031_S70_fastq-read-qualit-e-bam-allineamenti.m` — slide 70, blocco 2: FASTQ (read + qualità) e BAM (allineamenti)
 - `E032_S71_quality-control-ngs-qualit-per-base-e-filtri.m` — slide 71, blocco 1: Quality control NGS: qualità per base e filtri
 - `E033_S73_sequenze-in-matlab-1-2-fasta-e-composizione.m` — slide 73, blocco 1: Sequenze in MATLAB (1/2): FASTA e composizione
-- `E034_S74_sequenze-in-matlab-2-2-complemento-traduzion.m` — slide 74, blocco 1: Sequenze in MATLAB (2/2): complemento, traduzione, ORF (cont. 2/2)
-- `E035_S75_sequenze-in-matlab-2-2-complemento-traduzion.m` — slide 75, blocco 1: Sequenze in MATLAB (2/2): complemento, traduzione, ORF
+- `E034_S74_sequenze-in-matlab-2-2-complemento-traduzion.m` — slide 74, blocco 1: Sequenze in MATLAB (2/2): complemento, traduzione, ORF
+- `E035_S75_sequenze-in-matlab-2-2-complemento-traduzion.m` — slide 75, blocco 1: Sequenze in MATLAB (2/2): complemento, traduzione, ORF (cont. 2/2)
 - `E036_S76_allineamento-a-coppie-nwalign-e-swalign.m` — slide 76, blocco 1: Allineamento a coppie: nwalign e swalign
 - `E037_S77_allineamento-multiplo-e-visualizzazione.m` — slide 77, blocco 1: Allineamento multiplo e visualizzazione
-- `E038_S79_getgenbank-1-3-scaricare-e-ispezionare-un-re.m` — slide 79, blocco 1: getgenbank (1/3): scaricare e ispezionare un record (cont. 2/2)
-- `E039_S80_getgenbank-1-3-scaricare-e-ispezionare-un-re.m` — slide 80, blocco 1: getgenbank (1/3): scaricare e ispezionare un record
+- `E038_S79_getgenbank-1-3-scaricare-e-ispezionare-un-re.m` — slide 79, blocco 1: getgenbank (1/3): scaricare e ispezionare un record
+- `E039_S80_getgenbank-1-3-scaricare-e-ispezionare-un-re.m` — slide 80, blocco 1: getgenbank (1/3): scaricare e ispezionare un record (cont. 2/2)
 - `E040_S81_getgenbank-2-3-controllare-la-sequenza-e-sal.m` — slide 81, blocco 1: getgenbank (2/3): controllare la sequenza e salvarla
-- `E041_S82_getgenbank-2-2-porzioni-e-proteine-con-getge.m` — slide 82, blocco 1: getgenbank (2/2): porzioni e proteine con getgenpept
+- `E041_S82_getgenbank-3-3-porzioni-e-proteine-con-getge.m` — slide 82, blocco 1: getgenbank (3/3): porzioni e proteine con getgenpept
 - `E042_S83_ncbi-e-utilities-ricerche-programmatiche-1-2.m` — slide 83, blocco 1: NCBI E-Utilities: ricerche programmatiche (1/2)
 - `E043_S84_ncbi-e-utilities-ricerche-programmatiche-2-2.m` — slide 84, blocco 1: NCBI E-Utilities: ricerche programmatiche (2/2)

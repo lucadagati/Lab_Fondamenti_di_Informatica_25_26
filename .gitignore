@@ -28,3 +28,6 @@ venv/
 __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
+
+# Lab 7 – database SQLite generato localmente
+07-matlab-sqlite-database/dati/*.db
