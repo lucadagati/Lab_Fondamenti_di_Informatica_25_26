@@ -123,6 +123,89 @@ run('codice/init_lab07_database.m')
 | `esercizi/es04_execute_insert.m` | `INSERT` con `execute` |
 | `esercizi/es05_sqlwrite_bulk.m` | Inserimento multiplo con `sqlwrite` |
 
+### Schema logico del database di laboratorio
+
+Il file `lab07_biomed.db` contiene due tabelle collegate da una chiave esterna (`paziente_id` → `pazienti.id`):
+
+```mermaid
+erDiagram
+    pazienti ||--o{ esami_lab : "ha misurazioni"
+    pazienti {
+        int id PK
+        string nome
+        string cognome
+        int anno_nascita
+        string sesso
+    }
+    esami_lab {
+        int id PK
+        int paziente_id FK
+        string nome_esame
+        float valore
+        string unita
+        string data_esame
+        string note
+    }
+```
+
+### Flusso comune a tutti gli script (reset + connessione)
+
+Prima di ogni esercizio il database viene ricreato da zero, così ogni Run è ripetibile e isolato:
+
+```mermaid
+flowchart TD
+    A[Avvio script .m] --> B["lab07_create_fresh_database(labDir)"]
+    B --> C["Elimina lab07_biomed.db se esiste"]
+    C --> D["CREATE TABLE pazienti / esami_lab"]
+    D --> E["INSERT dati di esempio"]
+    E --> F["conn = sqlite(dbPath)"]
+    F --> G{Esercizio}
+    G --> H["Operazioni SQL / MATLAB"]
+    H --> I["close(conn)"]
+```
+
+### Cosa fa ogni esercizio sul database
+
+```mermaid
+flowchart LR
+    subgraph es01["es01 — lettura tabella"]
+        e1a["sqlread(conn,'pazienti')"] --> e1b["table T in workspace"]
+    end
+    subgraph es02["es02 — filtro WHERE"]
+        e2a["fetch: SELECT … FROM esami_lab WHERE …"] --> e2b["solo glicemia ≥ 100"]
+    end
+    subgraph es03["es03 — JOIN + GROUP BY"]
+        e3a["JOIN pazienti ↔ esami_lab"] --> e3b["COUNT per paziente"]
+    end
+    subgraph es04["es04 — INSERT testuale"]
+        e4a["execute(INSERT …)"] --> e4b["nuova riga Ferritina"]
+    end
+    subgraph es05["es05 — bulk da table"]
+        e5a["table MATLAB 2 righe"] --> e5b["sqlwrite → esami_lab"]
+    end
+```
+
+Relazione tra **join** dell’esercizio 3 e le due tabelle:
+
+```mermaid
+flowchart LR
+    P[pazienti] -->|p.id = e.paziente_id| E[esami_lab]
+    E --> Q["SELECT … COUNT(e.id) … GROUP BY p.id"]
+    P --> Q
+```
+
+### Sequenza consigliata (dipendenze concettuali)
+
+Dal più “passivo” (solo lettura intera tabella) al più “attivo” (scrittura multipla):
+
+```mermaid
+flowchart TD
+    es01["es01 sqlread"] --> es02["es02 fetch + WHERE"]
+    es02 --> es03["es03 JOIN + GROUP BY"]
+    es03 --> es04["es04 execute INSERT"]
+    es04 --> es05["es05 sqlwrite bulk"]
+```
+
 Le soluzioni in `soluzioni/*_sol.m` replicano lo stesso comportamento degli esercizi corrispondenti.
 
 ---
