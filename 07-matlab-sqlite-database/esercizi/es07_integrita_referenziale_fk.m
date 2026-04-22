@@ -1,7 +1,10 @@
-% ESERCIZIO 7 — Chiave esterna e integrità referenziale
+% ESERCIZIO 7 — Foreign key: niente esami senza paziente reale
 %
-% esami_lab.paziente_id punta a pazienti.id (FOREIGN KEY). Significa: non puoi
-% registrare un esame per un paziente che non esiste. Così non restano “esami orfani”.
+% esami_lab.paziente_id è FOREIGN KEY verso pazienti.id: ogni esame deve riferire
+% un id che esiste davvero in pazienti. Senza PRAGMA foreign_keys=ON SQLite
+% potrebbe accettare anche id sbagliati: per questo la riga PRAGMA è obbligatoria.
+%
+% Glossario: es01_apri_db_sqlread.m
 
 cartellaScript = fileparts(mfilename('fullpath'));
 cartellaLab = fileparts(cartellaScript);
@@ -9,12 +12,11 @@ addpath(fullfile(cartellaLab, 'codice'));
 
 percorsoDb = lab07_create_fresh_database(cartellaLab);
 conn = sqlite(percorsoDb);
-execute(conn, 'PRAGMA foreign_keys=ON;');
+execute(conn, 'PRAGMA foreign_keys=ON;');  % senza questo, SQLite potrebbe ignorare le FK
 
-disp('--- Nessun paziente con id = 9999 (id inventato) ---');
+disp('--- Quanti pazienti hanno id = 9999? (deve essere 0) ---');
 disp(fetch(conn, 'SELECT COUNT(*) AS n FROM pazienti WHERE id = 9999;'));
 
-% --- Tentativo errato: esame collegato a un paziente inesistente ---------------
 try
     execute(conn, [ ...
         'INSERT INTO esami_lab (paziente_id, nome_esame, valore, unita, data_esame) ' ...
@@ -22,7 +24,7 @@ try
         ]);
     disp('ERRORE: l''INSERT non avrebbe dovuto riuscire.');
 catch ME
-    disp('--- Il database ha bloccato l''INSERT (integrità referenziale) ---');
+    disp('--- Errore atteso: violazione di FOREIGN KEY (paziente inesistente) ---');
     disp(ME.message);
 end
 

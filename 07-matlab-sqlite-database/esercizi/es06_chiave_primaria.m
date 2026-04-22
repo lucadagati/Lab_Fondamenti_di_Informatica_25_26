@@ -1,8 +1,10 @@
-% ESERCIZIO 6 — Perché serve la chiave primaria (id univoco)
+% ESERCIZIO 6 — Chiave primaria: perché l id non può duplicarsi
 %
-% La colonna id in pazienti è PRIMARY KEY: identifica una sola riga e non può
-% essere duplicata. Qui proviamo a inserire un secondo paziente con lo stesso
-% id = 1 (già usato da Giulia Verdi): il database deve rifiutare l’operazione.
+% In pazienti la colonna id è PRIMARY KEY = identificatore univoco della riga.
+% Se potessi duplicare lo stesso id, non sapresti quale record aggiornare o cancellare.
+%
+% Glossario comandi: vedi es01_apri_db_sqlread.m (sqlite, execute, fetch, PRAGMA, close).
+% try / catch : esegue il blocco try; se MATLAB riceve un errore dall execute, salta al catch.
 
 cartellaScript = fileparts(mfilename('fullpath'));
 cartellaLab = fileparts(cartellaScript);
@@ -10,14 +12,12 @@ addpath(fullfile(cartellaLab, 'codice'));
 
 percorsoDb = lab07_create_fresh_database(cartellaLab);
 conn = sqlite(percorsoDb);
-execute(conn, 'PRAGMA foreign_keys=ON;');
+execute(conn, 'PRAGMA foreign_keys=ON;');  % glossario: es01_apri_db_sqlread.m
 
-disp('--- Prima riga in pazienti (id = 1 è occupato) ---');
+disp('--- Riga con id = 1 (già presente dopo l init) ---');
 disp(fetch(conn, 'SELECT id, nome, cognome FROM pazienti WHERE id = 1;'));
 
-% --- Tentativo errato: stesso id di una riga già esistente -------------------
-% Senza chiave primaria potresti avere due “Giulia” con lo stesso id e non sapere
-% quale aggiornare: il modello relazionale impedisce questa ambiguità.
+% execute(...) lancerà errore se violi la PRIMARY KEY → lo catturiamo con catch
 try
     execute(conn, [ ...
         'INSERT INTO pazienti (id, nome, cognome, anno_nascita, sesso) ' ...
@@ -25,7 +25,7 @@ try
         ]);
     disp('ERRORE: l''INSERT non avrebbe dovuto riuscire.');
 catch ME
-    disp('--- Il database ha bloccato l''INSERT (come atteso) ---');
+    disp('--- Messaggio di errore del database (violazione di chiave primaria) ---');
     disp(ME.message);
 end
 

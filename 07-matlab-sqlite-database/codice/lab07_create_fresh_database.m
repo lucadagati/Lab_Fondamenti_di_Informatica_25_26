@@ -1,14 +1,11 @@
 function dbPath = lab07_create_fresh_database(labDir)
 %LAB07_CREATE_FRESH_DATABASE Ricrea da zero il file SQLite del laboratorio.
 %
-%   Passi interni: (1) elimina lab07_biomed.db se presente; (2) apre sqlite;
-%   (3) PRAGMA foreign_keys=ON sulla connessione; (4) CREATE TABLE;
-%   (5) INSERT dati di esempio; (6) chiude la connessione. Restituisce il path del .db.
-%
 %   dbPath = lab07_create_fresh_database(labDir)
-%   labDir = cartella 07-matlab-sqlite-database (quella che contiene codice/, esercizi/, …).
+%   labDir = cartella radice 07-matlab-sqlite-database.
 %
 %   Richiede Database Toolbox: sqlite, execute, close.
+%   Glossario dei comandi MATLAB/SQLite: vedi anche esercizi/es01_apri_db_sqlread.m
 
     labDir = char(labDir);
     datiDir = fullfile(labDir, 'dati');
@@ -17,6 +14,7 @@ function dbPath = lab07_create_fresh_database(labDir)
     end
 
     dbPath = fullfile(datiDir, 'lab07_biomed.db');
+
     if isfile(dbPath)
         try
             delete(dbPath);
@@ -25,10 +23,13 @@ function dbPath = lab07_create_fresh_database(labDir)
         end
     end
 
+    % sqlite(apreFile) crea l oggetto connessione; il file viene creato se non esiste
     conn = sqlite(dbPath);
-    % In SQLite i vincoli FOREIGN KEY sono controllati solo se questa pragma è ON per la connessione.
+
+    % PRAGMA = comando speciale SQLite; foreign_keys=ON attiva i controlli sulle FK
     execute(conn, 'PRAGMA foreign_keys=ON;');
 
+    % CREATE TABLE definisce la tabella pazienti nel file .db
     execute(conn, [ ...
         'CREATE TABLE pazienti (' ...
         'id INTEGER PRIMARY KEY AUTOINCREMENT,' ...
@@ -39,6 +40,7 @@ function dbPath = lab07_create_fresh_database(labDir)
         ');' ...
         ]);
 
+    % REFERENCES … ON DELETE CASCADE: se cancello un paziente, SQLite rimuove i suoi esami
     execute(conn, [ ...
         'CREATE TABLE esami_lab (' ...
         'id INTEGER PRIMARY KEY AUTOINCREMENT,' ...
@@ -51,6 +53,7 @@ function dbPath = lab07_create_fresh_database(labDir)
         ');' ...
         ]);
 
+    % Ogni execute con INSERT aggiunge una riga; le stringhe SQL usano '' per l apostrofo
     execute(conn, 'INSERT INTO pazienti (nome, cognome, anno_nascita, sesso) VALUES (''Giulia'', ''Verdi'', 1992, ''F'');');
     execute(conn, 'INSERT INTO pazienti (nome, cognome, anno_nascita, sesso) VALUES (''Marco'', ''Bianchi'', 1985, ''M'');');
     execute(conn, 'INSERT INTO pazienti (nome, cognome, anno_nascita, sesso) VALUES (''Laura'', ''Neri'', 2001, ''F'');');

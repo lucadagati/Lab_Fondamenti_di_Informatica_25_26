@@ -1,6 +1,6 @@
-% DEMO — Lettura da SQLite: sqlread e fetch (con JOIN)
+% DEMO — Lettura: sqlread e fetch (con JOIN)
 %
-% Esempio breve dopo aver ricreato il database di laboratorio.
+% Glossario completo (sqlite, execute, fetch, PRAGMA, close): es01_apri_db_sqlread.m
 
 cartellaScript = fileparts(mfilename('fullpath'));
 cartellaLab = fileparts(cartellaScript);
@@ -10,12 +10,10 @@ percorsoDb = lab07_create_fresh_database(cartellaLab);
 conn = sqlite(percorsoDb);
 execute(conn, 'PRAGMA foreign_keys=ON;');
 
-% Lettura rapida di un’intera tabella
 pazienti = sqlread(conn, 'pazienti');
 disp('Pazienti:');
 disp(pazienti);
 
-% Query con join: cognome del paziente accanto a ogni glicemia
 sqlGlicemia = [ ...
     'SELECT p.cognome, e.valore, e.unita ' ...
     'FROM esami_lab e ' ...
@@ -24,7 +22,7 @@ sqlGlicemia = [ ...
     'ORDER BY e.valore DESC' ...
     ];
 glicemie = fetch(conn, sqlGlicemia);
-disp('Glicemie (con cognome):');
+disp('Glicemie con cognome:');
 disp(glicemie);
 
 close(conn);

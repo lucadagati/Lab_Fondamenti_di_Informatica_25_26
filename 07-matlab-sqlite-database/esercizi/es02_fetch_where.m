@@ -1,27 +1,26 @@
 % ESERCIZIO 2 — Filtrare righe con SELECT e fetch
 %
-% Cosa impari: scrivere una query SQL con WHERE e leggere il risultato in MATLAB.
-%             Qui: solo le glicemie maggiori o uguali a 100 mg/dL.
+% Obiettivo: usare WHERE in SQL e leggere il risultato con fetch (solo glicemie ≥ 100).
+%
+% Glossario: vedi commenti in es01_apri_db_sqlread.m (sqlite, execute, fetch, PRAGMA, close).
 
-cartellaScript = fileparts(mfilename('fullpath'));
-cartellaLab = fileparts(cartellaScript);
-addpath(fullfile(cartellaLab, 'codice'));
+cartellaScript = fileparts(mfilename('fullpath'));  % cartella di questo script
+cartellaLab = fileparts(cartellaScript);              % radice del lab 07
+addpath(fullfile(cartellaLab, 'codice'));             % così MATLAB trova lab07_create_…
 
-percorsoDb = lab07_create_fresh_database(cartellaLab);
-conn = sqlite(percorsoDb);
-execute(conn, 'PRAGMA foreign_keys=ON;');
+percorsoDb = lab07_create_fresh_database(cartellaLab);  % ricrea il file .db
+conn = sqlite(percorsoDb);                              % apre il database
+execute(conn, 'PRAGMA foreign_keys=ON;');               % vedi glossario in es01
 
-% --- Query SQL (testo) -------------------------------------------------------
-% In SQL l’apostrofo dentro una stringa si scrive raddoppiato: ''Glicemia''
-% La query chiede: tutte le colonne utili, dalla tabella esami_lab,
-% solo righe dove il nome dell’esame è "Glicemia" e il valore è >= 100.
+% Costruiamo il testo della query SQL (è una stringa MATLAB, una sola istruzione SELECT).
+% Regola SQL: l’apostrofo dentro il testo si scrive doppio → ''Glicemia'' nel codice MATLAB.
 query = [ ...
     'SELECT id, paziente_id, nome_esame, valore, unita, data_esame ' ...
     'FROM esami_lab ' ...
     'WHERE nome_esame = ''Glicemia'' AND valore >= 100' ...
     ];
 
-% fetch esegue il SELECT e restituisce una table MATLAB
+% fetch esegue il SELECT e mette le righe trovate in una table MATLAB chiamata risultato
 risultato = fetch(conn, query);
 
 close(conn);

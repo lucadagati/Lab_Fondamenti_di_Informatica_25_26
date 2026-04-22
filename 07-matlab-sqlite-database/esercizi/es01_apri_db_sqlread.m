@@ -1,38 +1,41 @@
 % ESERCIZIO 1 — Leggere una tabella intera con sqlread
 %
-% Cosa impari: aprire un file SQLite e portare in MATLAB tutte le righe
-%             della tabella "pazienti" come una table.
+% Obiettivo: aprire il file SQLite e copiare in MATLAB tutta la tabella "pazienti".
+%
+% --- Glossario (comandi che trovi in tutti gli esercizi del lab) ---------------
+% sqlite(percorsoFile) : apre il database (è un file .db sul disco). Restituisce
+%                        l’oggetto "connessione" che chiamiamo spesso conn.
+% execute(conn, testoSql) : manda al motore SQLite una stringa SQL. Si usa per
+%                        comandi che NON restituiscono una tabella di risultato
+%                        (es. PRAGMA, INSERT, DELETE) oppure per impostazioni.
+% fetch(conn, testoSql)  : esegue un SELECT e restituisce il risultato come table.
+% sqlread(conn, nomeTab): equivale a "SELECT * FROM nomeTab": legge tutta la tabella.
+% close(conn)           : chiude la connessione; va sempre fatto a fine script.
+% PRAGMA foreign_keys=ON: PRAGMA = istruzione speciale di SQLite per configurare
+%                        il motore. foreign_keys=ON attiva il controllo delle
+%                        FOREIGN KEY su questa connessione (se no, SQLite le ignora).
 
-% --- Passo 1: capire in che cartella si trova questo script ----------------
-% mfilename('fullpath') restituisce il percorso completo di questo file .m
-% fileparts(...) toglie il nome del file e lascia la cartella "esercizi"
-cartellaScript = fileparts(mfilename('fullpath'));
+% --- Percorsi: dove siamo sul disco -----------------------------------------
+cartellaScript = fileparts(mfilename('fullpath'));   % cartella che contiene questo .m (esercizi/)
+cartellaLab = fileparts(cartellaScript);             % cartella radice del lab 07
 
-% La cartella del laboratorio è un livello sopra (contiene esercizi/, codice/, …)
-cartellaLab = fileparts(cartellaScript);
-
-% --- Passo 2: rendere visibile la funzione che crea il database ------------
-% La funzione lab07_create_fresh_database sta in codice/
+% MATLAB deve "vedere" la funzione in codice/ → la aggiungiamo al path
 addpath(fullfile(cartellaLab, 'codice'));
 
-% --- Passo 3: creare (da zero) il file dati/lab07_biomed.db -----------------
-% Cancella il vecchio file se c’è, ricrea tabelle e dati di esempio.
-% Il valore di ritorno è il percorso completo del file .db
+% Ricrea da zero il file dati/lab07_biomed.db (tabelle + righe di esempio)
 percorsoDb = lab07_create_fresh_database(cartellaLab);
 
-% --- Passo 4: aprire il database --------------------------------------------
-% conn è l’oggetto "connessione": serve per tutte le operazioni successive
+% Apre il file .db: da qui in poi parliamo col database tramite conn
 conn = sqlite(percorsoDb);
-% Abilita il controllo delle FOREIGN KEY su questa connessione (in SQLite è off di default).
+
+% PRAGMA non è una tabella: è un comando al motore. Qui chiediamo: controlla le FK.
 execute(conn, 'PRAGMA foreign_keys=ON;');
 
-% --- Passo 5: leggere tutta la tabella pazienti ------------------------------
-% sqlread legge un’intera tabella e la mette in una table MATLAB (righe = pazienti)
+% Leggiamo l’intera tabella pazienti → una table MATLAB (una riga per paziente)
 tabellaPazienti = sqlread(conn, 'pazienti');
 
-% --- Passo 6: chiudere la connessione (buona abitudine) ----------------------
+% Liberiamo il file .db per altri programmi / prossime esecuzioni
 close(conn);
 
-% --- Passo 7: vedere il risultato a Command Window ---------------------------
 disp('Tabella pazienti:');
 disp(tabellaPazienti);

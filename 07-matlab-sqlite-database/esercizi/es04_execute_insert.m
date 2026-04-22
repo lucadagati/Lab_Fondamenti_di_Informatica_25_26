@@ -1,6 +1,9 @@
-% ESERCIZIO 4 — Inserire una riga con execute (testo SQL fisso)
+% ESERCIZIO 4 — Inserire una riga con execute (comando SQL INSERT)
 %
-% Cosa impari: usare INSERT ... VALUES ... per aggiungere un esame al database.
+% Obiettivo: aggiungere un esame scrivendo l’INSERT a mano come stringa.
+%
+% execute(conn, sql) : per INSERT/UPDATE/DELETE non serve fetch: execute invia il comando
+%                      e non restituisce righe. Per controllare dopo, usi fetch con un SELECT.
 
 cartellaScript = fileparts(mfilename('fullpath'));
 cartellaLab = fileparts(cartellaScript);
@@ -8,11 +11,9 @@ addpath(fullfile(cartellaLab, 'codice'));
 
 percorsoDb = lab07_create_fresh_database(cartellaLab);
 conn = sqlite(percorsoDb);
-execute(conn, 'PRAGMA foreign_keys=ON;');
+execute(conn, 'PRAGMA foreign_keys=ON;');  % glossario: es01
 
-% --- INSERT: una nuova riga nella tabella esami_lab -------------------------
-% paziente_id = 1 è il primo paziente inserito dalla funzione di init
-% I valori testuali in SQL vanno tra apici singoli ''testo''
+% Stringa SQL completa: INSERT INTO … VALUES (…). Numeri senza apici; testi con ''…''.
 comandoInsert = [ ...
     'INSERT INTO esami_lab (paziente_id, nome_esame, valore, unita, data_esame) ' ...
     'VALUES (1, ''Ferritina'', 85, ''ng/mL'', ''2025-05-01'')' ...
@@ -20,7 +21,7 @@ comandoInsert = [ ...
 
 execute(conn, comandoInsert);
 
-% --- Verifica: leggiamo solo le righe "Ferritina" ----------------------------
+% Dopo una scrittura, spesso si verifica con un SELECT (qui fetch)
 verifica = fetch(conn, 'SELECT * FROM esami_lab WHERE nome_esame = ''Ferritina''');
 
 close(conn);

@@ -1,7 +1,9 @@
-% ESERCIZIO 5 — Inserire più righe insieme con sqlwrite
+% ESERCIZIO 5 — Inserire più righe con sqlwrite
 %
-% Cosa impari: costruire una table MATLAB e copiarla nel database come nuove righe.
-%             Più comodo del INSERT a mano quando hai molte righe simili.
+% Obiettivo: costruire una table MATLAB e copiarla nel DB senza scrivere INSERT a mano.
+%
+% sqlwrite(conn, nomeTabellaDb, tableMatlab) : aggiunge in coda alla tabella SQL le righe
+%     della table MATLAB. I nomi delle colonne della table devono coincidere con il DB.
 
 cartellaScript = fileparts(mfilename('fullpath'));
 cartellaLab = fileparts(cartellaScript);
@@ -9,26 +11,20 @@ addpath(fullfile(cartellaLab, 'codice'));
 
 percorsoDb = lab07_create_fresh_database(cartellaLab);
 conn = sqlite(percorsoDb);
-execute(conn, 'PRAGMA foreign_keys=ON;');
+execute(conn, 'PRAGMA foreign_keys=ON;');  % glossario: es01
 
-% --- Costruiamo una table con 2 righe e 5 colonne ---------------------------
-% I nomi delle colonne della table devono coincidere con i nomi nel database:
-%   paziente_id, nome_esame, valore, unita, data_esame
-% Ogni colonna è un vettore colonna: due righe = due valori per colonna.
-
+% table(...) costruisce una tabella MATLAB: ogni argomento è una colonna (vettore colonna).
 nuoveRighe = table( ...
-    [2; 2], ...              % stesso paziente (id 2) per entrambe le righe
-    {'LDH'; 'PCR'}, ...      % nome dell’esame, una stringa per riga
-    [230; 0.4], ...          % valore numerico
-    {'U/L'; 'mg/dL'}, ...    % unità di misura
-    {'2025-05-10'; '2025-05-10'}, ...  % data (testo, come nello schema)
+    [2; 2], ...                        % colonna paziente_id (due righe, stesso id)
+    {'LDH'; 'PCR'}, ...                % colonna nome_esame (celle di testo)
+    [230; 0.4], ...                    % colonna valore (numeri)
+    {'U/L'; 'mg/dL'}, ...              % colonna unita
+    {'2025-05-10'; '2025-05-10'}, ...  % colonna data_esame (testo, come nello schema SQL)
     'VariableNames', {'paziente_id', 'nome_esame', 'valore', 'unita', 'data_esame'} ...
     );
 
-% sqlwrite aggiunge in fondo alla tabella esami_lab le righe della table MATLAB
 sqlwrite(conn, 'esami_lab', nuoveRighe);
 
-% --- Verifica con una lettura semplice ---------------------------------------
 queryVerifica = [ ...
     'SELECT * FROM esami_lab ' ...
     'WHERE paziente_id = 2 AND nome_esame IN (''LDH'', ''PCR'') ' ...

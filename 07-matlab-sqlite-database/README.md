@@ -114,7 +114,19 @@ run('codice/init_lab07_database.m')
 
 ## 5) Esercizi (script autonomi, commentati)
 
-Gli script in `esercizi/` sono **l’unico insieme di esercizi**: nessuna cartella “soluzioni”; il codice è già completo, **lineare** e **commentato** riga per sezione per seguire il flusso (cartelle → database → query → chiusura → `disp`).
+Gli script in `esercizi/` sono **l’unico insieme di esercizi**: nessuna cartella “soluzioni”; il codice è già completo, **lineare** e commentato in italiano.
+
+**Glossario nel codice (cosa significa `PRAGMA` e gli altri comandi)**  
+Nel file **`esercizi/es01_apri_db_sqlread.m`** trovi all’inizio un blocco di commenti che spiega, punto per punto:
+
+- **`PRAGMA foreign_keys=ON`** — in SQLite la parola *PRAGMA* indica un’istruzione speciale per **configurare il motore**, non una tabella. `foreign_keys=ON` **attiva il controllo** delle chiavi esterne su **questa** connessione; se restasse disattivato (comportamento storico di SQLite), potresti inserire `paziente_id` inesistenti senza errore.
+- **`sqlite(percorso)`** — apre il file `.db` e restituisce l’oggetto connessione.
+- **`execute(conn, sql)`** — invia al motore una stringa SQL che **non** deve restituire una tabella di risultato (es. `PRAGMA`, `INSERT`, `DELETE`, `BEGIN`).
+- **`fetch(conn, sql)`** — esegue un `SELECT` e restituisce una **table** MATLAB.
+- **`sqlread(conn, nomeTabella)`** — scorciatoia per leggere tutta una tabella.
+- **`close(conn)`** — chiude la connessione al file.
+
+Gli altri esercizi **rimandano a es01** per il glossario lungo e aggiungono commenti **sopra o a fine riga** su ogni passaggio nuovo (`JOIN`, `try/catch`, `BEGIN`/`ROLLBACK`, `sprintf`, …). Lo stesso stile è in `codice/lab07_create_fresh_database.m` (commenti sulle `CREATE`/`INSERT`).
 
 | File | Argomento |
 |------|-----------|

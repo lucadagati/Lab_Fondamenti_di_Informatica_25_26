@@ -1,7 +1,7 @@
-% init_lab07_database — ricrea il database di esempio (punto di ingresso da riga di comando)
+% init_lab07_database — ricrea solo il file .db (nessun esercizio)
 %
-% Imposta la Current Folder sulla cartella 07-matlab-sqlite-database, poi:
-%   run('codice/init_lab07_database.m')
+% Esegui dalla cartella del lab: run('codice/init_lab07_database.m')
+% Glossario comandi: vedi esercizi/es01_apri_db_sqlread.m
 
 thisDir = fileparts(mfilename('fullpath'));
 labDir = fileparts(thisDir);

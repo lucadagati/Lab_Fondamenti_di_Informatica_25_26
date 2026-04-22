@@ -1,6 +1,6 @@
-% DEMO — Inserire una riga con sqlwrite e controllare con fetch
+% DEMO — sqlwrite: da table MATLAB a riga nel database
 %
-% Mostra come passare da una piccola table MATLAB a una nuova riga SQL.
+% Glossario: es01_apri_db_sqlread.m. sqlwrite = inserimento da table senza scrivere INSERT a mano.
 
 cartellaScript = fileparts(mfilename('fullpath'));
 cartellaLab = fileparts(cartellaScript);
@@ -10,7 +10,6 @@ percorsoDb = lab07_create_fresh_database(cartellaLab);
 conn = sqlite(percorsoDb);
 execute(conn, 'PRAGMA foreign_keys=ON;');
 
-% Una sola riga da inserire: nomi colonne = colonne del database
 riga = table( ...
     3, {'Creatinina'}, 97.0, {'umol/L'}, {'2025-04-20'}, ...
     'VariableNames', {'paziente_id', 'nome_esame', 'valore', 'unita', 'data_esame'} ...
