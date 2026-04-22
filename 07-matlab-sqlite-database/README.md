@@ -58,7 +58,7 @@ In questo laboratorio SQLite è proprio questo: un **file relazionale** (`dati/l
 
 ## 1) Obiettivi
 
-- Capire **schema relazionale** minimale (chiavi, vincoli `FOREIGN KEY`, tipi di dato SQLite).
+- Capire **schema relazionale** esteso a più tabelle (chiavi, vincoli `FOREIGN KEY`, `CASCADE` / `RESTRICT`, tipi SQLite).
 - Scrivere interrogazioni **SELECT** con **WHERE**, **JOIN**, **GROUP BY**.
 - Eseguire **INSERT** con `execute` e inserimenti tabellari con `sqlwrite`.
 - Aprire un file **`.db`**, leggere risultati come `table` MATLAB e chiudere la connessione in modo ordinato.
@@ -119,7 +119,7 @@ Gli script in `esercizi/` sono **l’unico insieme di esercizi**: nessuna cartel
 **Glossario nel codice (cosa significa `PRAGMA` e gli altri comandi)**  
 Nel file **`esercizi/es01_apri_db_sqlread.m`** trovi all’inizio un blocco di commenti che spiega, punto per punto:
 
-- **`PRAGMA foreign_keys=ON`** — in SQLite la parola *PRAGMA* indica un’istruzione speciale per **configurare il motore**, non una tabella. `foreign_keys=ON` **attiva il controllo** delle chiavi esterne su **questa** connessione; se restasse disattivato (comportamento storico di SQLite), potresti inserire `paziente_id` inesistenti senza errore.
+- **`PRAGMA foreign_keys=ON`** — in SQLite la parola *PRAGMA* indica un’istruzione speciale per **configurare il motore**, non una tabella. `foreign_keys=ON` **attiva il controllo** delle chiavi esterne su **questa** connessione; se restasse disattivato (comportamento storico di SQLite), potresti inserire `visita_id` o `tipo_esame_id` inesistenti senza errore.
 - **`sqlite(percorso)`** — apre il file `.db` e restituisce l’oggetto connessione.
 - **`execute(conn, sql)`** — invia al motore una stringa SQL che **non** deve restituire una tabella di risultato (es. `PRAGMA`, `INSERT`, `DELETE`, `BEGIN`).
 - **`fetch(conn, sql)`** — esegue un `SELECT` e restituisce una **table** MATLAB.
@@ -136,40 +136,84 @@ Gli altri esercizi **rimandano a es01** per il glossario lungo e aggiungono comm
 | `esercizi/es04_execute_insert.m` | `INSERT` con `execute` |
 | `esercizi/es05_sqlwrite_bulk.m` | Inserimento multiplo con `sqlwrite` |
 | `esercizi/es06_chiave_primaria.m` | **Chiave primaria**: perché `id` non può essere duplicato |
-| `esercizi/es07_integrita_referenziale_fk.m` | **Foreign key**: niente esami per `paziente_id` inesistente |
+| `esercizi/es07_integrita_referenziale_fk.m` | **Foreign key**: niente risultati per `visita_id` inesistente |
 | `esercizi/es08_delete_cascade.m` | **ON DELETE CASCADE**: coerenza dopo cancellazione paziente |
 | `esercizi/es09_transazione_coerenza.m` | **Transazione + ROLLBACK**: modifiche annullate insieme |
 
 ### Chiavi, integrità referenziale e coerenza
 
-- **Chiave primaria** (`pazienti.id`): identifica in modo univoco una riga; evita duplicati ambigui e collega in modo stabile le righe delle altre tabelle.
-- **Chiave esterna** (`esami_lab.paziente_id` → `pazienti.id`): impone che ogni esame appartenga a un paziente realmente presente (**integrità referenziale**). In SQLite il controllo è attivo solo se sulla connessione è impostato `PRAGMA foreign_keys=ON` (lo fanno `lab07_create_fresh_database` e ogni script del lab dopo `sqlite(...)`).
-- **ON DELETE CASCADE**: quando elimini un paziente, i suoi esami vengono rimossi automaticamente, così non restano righe “orfane”.
-- **Transazioni** (`BEGIN` / `COMMIT` / `ROLLBACK`): raggruppano più comandi in un’unità logica; con `ROLLBACK` il database torna allo stato precedente, utile per coerenza in caso di errore o annullamento.
+- **Chiave primaria** (es. `pazienti.id`, `visite.id`): identifica in modo univoco una riga e collega in modo stabile le altre tabelle.
+- **Chiavi esterne**: ogni risultato in `esami_lab` punta a una **visita** reale (`visita_id` → `visite.id`) e a un **tipo di test** del catalogo (`tipo_esame_id` → `tipi_esame.id`). Le visite collegano **paziente** e **medico**. In SQLite il controllo FK è attivo solo con `PRAGMA foreign_keys=ON` (come in `lab07_create_fresh_database` e negli script del lab).
+- **ON DELETE CASCADE** (catena paziente → visite → esami): eliminando un paziente, SQLite rimuove le sue visite e, grazie a un secondo `CASCADE` su `esami_lab`, anche tutti i risultati legati a quelle visite, evitando orfani.
+- **ON DELETE RESTRICT** (es. `medici.reparto_id`): impedisce di cancellare un `reparti` se esistono medici ancora assegnati — modello realistico di vincolo “amministrativo”.
+- **Transazioni** (`BEGIN` / `COMMIT` / `ROLLBACK`): raggruppano più comandi in un’unità logica; con `ROLLBACK` il database torna allo stato precedente, utile quando più tabelle devono aggiornarsi insieme.
 
 Approfondimento ufficiale SQLite sulle foreign key: [Foreign Key Support](https://www.sqlite.org/foreignkeys.html).
 
 ### Schema logico del database di laboratorio
 
-Il file `lab07_biomed.db` contiene due tabelle collegate da una chiave esterna (`paziente_id` → `pazienti.id`):
+Il file `lab07_biomed.db` modella in modo semplificato un contesto **LIS / cartella clinica**: reparti e personale, pazienti, catalogo prestazioni, visite (contesto in cui si richiedono esami) e infine i **risultati numerici** collegati alla visita e al tipo di test.
+
+| Tabella | Ruolo |
+|---------|--------|
+| `reparti` | Unità organizzative (laboratorio, ematologia, medicina interna): contesto in cui lavorano medici e, opzionalmente, dove è seguito il paziente. |
+| `medici` | Anagrafica minima; ogni medico appartiene a un reparto (`reparto_id` con `ON DELETE RESTRICT`). |
+| `pazienti` | Anagrafica paziente; `reparto_id` opzionale (`SET NULL` se il reparto viene rimosso). |
+| `tipi_esame` | Catalogo dei test (codice univoco, nome, unità di riferimento, range min/max didattici). |
+| `visite` | Incontro **paziente–medico** in una data, con motivo della visita; è il “contenitore” logico delle richieste/risposte di laboratorio in questo esempio. |
+| `esami_lab` | Una riga = un valore misurato: FK a `visite` (`CASCADE` alla cancellazione della visita o, a catena, del paziente) e a `tipi_esame` (`RESTRICT`: non si cancella un tipo se esistono ancora risultati). |
 
 ```mermaid
 erDiagram
-    pazienti ||--o{ esami_lab : "ha misurazioni"
+    reparti ||--o{ medici : "ospita"
+    reparti ||--o{ pazienti : "riferimento opzionale"
+    pazienti ||--o{ visite : "effettua"
+    medici ||--o{ visite : "segue"
+    visite ||--o{ esami_lab : "produce risultati"
+    tipi_esame ||--o{ esami_lab : "classifica"
+    reparti {
+        int id PK
+        string nome
+        int piano
+        string descrizione
+    }
+    medici {
+        int id PK
+        string nome
+        string cognome
+        int reparto_id FK
+        string specialita
+    }
     pazienti {
         int id PK
         string nome
         string cognome
         int anno_nascita
         string sesso
+        int reparto_id FK
+    }
+    tipi_esame {
+        int id PK
+        string codice UK
+        string nome
+        string unita_ref
+        float valore_min
+        float valore_max
+    }
+    visite {
+        int id PK
+        int paziente_id FK
+        int medico_id FK
+        string data_visita
+        string motivo
     }
     esami_lab {
         int id PK
-        int paziente_id FK
-        string nome_esame
+        int visita_id FK
+        int tipo_esame_id FK
         float valore
         string unita
-        string data_esame
+        string data_risultato
         string note
     }
 ```
@@ -182,7 +226,7 @@ Prima di ogni esercizio il database viene ricreato da zero, così ogni Run è ri
 flowchart TD
     A[Avvio script .m] --> B["lab07_create_fresh_database(labDir)"]
     B --> C["Elimina lab07_biomed.db se esiste"]
-    C --> D["CREATE TABLE pazienti / esami_lab"]
+    C --> D["CREATE TABLE (6 tabelle + FK)"]
     D --> E["INSERT dati di esempio"]
     E --> F["conn = sqlite(dbPath)"]
     F --> F2["PRAGMA foreign_keys=ON"]
@@ -199,13 +243,13 @@ flowchart LR
         e1a["sqlread(conn,'pazienti')"] --> e1b["table T in workspace"]
     end
     subgraph es02["es02 — filtro WHERE"]
-        e2a["fetch: SELECT … FROM esami_lab WHERE …"] --> e2b["solo glicemia ≥ 100"]
+        e2a["fetch: JOIN esami + tipi + visite"] --> e2b["solo glicemia ≥ 100"]
     end
     subgraph es03["es03 — JOIN + GROUP BY"]
-        e3a["JOIN pazienti ↔ esami_lab"] --> e3b["COUNT per paziente"]
+        e3a["pazienti ↔ visite ↔ esami_lab"] --> e3b["COUNT per paziente"]
     end
     subgraph es04["es04 — INSERT testuale"]
-        e4a["execute(INSERT …)"] --> e4b["nuova riga Ferritina"]
+        e4a["execute(INSERT …)"] --> e4b["nuova riga esami_lab (FK visita+tipo)"]
     end
     subgraph es05["es05 — bulk da table"]
         e5a["table MATLAB 2 righe"] --> e5b["sqlwrite → esami_lab"]
@@ -220,22 +264,23 @@ flowchart TB
         s6["INSERT con id duplicato"] --> r6["errore: PK"]
     end
     subgraph es07["es07 — foreign key"]
-        s7["INSERT esame paziente_id=9999"] --> r7["errore: FK"]
+        s7["INSERT esame visita_id=9999"] --> r7["errore: FK"]
     end
     subgraph es08["es08 — CASCADE"]
-        s8["DELETE paziente"] --> r8["esami collegati eliminati"]
+        s8["DELETE paziente"] --> r8["visite ed esami a catena"]
     end
     subgraph es09["es09 — transazione"]
-        s9["BEGIN + INSERT + ROLLBACK"] --> r9["nessuna traccia residua"]
+        s9["BEGIN + INSERT paziente/visita/esame + ROLLBACK"] --> r9["nessuna traccia residua"]
     end
 ```
 
-Relazione tra **join** dell’esercizio 3 e le due tabelle:
+Relazione tra **join** dell’esercizio 3 e le tabelle coinvolte:
 
 ```mermaid
 flowchart LR
-    P[pazienti] -->|p.id = e.paziente_id| E[esami_lab]
-    E --> Q["SELECT … COUNT(e.id) … GROUP BY p.id"]
+    P[pazienti] -->|p.id = v.paziente_id| V[visite]
+    V -->|v.id = e.visita_id| E[esami_lab]
+    E --> Q["COUNT(e.id) GROUP BY p.id"]
     P --> Q
 ```
 

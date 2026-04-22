@@ -1,8 +1,7 @@
 % ESERCIZIO 8 — ON DELETE CASCADE: se togli il paziente, spariscono i suoi esami
 %
-% Nello schema CREATE, esami_lab ha REFERENCES pazienti(id) ON DELETE CASCADE.
-% CASCADE = effetto a catena: DELETE su pazienti rimuove automaticamente le righe
-% di esami_lab che puntavano a quel paziente_id.
+% Schema a catena: visite REFERENCES pazienti ON DELETE CASCADE; esami_lab REFERENCES
+% visite ON DELETE CASCADE. DELETE su pazienti elimina le sue visite e quindi i risultati.
 %
 % Glossario: es01. COUNT(*) in SQL conta le righe; AS n dà nome alla colonna del risultato.
 
@@ -14,15 +13,20 @@ percorsoDb = lab07_create_fresh_database(cartellaLab);
 conn = sqlite(percorsoDb);
 execute(conn, 'PRAGMA foreign_keys=ON;');  % necessario anche per ON DELETE CASCADE
 
-prima = fetch(conn, 'SELECT COUNT(*) AS n FROM esami_lab WHERE paziente_id = 1;');
-disp('--- Numero esami con paziente_id = 1 prima del DELETE sul paziente ---');
+prima = fetch(conn, [ ...
+    'SELECT COUNT(*) AS n FROM esami_lab e ' ...
+    'JOIN visite v ON v.id = e.visita_id WHERE v.paziente_id = 1;' ...
+    ]);
+disp('--- Esami legati al paziente id=1 (tramite visite) prima del DELETE ---');
 disp(prima.n(1));
 
-% DELETE rimuove righe dalla tabella pazienti che soddisfano la condizione WHERE
 execute(conn, 'DELETE FROM pazienti WHERE id = 1;');
 
-dopo = fetch(conn, 'SELECT COUNT(*) AS n FROM esami_lab WHERE paziente_id = 1;');
-disp('--- Stesso conteggio dopo il DELETE (grazie alla CASCADE deve essere 0) ---');
+dopo = fetch(conn, [ ...
+    'SELECT COUNT(*) AS n FROM esami_lab e ' ...
+    'JOIN visite v ON v.id = e.visita_id WHERE v.paziente_id = 1;' ...
+    ]);
+disp('--- Stesso conteggio dopo il DELETE (CASCADE su visite ed esami → 0) ---');
 disp(dopo.n(1));
 
 close(conn);
