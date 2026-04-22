@@ -90,10 +90,10 @@ Se restituisce `0`, installare/abilitare il toolbox o usare il percorso alternat
 | `codice/init_lab07_database.m` | Punto di ingresso: chiama la funzione sopra e stampa il path del file creato |
 | `codice/demo_connessione_lettura.m` | Demo breve: `sqlread` + `fetch` con `JOIN` |
 | `codice/demo_sqlwrite_inserimento.m` | Demo breve: `sqlwrite` + verifica |
-| `esercizi/` | **Solo** script completi, **commentati passo passo** in italiano; ogni Run ricrea il DB |
+| `esercizi/` | Nove esercizi MATLAB (`es01`–`es09`); ogni esecuzione rigenera il database di esempio |
 | `dati/` | Qui viene creato `lab07_biomed.db` (non versionato; vedi `.gitignore` del repo) |
 
-Ogni script in `esercizi/` e nelle `demo` aggiunge `codice` al path MATLAB, chiama `lab07_create_fresh_database(labDir)` e poi esegue le operazioni illustrate nei commenti.
+Ogni file in `esercizi/` e nelle `demo` aggiunge `codice` al path MATLAB, chiama `lab07_create_fresh_database(labDir)` e applica le operazioni descritte nello stesso file.
 
 ---
 
@@ -112,11 +112,11 @@ run('codice/init_lab07_database.m')
 
 ---
 
-## 5) Esercizi (script autonomi, commentati)
+## 5) Esercizi
 
-Gli script in `esercizi/` sono **l’unico insieme di esercizi**: nessuna cartella “soluzioni”; il codice è già completo, **lineare** e commentato in italiano.
+La cartella `esercizi/` contiene nove file MATLAB, da `es01_apri_db_sqlread.m` a `es09_transazione_coerenza.m`. Ogni file può essere eseguito indipendentemente dagli altri e, all’avvio, ricrea il database di esempio, così i risultati sono riproducibili.
 
-**Glossario nel codice (cosa significa `PRAGMA` e gli altri comandi)**  
+**Glossario nel codice (`PRAGMA`, `sqlite`, `fetch`, …)**  
 Nel file **`esercizi/es01_apri_db_sqlread.m`** trovi all’inizio un blocco di commenti che spiega, punto per punto:
 
 - **`PRAGMA foreign_keys=ON`** — in SQLite la parola *PRAGMA* indica un’istruzione speciale per **configurare il motore**, non una tabella. `foreign_keys=ON` **attiva il controllo** delle chiavi esterne su **questa** connessione; se restasse disattivato (comportamento storico di SQLite), potresti inserire `visita_id` o `tipo_esame_id` inesistenti senza errore.
@@ -126,7 +126,7 @@ Nel file **`esercizi/es01_apri_db_sqlread.m`** trovi all’inizio un blocco di c
 - **`sqlread(conn, nomeTabella)`** — scorciatoia per leggere tutta una tabella.
 - **`close(conn)`** — chiude la connessione al file.
 
-Gli altri esercizi **rimandano a es01** per il glossario lungo e aggiungono commenti **sopra o a fine riga** su ogni passaggio nuovo (`JOIN`, `try/catch`, `BEGIN`/`ROLLBACK`, `sprintf`, …). Lo stesso stile è in `codice/lab07_create_fresh_database.m` (commenti sulle `CREATE`/`INSERT`).
+Dall’`es02` in poi si usano le stesse definizioni dell’`es01` e si introducono nel codice le tecniche aggiuntive (`JOIN`, `try/catch`, `BEGIN`/`ROLLBACK`, `sprintf`, …). Anche `codice/lab07_create_fresh_database.m` include commenti sulle istruzioni `CREATE` e `INSERT`.
 
 | File | Argomento |
 |------|-----------|
