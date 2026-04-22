@@ -1,8 +1,9 @@
-% Soluzione esercizio 2
+% Soluzione esercizio 2 (stesso comportamento di esercizi/es02_fetch_where.m)
 
 thisDir = fileparts(mfilename('fullpath'));
 labDir = fileparts(thisDir);
-dbPath = fullfile(labDir, 'dati', 'lab07_biomed.db');
+addpath(fullfile(labDir, 'codice'));
+dbPath = lab07_create_fresh_database(labDir);
 
 conn = sqlite(dbPath);
 q = [ ...
@@ -12,4 +13,6 @@ q = [ ...
     ];
 T = fetch(conn, q);
 close(conn);
+
+disp('--- Glicemia >= 100 mg/dL ---');
 disp(T);

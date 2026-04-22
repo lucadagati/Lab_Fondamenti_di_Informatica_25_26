@@ -1,18 +1,27 @@
-% Esercizio 5 — sqlwrite da table MATLAB
-% Obiettivo: costruire in MATLAB una table con 2 righe di esami per paziente_id = 2
-% e inserirle in blocco con sqlwrite nella tabella esami_lab.
+% Esercizio 5 — sqlwrite: due nuovi esami per il paziente_id = 2
+%
+% Ricrea il database, inserisce due righe da table MATLAB, verifica con fetch.
 
 thisDir = fileparts(mfilename('fullpath'));
 labDir = fileparts(thisDir);
-dbPath = fullfile(labDir, 'dati', 'lab07_biomed.db');
+addpath(fullfile(labDir, 'codice'));
+dbPath = lab07_create_fresh_database(labDir);
 
-% TODO 1: conn = sqlite(dbPath);
+conn = sqlite(dbPath);
+T = table( ...
+    [2; 2], ...
+    {'LDH'; 'PCR'}, ...
+    [230; 0.4], ...
+    {'U/L'; 'mg/dL'}, ...
+    {'2025-05-10'; '2025-05-10'}, ...
+    'VariableNames', {'paziente_id', 'nome_esame', 'valore', 'unita', 'data_esame'} ...
+    );
+sqlwrite(conn, 'esami_lab', T);
+T2 = fetch(conn, [ ...
+    'SELECT * FROM esami_lab WHERE paziente_id = 2 ' ...
+    'AND nome_esame IN (''LDH'', ''PCR'') ORDER BY nome_esame;' ...
+    ]);
+close(conn);
 
-% TODO 2: costruire T con colonne paziente_id, nome_esame, valore, unita, data_esame
-% (esempio: LDH 230 U/L e PCR 0.4 mg/dL, data coerente)
-
-% TODO 3: sqlwrite(conn, 'esami_lab', T);
-
-% TODO 4: leggere con fetch le righe appena inserite (filtro su paziente_id = 2 e nome_esame IN (...))
-
-% TODO 5: close(conn); disp(...);
+disp('--- Esami LDH e PCR per paziente 2 ---');
+disp(T2);

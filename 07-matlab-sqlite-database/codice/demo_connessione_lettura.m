@@ -1,23 +1,16 @@
-% demo_connessione_lettura — esempio minimo: aprire SQLite e leggere dati
-%
-% Prerequisito: eseguire prima init_lab07_database.m (una volta per sessione).
+% demo_connessione_lettura — esempio: ricrea il DB, sqlread e fetch con JOIN
 
 thisDir = fileparts(mfilename('fullpath'));
 labDir = fileparts(thisDir);
-dbPath = fullfile(labDir, 'dati', 'lab07_biomed.db');
-
-if ~isfile(dbPath)
-    error('Manca il database. Esegui: run(''codice/init_lab07_database.m'')');
-end
+addpath(fullfile(labDir, 'codice'));
+dbPath = lab07_create_fresh_database(labDir);
 
 conn = sqlite(dbPath);
 
-% Lettura intera tabella come table MATLAB
 T_paz = sqlread(conn, 'pazienti');
 disp('--- pazienti (sqlread) ---');
 disp(T_paz);
 
-% Query arbitraria con fetch
 q = [ ...
     'SELECT p.cognome, e.nome_esame, e.valore, e.unita ' ...
     'FROM esami_lab e JOIN pazienti p ON e.paziente_id = p.id ' ...

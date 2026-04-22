@@ -1,14 +1,12 @@
-% demo_sqlwrite_inserimento — inserire righe da una table MATLAB in SQLite
-%
-% Prerequisito: database creato con init_lab07_database.m
+% demo_sqlwrite_inserimento — ricrea il DB, inserisce una riga con sqlwrite, verifica con fetch
 
 thisDir = fileparts(mfilename('fullpath'));
 labDir = fileparts(thisDir);
-dbPath = fullfile(labDir, 'dati', 'lab07_biomed.db');
+addpath(fullfile(labDir, 'codice'));
+dbPath = lab07_create_fresh_database(labDir);
 
 conn = sqlite(dbPath);
 
-% Nuova riga come table MATLAB (nomi colonne = nomi colonne DB)
 Nuovo = table( ...
     3, {'Creatinina'}, 97.0, {'umol/L'}, {'2025-04-20'}, ...
     'VariableNames', {'paziente_id', 'nome_esame', 'valore', 'unita', 'data_esame'} ...

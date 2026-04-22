@@ -1,21 +1,15 @@
-% Esercizio 1 — Connessione e sqlread
-% Obiettivo: aprire lab07_biomed.db e caricare la tabella pazienti in una table T.
+% Esercizio 1 — Connessione SQLite, lettura tabella pazienti con sqlread
+%
+% Eseguibile con un solo Run: ricrea sempre lab07_biomed.db e mostra i pazienti.
 
 thisDir = fileparts(mfilename('fullpath'));
 labDir = fileparts(thisDir);
-dbPath = fullfile(labDir, 'dati', 'lab07_biomed.db');
+addpath(fullfile(labDir, 'codice'));
+dbPath = lab07_create_fresh_database(labDir);
 
-% TODO 1: verificare che il file DB esista; se manca, suggerire di lanciare init_lab07_database.m
-% if ~isfile(dbPath) ...
+conn = sqlite(dbPath);
+T = sqlread(conn, 'pazienti');
+close(conn);
 
-% TODO 2: creare la connessione SQLite
-% conn = sqlite(dbPath);
-
-% TODO 3: leggere la tabella pazienti
-% T = sqlread(conn, 'pazienti');
-
-% TODO 4: chiudere la connessione
-% close(conn);
-
-% TODO 5: visualizzare T con disp
-% disp(T);
+disp('--- Tabella pazienti ---');
+disp(T);

@@ -1,8 +1,9 @@
-% Soluzione esercizio 3
+% Soluzione esercizio 3 (stesso comportamento di esercizi/es03_join_groupby.m)
 
 thisDir = fileparts(mfilename('fullpath'));
 labDir = fileparts(thisDir);
-dbPath = fullfile(labDir, 'dati', 'lab07_biomed.db');
+addpath(fullfile(labDir, 'codice'));
+dbPath = lab07_create_fresh_database(labDir);
 
 conn = sqlite(dbPath);
 q = [ ...
@@ -14,4 +15,6 @@ q = [ ...
     ];
 T = fetch(conn, q);
 close(conn);
+
+disp('--- Numero esami per paziente ---');
 disp(T);

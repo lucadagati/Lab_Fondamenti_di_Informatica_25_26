@@ -1,13 +1,22 @@
-% Esercizio 3 — JOIN e aggregazione
-% Obiettivo: per ogni paziente, contare quante misurazioni ha in esami_lab (alias: n_esami).
+% Esercizio 3 — JOIN e GROUP BY: numero di esami per paziente
+%
+% Ricrea il database, conta le righe in esami_lab per ogni paziente.
 
 thisDir = fileparts(mfilename('fullpath'));
 labDir = fileparts(thisDir);
-dbPath = fullfile(labDir, 'dati', 'lab07_biomed.db');
+addpath(fullfile(labDir, 'codice'));
+dbPath = lab07_create_fresh_database(labDir);
 
-% TODO 1: conn = sqlite(dbPath);
+conn = sqlite(dbPath);
+q = [ ...
+    'SELECT p.id, p.cognome, COUNT(e.id) AS n_esami ' ...
+    'FROM pazienti p ' ...
+    'LEFT JOIN esami_lab e ON e.paziente_id = p.id ' ...
+    'GROUP BY p.id, p.cognome ' ...
+    'ORDER BY p.id;' ...
+    ];
+T = fetch(conn, q);
+close(conn);
 
-% TODO 2: scrivere una query con JOIN pazienti/esami_lab e GROUP BY paziente (o p.id)
-% Suggerimento: SELECT p.id, p.cognome, COUNT(e.id) AS n_esami FROM ...
-
-% TODO 3: T = fetch(conn, q); close(conn); disp(T);
+disp('--- Numero esami per paziente ---');
+disp(T);

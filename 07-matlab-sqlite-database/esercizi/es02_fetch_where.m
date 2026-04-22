@@ -1,15 +1,20 @@
-% Esercizio 2 — fetch e filtro WHERE
-% Obiettivo: selezionare tutte le misurazioni di glicemia con valore >= 100 mg/dL.
+% Esercizio 2 — fetch: glicemia con valore >= 100 mg/dL
+%
+% Ricrea il database, interroga esami_lab con filtri WHERE.
 
 thisDir = fileparts(mfilename('fullpath'));
 labDir = fileparts(thisDir);
-dbPath = fullfile(labDir, 'dati', 'lab07_biomed.db');
+addpath(fullfile(labDir, 'codice'));
+dbPath = lab07_create_fresh_database(labDir);
 
-% TODO 1: aprire conn = sqlite(dbPath);
+conn = sqlite(dbPath);
+q = [ ...
+    'SELECT id, paziente_id, nome_esame, valore, unita, data_esame ' ...
+    'FROM esami_lab ' ...
+    'WHERE nome_esame = ''Glicemia'' AND valore >= 100;' ...
+    ];
+T = fetch(conn, q);
+close(conn);
 
-% TODO 2: costruire la stringa SQL (attenzione alle virgolette singole in SQL: '' per apostrofo)
-% q = 'SELECT ... FROM esami_lab WHERE nome_esame = ''Glicemia'' AND valore >= 100;';
-
-% TODO 3: T = fetch(conn, q);
-
-% TODO 4: close(conn); disp(T);
+disp('--- Glicemia >= 100 mg/dL ---');
+disp(T);

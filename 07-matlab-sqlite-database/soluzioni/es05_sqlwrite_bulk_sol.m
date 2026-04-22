@@ -1,8 +1,9 @@
-% Soluzione esercizio 5
+% Soluzione esercizio 5 (stesso comportamento di esercizi/es05_sqlwrite_bulk.m)
 
 thisDir = fileparts(mfilename('fullpath'));
 labDir = fileparts(thisDir);
-dbPath = fullfile(labDir, 'dati', 'lab07_biomed.db');
+addpath(fullfile(labDir, 'codice'));
+dbPath = lab07_create_fresh_database(labDir);
 
 conn = sqlite(dbPath);
 T = table( ...
@@ -19,4 +20,6 @@ T2 = fetch(conn, [ ...
     'AND nome_esame IN (''LDH'', ''PCR'') ORDER BY nome_esame;' ...
     ]);
 close(conn);
+
+disp('--- Esami LDH e PCR per paziente 2 ---');
 disp(T2);

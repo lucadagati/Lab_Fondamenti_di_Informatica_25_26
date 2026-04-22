@@ -1,14 +1,13 @@
-% Soluzione esercizio 1
+% Soluzione esercizio 1 (stesso comportamento di esercizi/es01_apri_db_sqlread.m)
 
 thisDir = fileparts(mfilename('fullpath'));
 labDir = fileparts(thisDir);
-dbPath = fullfile(labDir, 'dati', 'lab07_biomed.db');
-
-if ~isfile(dbPath)
-    error('Esegui prima: run(''codice/init_lab07_database.m'') con Current Folder sulla cartella 07-matlab-sqlite-database.');
-end
+addpath(fullfile(labDir, 'codice'));
+dbPath = lab07_create_fresh_database(labDir);
 
 conn = sqlite(dbPath);
 T = sqlread(conn, 'pazienti');
 close(conn);
+
+disp('--- Tabella pazienti ---');
 disp(T);

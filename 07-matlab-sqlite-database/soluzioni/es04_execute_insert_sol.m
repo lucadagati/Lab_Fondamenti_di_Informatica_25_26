@@ -1,8 +1,9 @@
-% Soluzione esercizio 4
+% Soluzione esercizio 4 (stesso comportamento di esercizi/es04_execute_insert.m)
 
 thisDir = fileparts(mfilename('fullpath'));
 labDir = fileparts(thisDir);
-dbPath = fullfile(labDir, 'dati', 'lab07_biomed.db');
+addpath(fullfile(labDir, 'codice'));
+dbPath = lab07_create_fresh_database(labDir);
 
 conn = sqlite(dbPath);
 sql = [ ...
@@ -12,4 +13,6 @@ sql = [ ...
 execute(conn, sql);
 T = fetch(conn, 'SELECT * FROM esami_lab WHERE nome_esame = ''Ferritina'';');
 close(conn);
+
+disp('--- Riga Ferritina inserita ---');
 disp(T);

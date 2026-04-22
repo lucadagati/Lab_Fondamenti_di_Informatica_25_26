@@ -35,34 +35,35 @@ Se restituisce `0`, installare/abilitare il toolbox o usare il percorso alternat
 
 | Percorso | Contenuto |
 |----------|-----------|
-| `sql/lab07_schema.sql` | Script SQL portabile (tabelle `pazienti`, `esami_lab` + dati di esempio) |
-| `codice/init_lab07_database.m` | Ricrea `dati/lab07_biomed.db` via MATLAB |
-| `codice/demo_connessione_lettura.m` | Demo: `sqlread` + `fetch` con `JOIN` |
-| `codice/demo_sqlwrite_inserimento.m` | Demo: `sqlwrite` |
-| `esercizi/` | File con `TODO` da completare |
-| `soluzioni/` | Script `_sol.m` corrispondenti |
+| `sql/lab07_schema.sql` | Script SQL portabile (stesso schema dei dati di esempio; utile con `sqlite3`) |
+| `codice/lab07_create_fresh_database.m` | Funzione che **elimina e ricrea** `dati/lab07_biomed.db` (schema + insert) |
+| `codice/init_lab07_database.m` | Punto di ingresso: chiama la funzione sopra e stampa il path del file creato |
+| `codice/demo_connessione_lettura.m` | Demo eseguibile con un Run: ricrea il DB, `sqlread` + `fetch` con `JOIN` |
+| `codice/demo_sqlwrite_inserimento.m` | Demo: ricrea il DB, `sqlwrite`, verifica con `fetch` |
+| `esercizi/` | Script **completi** (nessun `TODO`): ogni Run ricrea il DB e svolge l’esercizio |
+| `soluzioni/` | Stessa logica degli esercizi (`*_sol.m`), per confronto |
 | `dati/` | Qui viene creato `lab07_biomed.db` (non versionato; vedi `.gitignore` del repo) |
+
+Ogni script in `esercizi/`, `soluzioni/` e le `demo` aggiunge `codice` al path MATLAB e chiama `lab07_create_fresh_database(labDir)` prima delle query, così il file SQLite è sempre coerente con lo schema di laboratorio.
 
 ---
 
-## 4) Setup (prima volta)
+## 4) Come eseguire
 
-1. In MATLAB imposta **Current Folder** sulla cartella `07-matlab-sqlite-database`.
-2. Esegui:
+1. Imposta la **Current Folder** su `07-matlab-sqlite-database` (radice del lab).
+2. Esegui un qualsiasi file `.m` con il pulsante **Run** (oppure `run('esercizi/es01_apri_db_sqlread.m')`, ecc.).
+
+Non serve un ordine obbligato: **ogni script ricrea da zero** `dati/lab07_biomed.db`, apre la connessione, esegue le operazioni e chiude.
+
+Opzionale — solo creazione DB da prompt:
 
 ```matlab
 run('codice/init_lab07_database.m')
 ```
 
-3. Controlla che esista `dati/lab07_biomed.db`, poi prova:
-
-```matlab
-run('codice/demo_connessione_lettura.m')
-```
-
 ---
 
-## 5) Esercizi
+## 5) Esercizi (script autonomi)
 
 | File | Argomento |
 |------|-----------|
@@ -72,9 +73,7 @@ run('codice/demo_connessione_lettura.m')
 | `esercizi/es04_execute_insert.m` | `INSERT` con `execute` |
 | `esercizi/es05_sqlwrite_bulk.m` | Inserimento multiplo con `sqlwrite` |
 
-Le soluzioni sono in `soluzioni/*_sol.m`.
-
-**Nota:** gli esercizi 4–5 **modificano** il database. Se vuoi ripartire da dati puliti, rilancia `init_lab07_database.m`.
+Le soluzioni in `soluzioni/*_sol.m` replicano lo stesso comportamento degli esercizi corrispondenti.
 
 ---
 
