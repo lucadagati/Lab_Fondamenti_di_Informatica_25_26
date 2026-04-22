@@ -2,8 +2,8 @@ function dbPath = lab07_create_fresh_database(labDir)
 %LAB07_CREATE_FRESH_DATABASE Ricrea da zero il file SQLite del laboratorio.
 %
 %   Passi interni: (1) elimina lab07_biomed.db se presente; (2) apre sqlite;
-%   (3) CREATE TABLE per pazienti ed esami_lab; (4) INSERT dei dati di esempio;
-%   (5) chiude la connessione. Restituisce il percorso completo del file .db.
+%   (3) PRAGMA foreign_keys=ON sulla connessione; (4) CREATE TABLE;
+%   (5) INSERT dati di esempio; (6) chiude la connessione. Restituisce il path del .db.
 %
 %   dbPath = lab07_create_fresh_database(labDir)
 %   labDir = cartella 07-matlab-sqlite-database (quella che contiene codice/, esercizi/, …).
@@ -26,6 +26,8 @@ function dbPath = lab07_create_fresh_database(labDir)
     end
 
     conn = sqlite(dbPath);
+    % In SQLite i vincoli FOREIGN KEY sono controllati solo se questa pragma è ON per la connessione.
+    execute(conn, 'PRAGMA foreign_keys=ON;');
 
     execute(conn, [ ...
         'CREATE TABLE pazienti (' ...

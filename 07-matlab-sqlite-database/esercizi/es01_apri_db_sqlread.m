@@ -23,6 +23,8 @@ percorsoDb = lab07_create_fresh_database(cartellaLab);
 % --- Passo 4: aprire il database --------------------------------------------
 % conn è l’oggetto "connessione": serve per tutte le operazioni successive
 conn = sqlite(percorsoDb);
+% Abilita il controllo delle FOREIGN KEY su questa connessione (in SQLite è off di default).
+execute(conn, 'PRAGMA foreign_keys=ON;');
 
 % --- Passo 5: leggere tutta la tabella pazienti ------------------------------
 % sqlread legge un’intera tabella e la mette in una table MATLAB (righe = pazienti)

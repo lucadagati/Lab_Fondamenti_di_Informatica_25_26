@@ -123,6 +123,19 @@ Gli script in `esercizi/` sono **l’unico insieme di esercizi**: nessuna cartel
 | `esercizi/es03_join_groupby.m` | `JOIN` + `COUNT` / `GROUP BY` |
 | `esercizi/es04_execute_insert.m` | `INSERT` con `execute` |
 | `esercizi/es05_sqlwrite_bulk.m` | Inserimento multiplo con `sqlwrite` |
+| `esercizi/es06_chiave_primaria.m` | **Chiave primaria**: perché `id` non può essere duplicato |
+| `esercizi/es07_integrita_referenziale_fk.m` | **Foreign key**: niente esami per `paziente_id` inesistente |
+| `esercizi/es08_delete_cascade.m` | **ON DELETE CASCADE**: coerenza dopo cancellazione paziente |
+| `esercizi/es09_transazione_coerenza.m` | **Transazione + ROLLBACK**: modifiche annullate insieme |
+
+### Chiavi, integrità referenziale e coerenza
+
+- **Chiave primaria** (`pazienti.id`): identifica in modo univoco una riga; evita duplicati ambigui e collega in modo stabile le righe delle altre tabelle.
+- **Chiave esterna** (`esami_lab.paziente_id` → `pazienti.id`): impone che ogni esame appartenga a un paziente realmente presente (**integrità referenziale**). In SQLite il controllo è attivo solo se sulla connessione è impostato `PRAGMA foreign_keys=ON` (lo fanno `lab07_create_fresh_database` e ogni script del lab dopo `sqlite(...)`).
+- **ON DELETE CASCADE**: quando elimini un paziente, i suoi esami vengono rimossi automaticamente, così non restano righe “orfane”.
+- **Transazioni** (`BEGIN` / `COMMIT` / `ROLLBACK`): raggruppano più comandi in un’unità logica; con `ROLLBACK` il database torna allo stato precedente, utile per coerenza in caso di errore o annullamento.
+
+Approfondimento ufficiale SQLite sulle foreign key: [Foreign Key Support](https://www.sqlite.org/foreignkeys.html).
 
 ### Schema logico del database di laboratorio
 
@@ -160,7 +173,8 @@ flowchart TD
     C --> D["CREATE TABLE pazienti / esami_lab"]
     D --> E["INSERT dati di esempio"]
     E --> F["conn = sqlite(dbPath)"]
-    F --> G{Esercizio}
+    F --> F2["PRAGMA foreign_keys=ON"]
+    F2 --> G{Esercizio}
     G --> H["Operazioni SQL / MATLAB"]
     H --> I["close(conn)"]
 ```
@@ -186,6 +200,24 @@ flowchart LR
     end
 ```
 
+Esercizi su **vincoli e coerenza** (dopo le letture/scritture di base):
+
+```mermaid
+flowchart TB
+    subgraph es06["es06 — chiave primaria"]
+        s6["INSERT con id duplicato"] --> r6["errore: PK"]
+    end
+    subgraph es07["es07 — foreign key"]
+        s7["INSERT esame paziente_id=9999"] --> r7["errore: FK"]
+    end
+    subgraph es08["es08 — CASCADE"]
+        s8["DELETE paziente"] --> r8["esami collegati eliminati"]
+    end
+    subgraph es09["es09 — transazione"]
+        s9["BEGIN + INSERT + ROLLBACK"] --> r9["nessuna traccia residua"]
+    end
+```
+
 Relazione tra **join** dell’esercizio 3 e le due tabelle:
 
 ```mermaid
@@ -205,6 +237,10 @@ flowchart TD
     es02 --> es03["es03 JOIN + GROUP BY"]
     es03 --> es04["es04 execute INSERT"]
     es04 --> es05["es05 sqlwrite bulk"]
+    es05 --> es06["es06 chiave primaria"]
+    es06 --> es07["es07 integrità FK"]
+    es07 --> es08["es08 DELETE CASCADE"]
+    es08 --> es09["es09 transazione ROLLBACK"]
 ```
 
 ---

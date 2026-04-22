@@ -8,6 +8,7 @@ addpath(fullfile(cartellaLab, 'codice'));
 
 percorsoDb = lab07_create_fresh_database(cartellaLab);
 conn = sqlite(percorsoDb);
+execute(conn, 'PRAGMA foreign_keys=ON;');
 
 % --- INSERT: una nuova riga nella tabella esami_lab -------------------------
 % paziente_id = 1 è il primo paziente inserito dalla funzione di init

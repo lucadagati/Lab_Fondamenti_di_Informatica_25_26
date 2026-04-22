@@ -8,6 +8,7 @@ addpath(fullfile(cartellaLab, 'codice'));
 
 percorsoDb = lab07_create_fresh_database(cartellaLab);
 conn = sqlite(percorsoDb);
+execute(conn, 'PRAGMA foreign_keys=ON;');
 
 % Una sola riga da inserire: nomi colonne = colonne del database
 riga = table( ...

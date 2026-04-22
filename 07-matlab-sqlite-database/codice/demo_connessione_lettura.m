@@ -8,6 +8,7 @@ addpath(fullfile(cartellaLab, 'codice'));
 
 percorsoDb = lab07_create_fresh_database(cartellaLab);
 conn = sqlite(percorsoDb);
+execute(conn, 'PRAGMA foreign_keys=ON;');
 
 % Lettura rapida di un’intera tabella
 pazienti = sqlread(conn, 'pazienti');

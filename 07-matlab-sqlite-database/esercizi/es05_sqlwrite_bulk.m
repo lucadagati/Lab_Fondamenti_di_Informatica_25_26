@@ -9,6 +9,7 @@ addpath(fullfile(cartellaLab, 'codice'));
 
 percorsoDb = lab07_create_fresh_database(cartellaLab);
 conn = sqlite(percorsoDb);
+execute(conn, 'PRAGMA foreign_keys=ON;');
 
 % --- Costruiamo una table con 2 righe e 5 colonne ---------------------------
 % I nomi delle colonne della table devono coincidere con i nomi nel database:

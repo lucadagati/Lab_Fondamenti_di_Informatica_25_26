@@ -8,6 +8,7 @@ addpath(fullfile(cartellaLab, 'codice'));
 
 percorsoDb = lab07_create_fresh_database(cartellaLab);
 conn = sqlite(percorsoDb);
+execute(conn, 'PRAGMA foreign_keys=ON;');
 
 % --- Idea della query --------------------------------------------------------
 % Partiamo dalla tabella pazienti (alias p).
