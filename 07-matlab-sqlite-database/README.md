@@ -88,13 +88,12 @@ Se restituisce `0`, installare/abilitare il toolbox o usare il percorso alternat
 | `sql/lab07_schema.sql` | Script SQL portabile (stesso schema dei dati di esempio; utile con `sqlite3`) |
 | `codice/lab07_create_fresh_database.m` | Funzione che **elimina e ricrea** `dati/lab07_biomed.db` (schema + insert) |
 | `codice/init_lab07_database.m` | Punto di ingresso: chiama la funzione sopra e stampa il path del file creato |
-| `codice/demo_connessione_lettura.m` | Demo eseguibile con un Run: ricrea il DB, `sqlread` + `fetch` con `JOIN` |
-| `codice/demo_sqlwrite_inserimento.m` | Demo: ricrea il DB, `sqlwrite`, verifica con `fetch` |
-| `esercizi/` | Script **completi** (nessun `TODO`): ogni Run ricrea il DB e svolge l’esercizio |
-| `soluzioni/` | Stessa logica degli esercizi (`*_sol.m`), per confronto |
+| `codice/demo_connessione_lettura.m` | Demo breve: `sqlread` + `fetch` con `JOIN` |
+| `codice/demo_sqlwrite_inserimento.m` | Demo breve: `sqlwrite` + verifica |
+| `esercizi/` | **Solo** script completi, **commentati passo passo** in italiano; ogni Run ricrea il DB |
 | `dati/` | Qui viene creato `lab07_biomed.db` (non versionato; vedi `.gitignore` del repo) |
 
-Ogni script in `esercizi/`, `soluzioni/` e le `demo` aggiunge `codice` al path MATLAB e chiama `lab07_create_fresh_database(labDir)` prima delle query, così il file SQLite è sempre coerente con lo schema di laboratorio.
+Ogni script in `esercizi/` e nelle `demo` aggiunge `codice` al path MATLAB, chiama `lab07_create_fresh_database(labDir)` e poi esegue le operazioni illustrate nei commenti.
 
 ---
 
@@ -113,7 +112,9 @@ run('codice/init_lab07_database.m')
 
 ---
 
-## 5) Esercizi (script autonomi)
+## 5) Esercizi (script autonomi, commentati)
+
+Gli script in `esercizi/` sono **l’unico insieme di esercizi**: nessuna cartella “soluzioni”; il codice è già completo, **lineare** e **commentato** riga per sezione per seguire il flusso (cartelle → database → query → chiusura → `disp`).
 
 | File | Argomento |
 |------|-----------|
@@ -205,8 +206,6 @@ flowchart TD
     es03 --> es04["es04 execute INSERT"]
     es04 --> es05["es05 sqlwrite bulk"]
 ```
-
-Le soluzioni in `soluzioni/*_sol.m` replicano lo stesso comportamento degli esercizi corrispondenti.
 
 ---
 

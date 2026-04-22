@@ -1,24 +1,29 @@
-% demo_connessione_lettura — esempio: ricrea il DB, sqlread e fetch con JOIN
+% DEMO — Lettura da SQLite: sqlread e fetch (con JOIN)
+%
+% Esempio breve dopo aver ricreato il database di laboratorio.
 
-thisDir = fileparts(mfilename('fullpath'));
-labDir = fileparts(thisDir);
-addpath(fullfile(labDir, 'codice'));
-dbPath = lab07_create_fresh_database(labDir);
+cartellaScript = fileparts(mfilename('fullpath'));
+cartellaLab = fileparts(cartellaScript);
+addpath(fullfile(cartellaLab, 'codice'));
 
-conn = sqlite(dbPath);
+percorsoDb = lab07_create_fresh_database(cartellaLab);
+conn = sqlite(percorsoDb);
 
-T_paz = sqlread(conn, 'pazienti');
-disp('--- pazienti (sqlread) ---');
-disp(T_paz);
+% Lettura rapida di un’intera tabella
+pazienti = sqlread(conn, 'pazienti');
+disp('Pazienti:');
+disp(pazienti);
 
-q = [ ...
-    'SELECT p.cognome, e.nome_esame, e.valore, e.unita ' ...
-    'FROM esami_lab e JOIN pazienti p ON e.paziente_id = p.id ' ...
+% Query con join: cognome del paziente accanto a ogni glicemia
+sqlGlicemia = [ ...
+    'SELECT p.cognome, e.valore, e.unita ' ...
+    'FROM esami_lab e ' ...
+    'JOIN pazienti p ON e.paziente_id = p.id ' ...
     'WHERE e.nome_esame = ''Glicemia'' ' ...
-    'ORDER BY e.valore DESC;' ...
+    'ORDER BY e.valore DESC' ...
     ];
-T_gli = fetch(conn, q);
-disp('--- glicemie con cognome (fetch + JOIN) ---');
-disp(T_gli);
+glicemie = fetch(conn, sqlGlicemia);
+disp('Glicemie (con cognome):');
+disp(glicemie);
 
 close(conn);

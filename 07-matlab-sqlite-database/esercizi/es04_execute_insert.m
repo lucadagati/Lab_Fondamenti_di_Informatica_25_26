@@ -1,20 +1,28 @@
-% Esercizio 4 — INSERT con execute (ferritina per paziente 1)
+% ESERCIZIO 4 — Inserire una riga con execute (testo SQL fisso)
 %
-% Ricrea il database, inserisce un nuovo esame, legge la riga inserita.
+% Cosa impari: usare INSERT ... VALUES ... per aggiungere un esame al database.
 
-thisDir = fileparts(mfilename('fullpath'));
-labDir = fileparts(thisDir);
-addpath(fullfile(labDir, 'codice'));
-dbPath = lab07_create_fresh_database(labDir);
+cartellaScript = fileparts(mfilename('fullpath'));
+cartellaLab = fileparts(cartellaScript);
+addpath(fullfile(cartellaLab, 'codice'));
 
-conn = sqlite(dbPath);
-sql = [ ...
+percorsoDb = lab07_create_fresh_database(cartellaLab);
+conn = sqlite(percorsoDb);
+
+% --- INSERT: una nuova riga nella tabella esami_lab -------------------------
+% paziente_id = 1 è il primo paziente inserito dalla funzione di init
+% I valori testuali in SQL vanno tra apici singoli ''testo''
+comandoInsert = [ ...
     'INSERT INTO esami_lab (paziente_id, nome_esame, valore, unita, data_esame) ' ...
-    'VALUES (1, ''Ferritina'', 85, ''ng/mL'', ''2025-05-01'');' ...
+    'VALUES (1, ''Ferritina'', 85, ''ng/mL'', ''2025-05-01'')' ...
     ];
-execute(conn, sql);
-T = fetch(conn, 'SELECT * FROM esami_lab WHERE nome_esame = ''Ferritina'';');
+
+execute(conn, comandoInsert);
+
+% --- Verifica: leggiamo solo le righe "Ferritina" ----------------------------
+verifica = fetch(conn, 'SELECT * FROM esami_lab WHERE nome_esame = ''Ferritina''');
+
 close(conn);
 
-disp('--- Riga Ferritina inserita ---');
-disp(T);
+disp('Righe Ferritina dopo l''inserimento:');
+disp(verifica);

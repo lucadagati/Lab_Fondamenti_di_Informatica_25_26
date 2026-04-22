@@ -47,7 +47,7 @@ flowchart TD
     LAB7 --> L7SQL[sql/]
     LAB7 --> L7CODE[codice/]
     LAB7 --> L7EX[esercizi/]
-    LAB7 --> L7SOL[soluzioni/]
+    LAB7 --> L7DATI[dati/]
 ```
 
 ```
@@ -92,7 +92,6 @@ Lab_Biomed/
     ├── dati/
     ├── codice/
     ├── esercizi/
-    ├── soluzioni/
     └── script_init_db.sh
 ```
 

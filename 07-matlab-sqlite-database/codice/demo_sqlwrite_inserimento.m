@@ -1,21 +1,24 @@
-% demo_sqlwrite_inserimento — ricrea il DB, inserisce una riga con sqlwrite, verifica con fetch
+% DEMO — Inserire una riga con sqlwrite e controllare con fetch
+%
+% Mostra come passare da una piccola table MATLAB a una nuova riga SQL.
 
-thisDir = fileparts(mfilename('fullpath'));
-labDir = fileparts(thisDir);
-addpath(fullfile(labDir, 'codice'));
-dbPath = lab07_create_fresh_database(labDir);
+cartellaScript = fileparts(mfilename('fullpath'));
+cartellaLab = fileparts(cartellaScript);
+addpath(fullfile(cartellaLab, 'codice'));
 
-conn = sqlite(dbPath);
+percorsoDb = lab07_create_fresh_database(cartellaLab);
+conn = sqlite(percorsoDb);
 
-Nuovo = table( ...
+% Una sola riga da inserire: nomi colonne = colonne del database
+riga = table( ...
     3, {'Creatinina'}, 97.0, {'umol/L'}, {'2025-04-20'}, ...
     'VariableNames', {'paziente_id', 'nome_esame', 'valore', 'unita', 'data_esame'} ...
     );
 
-sqlwrite(conn, 'esami_lab', Nuovo);
+sqlwrite(conn, 'esami_lab', riga);
 
-T_check = fetch(conn, 'SELECT * FROM esami_lab WHERE nome_esame = ''Creatinina'';');
-disp('--- dopo sqlwrite ---');
-disp(T_check);
+controllo = fetch(conn, 'SELECT * FROM esami_lab WHERE nome_esame = ''Creatinina''');
+disp('Dopo sqlwrite:');
+disp(controllo);
 
 close(conn);

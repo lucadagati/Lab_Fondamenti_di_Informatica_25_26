@@ -1,22 +1,31 @@
-% Esercizio 3 — JOIN e GROUP BY: numero di esami per paziente
+% ESERCIZIO 3 — Contare quanti esami ha ogni paziente (JOIN + GROUP BY)
 %
-% Ricrea il database, conta le righe in esami_lab per ogni paziente.
+% Cosa impari: collegare due tabelle (pazienti ed esami_lab) e usare COUNT.
 
-thisDir = fileparts(mfilename('fullpath'));
-labDir = fileparts(thisDir);
-addpath(fullfile(labDir, 'codice'));
-dbPath = lab07_create_fresh_database(labDir);
+cartellaScript = fileparts(mfilename('fullpath'));
+cartellaLab = fileparts(cartellaScript);
+addpath(fullfile(cartellaLab, 'codice'));
 
-conn = sqlite(dbPath);
-q = [ ...
+percorsoDb = lab07_create_fresh_database(cartellaLab);
+conn = sqlite(percorsoDb);
+
+% --- Idea della query --------------------------------------------------------
+% Partiamo dalla tabella pazienti (alias p).
+% LEFT JOIN con esami_lab (alias e): così restano tutti i pazienti anche se
+%   hanno zero esami (con INNER JOIN sparirebbero).
+% COUNT(e.id): conta le righe di esami collegate a ciascun paziente.
+% GROUP BY p.id, p.cognome: una riga per paziente nel risultato.
+
+query = [ ...
     'SELECT p.id, p.cognome, COUNT(e.id) AS n_esami ' ...
     'FROM pazienti p ' ...
     'LEFT JOIN esami_lab e ON e.paziente_id = p.id ' ...
     'GROUP BY p.id, p.cognome ' ...
-    'ORDER BY p.id;' ...
+    'ORDER BY p.id' ...
     ];
-T = fetch(conn, q);
+
+risultato = fetch(conn, query);
 close(conn);
 
-disp('--- Numero esami per paziente ---');
-disp(T);
+disp('Numero di esami per paziente:');
+disp(risultato);

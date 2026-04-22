@@ -1,20 +1,29 @@
-% Esercizio 2 — fetch: glicemia con valore >= 100 mg/dL
+% ESERCIZIO 2 — Filtrare righe con SELECT e fetch
 %
-% Ricrea il database, interroga esami_lab con filtri WHERE.
+% Cosa impari: scrivere una query SQL con WHERE e leggere il risultato in MATLAB.
+%             Qui: solo le glicemie maggiori o uguali a 100 mg/dL.
 
-thisDir = fileparts(mfilename('fullpath'));
-labDir = fileparts(thisDir);
-addpath(fullfile(labDir, 'codice'));
-dbPath = lab07_create_fresh_database(labDir);
+cartellaScript = fileparts(mfilename('fullpath'));
+cartellaLab = fileparts(cartellaScript);
+addpath(fullfile(cartellaLab, 'codice'));
 
-conn = sqlite(dbPath);
-q = [ ...
+percorsoDb = lab07_create_fresh_database(cartellaLab);
+conn = sqlite(percorsoDb);
+
+% --- Query SQL (testo) -------------------------------------------------------
+% In SQL l’apostrofo dentro una stringa si scrive raddoppiato: ''Glicemia''
+% La query chiede: tutte le colonne utili, dalla tabella esami_lab,
+% solo righe dove il nome dell’esame è "Glicemia" e il valore è >= 100.
+query = [ ...
     'SELECT id, paziente_id, nome_esame, valore, unita, data_esame ' ...
     'FROM esami_lab ' ...
-    'WHERE nome_esame = ''Glicemia'' AND valore >= 100;' ...
+    'WHERE nome_esame = ''Glicemia'' AND valore >= 100' ...
     ];
-T = fetch(conn, q);
+
+% fetch esegue il SELECT e restituisce una table MATLAB
+risultato = fetch(conn, query);
+
 close(conn);
 
-disp('--- Glicemia >= 100 mg/dL ---');
-disp(T);
+disp('Glicemie >= 100 mg/dL:');
+disp(risultato);

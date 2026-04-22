@@ -1,9 +1,14 @@
 function dbPath = lab07_create_fresh_database(labDir)
-%LAB07_CREATE_FRESH_DATABASE Elimina (se esiste) e ricrea lab07_biomed.db con schema e dati di esempio.
-%   dbPath = lab07_create_fresh_database(labDir)
-%   labDir = cartella radice del lab (07-matlab-sqlite-database).
+%LAB07_CREATE_FRESH_DATABASE Ricrea da zero il file SQLite del laboratorio.
 %
-%   Richiede Database Toolbox (sqlite, execute, close).
+%   Passi interni: (1) elimina lab07_biomed.db se presente; (2) apre sqlite;
+%   (3) CREATE TABLE per pazienti ed esami_lab; (4) INSERT dei dati di esempio;
+%   (5) chiude la connessione. Restituisce il percorso completo del file .db.
+%
+%   dbPath = lab07_create_fresh_database(labDir)
+%   labDir = cartella 07-matlab-sqlite-database (quella che contiene codice/, esercizi/, …).
+%
+%   Richiede Database Toolbox: sqlite, execute, close.
 
     labDir = char(labDir);
     datiDir = fullfile(labDir, 'dati');
