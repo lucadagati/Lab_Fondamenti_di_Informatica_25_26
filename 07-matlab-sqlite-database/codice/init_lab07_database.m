@@ -6,5 +6,5 @@
 thisDir = fileparts(mfilename('fullpath'));
 labDir = fileparts(thisDir);
 addpath(thisDir);
-dbPath = lab07_create_fresh_database(labDir);
+run(fullfile(thisDir, 'lab07_create_fresh_database.m'));
 fprintf('Database creato: %s\n', dbPath);

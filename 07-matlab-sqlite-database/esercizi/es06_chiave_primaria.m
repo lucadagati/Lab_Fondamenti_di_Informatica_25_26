@@ -10,7 +10,8 @@ cartellaScript = fileparts(mfilename('fullpath'));
 cartellaLab = fileparts(cartellaScript);
 addpath(fullfile(cartellaLab, 'codice'));
 
-percorsoDb = lab07_create_fresh_database(cartellaLab);
+run(fullfile(cartellaLab, 'codice', 'lab07_create_fresh_database.m'));
+percorsoDb = dbPath;
 conn = sqlite(percorsoDb);
 execute(conn, 'PRAGMA foreign_keys=ON;');  % glossario: es01_apri_db_sqlread.m
 

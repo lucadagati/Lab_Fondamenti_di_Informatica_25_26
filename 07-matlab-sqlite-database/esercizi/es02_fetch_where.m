@@ -8,7 +8,8 @@ cartellaScript = fileparts(mfilename('fullpath'));  % cartella di questo script
 cartellaLab = fileparts(cartellaScript);              % radice del lab 07
 addpath(fullfile(cartellaLab, 'codice'));             % così MATLAB trova lab07_create_…
 
-percorsoDb = lab07_create_fresh_database(cartellaLab);  % ricrea il file .db
+run(fullfile(cartellaLab, 'codice', 'lab07_create_fresh_database.m'));
+percorsoDb = dbPath;  % ricrea il file .db
 conn = sqlite(percorsoDb);                              % apre il database
 execute(conn, 'PRAGMA foreign_keys=ON;');               % vedi glossario in es01
 

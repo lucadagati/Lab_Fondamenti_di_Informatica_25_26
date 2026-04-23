@@ -19,11 +19,12 @@
 cartellaScript = fileparts(mfilename('fullpath'));   % cartella che contiene questo .m (esercizi/)
 cartellaLab = fileparts(cartellaScript);             % cartella radice del lab 07
 
-% MATLAB deve "vedere" la funzione in codice/ → la aggiungiamo al path
+% MATLAB deve "vedere" lo script in codice/ → la aggiungiamo al path
 addpath(fullfile(cartellaLab, 'codice'));
 
 % Ricrea da zero il file dati/lab07_biomed.db (tabelle + righe di esempio)
-percorsoDb = lab07_create_fresh_database(cartellaLab);
+run(fullfile(cartellaLab, 'codice', 'lab07_create_fresh_database.m'));
+percorsoDb = dbPath;
 
 % Apre il file .db: da qui in poi parliamo col database tramite conn
 conn = sqlite(percorsoDb);

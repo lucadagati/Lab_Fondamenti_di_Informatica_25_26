@@ -93,7 +93,7 @@ Se restituisce `0`, installare/abilitare il toolbox o usare il percorso alternat
 | `esercizi/` | Nove esercizi MATLAB (`es01`–`es09`); ogni esecuzione rigenera il database di esempio |
 | `dati/` | Qui viene creato `lab07_biomed.db` (non versionato; vedi `.gitignore` del repo) |
 
-Ogni file in `esercizi/` e nelle `demo` aggiunge `codice` al path MATLAB, chiama `lab07_create_fresh_database(labDir)` e applica le operazioni descritte nello stesso file.
+Ogni file in `esercizi/` e nelle `demo` aggiunge `codice` al path MATLAB, esegue `run(fullfile(cartellaLab, 'codice', 'lab07_create_fresh_database.m'))`, poi usa `dbPath` e applica le operazioni descritte nello stesso file.
 
 ---
 
@@ -224,7 +224,7 @@ Prima di ogni esercizio il database viene ricreato da zero, così ogni Run è ri
 
 ```mermaid
 flowchart TD
-    A[Avvio script .m] --> B["lab07_create_fresh_database(labDir)"]
+    A[Avvio script .m] --> B["run(.../lab07_create_fresh_database.m)"]
     B --> C["Elimina lab07_biomed.db se esiste"]
     C --> D["CREATE TABLE (6 tabelle + FK)"]
     D --> E["INSERT dati di esempio"]
