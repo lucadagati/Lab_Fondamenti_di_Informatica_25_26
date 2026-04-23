@@ -8,8 +8,20 @@
 % Variabile esportata nello workspace chiamante:
 %   dbPath  -> percorso completo del file .db creato
 
-thisScriptDir = fileparts(mfilename('fullpath'));
-labDir = fileparts(thisScriptDir);
+labDir = pwd;
+if ~(isfolder(fullfile(labDir, 'codice')) && isfolder(fullfile(labDir, 'dati')) )
+    parentDir = fileparts(labDir);
+    if isfolder(fullfile(parentDir, 'codice')) && isfolder(fullfile(parentDir, 'dati'))
+        labDir = parentDir;
+    else
+        candidate = fullfile(labDir, '07-matlab-sqlite-database');
+        if isfolder(fullfile(candidate, 'codice')) && isfolder(fullfile(candidate, 'dati'))
+            labDir = candidate;
+        else
+            error('lab07:path', 'Cartella lab non trovata partendo da pwd.');
+        end
+    end
+end
 datiDir = fullfile(labDir, 'dati');
 if ~isfolder(datiDir)
     mkdir(datiDir);

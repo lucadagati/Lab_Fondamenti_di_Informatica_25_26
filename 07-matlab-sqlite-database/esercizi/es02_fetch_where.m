@@ -4,9 +4,16 @@
 %
 % Glossario: vedi commenti in es01_apri_db_sqlread.m (sqlite, execute, fetch, PRAGMA, close).
 
-cartellaScript = fileparts(mfilename('fullpath'));  % cartella di questo script
-cartellaLab = fileparts(cartellaScript);              % radice del lab 07
-addpath(fullfile(cartellaLab, 'codice'));             % così MATLAB trova lab07_create_…
+cartellaLab = pwd;
+if ~isfolder(fullfile(cartellaLab, 'codice'))
+    parentDir = fileparts(cartellaLab);
+    if isfolder(fullfile(parentDir, 'codice'))
+        cartellaLab = parentDir;
+    else
+        error('lab07:path', 'Esegui dalla cartella del lab o da codice/esercizi.');
+    end
+end
+addpath(fullfile(cartellaLab, 'codice'));
 
 run(fullfile(cartellaLab, 'codice', 'lab07_create_fresh_database.m'));
 percorsoDb = dbPath;  % ricrea il file .db

@@ -16,10 +16,15 @@
 %                        FOREIGN KEY su questa connessione (se no, SQLite le ignora).
 
 % --- Percorsi: dove siamo sul disco -----------------------------------------
-cartellaScript = fileparts(mfilename('fullpath'));   % cartella che contiene questo .m (esercizi/)
-cartellaLab = fileparts(cartellaScript);             % cartella radice del lab 07
-
-% MATLAB deve "vedere" lo script in codice/ → la aggiungiamo al path
+cartellaLab = pwd;
+if ~isfolder(fullfile(cartellaLab, 'codice'))
+    parentDir = fileparts(cartellaLab);
+    if isfolder(fullfile(parentDir, 'codice'))
+        cartellaLab = parentDir;
+    else
+        error('lab07:path', 'Esegui dalla cartella del lab o da codice/esercizi.');
+    end
+end
 addpath(fullfile(cartellaLab, 'codice'));
 
 % Ricrea da zero il file dati/lab07_biomed.db (tabelle + righe di esempio)

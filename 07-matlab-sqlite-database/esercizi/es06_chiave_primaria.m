@@ -6,8 +6,15 @@
 % Glossario comandi: vedi es01_apri_db_sqlread.m (sqlite, execute, fetch, PRAGMA, close).
 % try / catch : esegue il blocco try; se MATLAB riceve un errore dall execute, salta al catch.
 
-cartellaScript = fileparts(mfilename('fullpath'));
-cartellaLab = fileparts(cartellaScript);
+cartellaLab = pwd;
+if ~isfolder(fullfile(cartellaLab, 'codice'))
+    parentDir = fileparts(cartellaLab);
+    if isfolder(fullfile(parentDir, 'codice'))
+        cartellaLab = parentDir;
+    else
+        error('lab07:path', 'Esegui dalla cartella del lab o da codice/esercizi.');
+    end
+end
 addpath(fullfile(cartellaLab, 'codice'));
 
 run(fullfile(cartellaLab, 'codice', 'lab07_create_fresh_database.m'));
