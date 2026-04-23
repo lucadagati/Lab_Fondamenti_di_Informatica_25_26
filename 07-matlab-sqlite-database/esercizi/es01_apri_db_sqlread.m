@@ -16,7 +16,7 @@
 %                        FOREIGN KEY su questa connessione (se no, SQLite le ignora).
 
 % --- Percorsi: dove siamo sul disco -----------------------------------------
-cartellaLab = pwd;
+cartellaLab = builtin('pwd');
 if ~isfolder(fullfile(cartellaLab, 'codice'))
     parentDir = fileparts(cartellaLab);
     if isfolder(fullfile(parentDir, 'codice'))

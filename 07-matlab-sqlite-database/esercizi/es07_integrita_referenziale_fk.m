@@ -6,7 +6,7 @@
 %
 % Glossario: es01_apri_db_sqlread.m
 
-cartellaLab = pwd;
+cartellaLab = builtin('pwd');
 if ~isfolder(fullfile(cartellaLab, 'codice'))
     parentDir = fileparts(cartellaLab);
     if isfolder(fullfile(parentDir, 'codice'))

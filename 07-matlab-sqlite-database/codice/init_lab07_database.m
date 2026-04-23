@@ -3,7 +3,7 @@
 % Esegui dalla cartella del lab: run('codice/init_lab07_database.m')
 % Glossario comandi: vedi esercizi/es01_apri_db_sqlread.m
 
-labDir = pwd;
+labDir = builtin('pwd');
 if ~isfolder(fullfile(labDir, 'codice'))
     parentDir = fileparts(labDir);
     if isfolder(fullfile(parentDir, 'codice'))

@@ -9,7 +9,7 @@
 %
 % sprintf in MATLAB costruisce una stringa sostituendo %d con un numero (qui idPaz).
 
-cartellaLab = pwd;
+cartellaLab = builtin('pwd');
 if ~isfolder(fullfile(cartellaLab, 'codice'))
     parentDir = fileparts(cartellaLab);
     if isfolder(fullfile(parentDir, 'codice'))

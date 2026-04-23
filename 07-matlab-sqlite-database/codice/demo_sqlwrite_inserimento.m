@@ -2,7 +2,7 @@
 %
 % Glossario: es01_apri_db_sqlread.m. sqlwrite = inserimento da table senza scrivere INSERT a mano.
 
-cartellaLab = pwd;
+cartellaLab = builtin('pwd');
 if ~isfolder(fullfile(cartellaLab, 'codice'))
     parentDir = fileparts(cartellaLab);
     if isfolder(fullfile(parentDir, 'codice'))

@@ -5,7 +5,7 @@
 % sqlwrite(conn, nomeTabellaDb, tableMatlab) : aggiunge in coda alla tabella SQL le righe
 %     della table MATLAB. I nomi delle colonne della table devono coincidere con il DB.
 
-cartellaLab = pwd;
+cartellaLab = builtin('pwd');
 if ~isfolder(fullfile(cartellaLab, 'codice'))
     parentDir = fileparts(cartellaLab);
     if isfolder(fullfile(parentDir, 'codice'))

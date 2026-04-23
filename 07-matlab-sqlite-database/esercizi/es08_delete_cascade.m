@@ -5,7 +5,7 @@
 %
 % Glossario: es01. COUNT(*) in SQL conta le righe; AS n dà nome alla colonna del risultato.
 
-cartellaLab = pwd;
+cartellaLab = builtin('pwd');
 if ~isfolder(fullfile(cartellaLab, 'codice'))
     parentDir = fileparts(cartellaLab);
     if isfolder(fullfile(parentDir, 'codice'))

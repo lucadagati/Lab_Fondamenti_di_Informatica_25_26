@@ -5,7 +5,7 @@
 % execute(conn, sql) : per INSERT/UPDATE/DELETE non serve fetch: execute invia il comando
 %                      e non restituisce righe. Per controllare dopo, usi fetch con un SELECT.
 
-cartellaLab = pwd;
+cartellaLab = builtin('pwd');
 if ~isfolder(fullfile(cartellaLab, 'codice'))
     parentDir = fileparts(cartellaLab);
     if isfolder(fullfile(parentDir, 'codice'))

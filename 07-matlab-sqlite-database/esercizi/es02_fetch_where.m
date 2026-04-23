@@ -4,7 +4,7 @@
 %
 % Glossario: vedi commenti in es01_apri_db_sqlread.m (sqlite, execute, fetch, PRAGMA, close).
 
-cartellaLab = pwd;
+cartellaLab = builtin('pwd');
 if ~isfolder(fullfile(cartellaLab, 'codice'))
     parentDir = fileparts(cartellaLab);
     if isfolder(fullfile(parentDir, 'codice'))

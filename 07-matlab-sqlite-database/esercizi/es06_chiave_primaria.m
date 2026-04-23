@@ -6,7 +6,7 @@
 % Glossario comandi: vedi es01_apri_db_sqlread.m (sqlite, execute, fetch, PRAGMA, close).
 % try / catch : esegue il blocco try; se MATLAB riceve un errore dall execute, salta al catch.
 
-cartellaLab = pwd;
+cartellaLab = builtin('pwd');
 if ~isfolder(fullfile(cartellaLab, 'codice'))
     parentDir = fileparts(cartellaLab);
     if isfolder(fullfile(parentDir, 'codice'))

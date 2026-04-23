@@ -8,7 +8,7 @@
 % Variabile esportata nello workspace chiamante:
 %   dbPath  -> percorso completo del file .db creato
 
-labDir = pwd;
+labDir = builtin('pwd');
 if ~(isfolder(fullfile(labDir, 'codice')) && isfolder(fullfile(labDir, 'dati')) )
     parentDir = fileparts(labDir);
     if isfolder(fullfile(parentDir, 'codice')) && isfolder(fullfile(parentDir, 'dati'))
