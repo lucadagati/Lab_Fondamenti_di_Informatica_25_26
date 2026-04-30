@@ -385,15 +385,14 @@ Questa sezione serve per sperimentare senza modificare gli esercizi. Imposta la 
 
 ```matlab
 run('codice/init_lab07_database.m')
-conn = sqlite(fullfile('dati', 'lab07_biomed.db'));
-execute(conn, 'PRAGMA foreign_keys=ON;')
 ```
 
-Cosa fanno questi comandi:
+Cosa fa questo comando:
 
-- `run(...)` esegue lo script che crea da zero il file `dati/lab07_biomed.db`.
-- `sqlite(...)` apre una connessione MATLAB verso quel file.
-- `execute(..., 'PRAGMA foreign_keys=ON;')` attiva il controllo delle chiavi esterne per questa connessione.
+- crea da zero il file `dati/lab07_biomed.db`;
+- apre una connessione MATLAB nella variabile `conn`;
+- attiva il controllo delle chiavi esterne con `PRAGMA foreign_keys=ON`;
+- lascia disponibile anche `percorsoDb`, cioè il percorso del file `.db`.
 
 ### 1. Leggere una tabella intera
 
