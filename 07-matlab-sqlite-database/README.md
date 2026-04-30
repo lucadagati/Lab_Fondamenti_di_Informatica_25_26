@@ -126,12 +126,12 @@ Nel file **`esercizi/es01_apri_db_sqlread.m`** trovi all’inizio un blocco di c
 
 - **`PRAGMA foreign_keys=ON`** — in SQLite la parola *PRAGMA* indica un’istruzione speciale per **configurare il motore**, non una tabella. `foreign_keys=ON` **attiva il controllo** delle chiavi esterne su **questa** connessione; se restasse disattivato (comportamento storico di SQLite), potresti inserire `visita_id` o `tipo_esame_id` inesistenti senza errore.
 - **`sqlite(percorso)`** — apre il file `.db` e restituisce l’oggetto connessione.
-- **`execute(conn, sql)`** — invia al motore una stringa SQL che **non** deve restituire una tabella di risultato (es. `PRAGMA`, `INSERT`, `DELETE`, `BEGIN`).
+- **`execute(conn, sql)`** — invia al motore una stringa SQL che **non** deve restituire una tabella di risultato (es. `PRAGMA`, `INSERT`, `DELETE`, `SAVEPOINT`).
 - **`fetch(conn, sql)`** — esegue un `SELECT` e restituisce una **table** MATLAB.
 - **`sqlread(conn, nomeTabella)`** — scorciatoia per leggere tutta una tabella.
 - **`close(conn)`** — chiude la connessione al file.
 
-Dall’`es02` in poi si usano le stesse definizioni dell’`es01` e si introducono nel codice le tecniche aggiuntive (`JOIN`, `try/catch`, `BEGIN`/`ROLLBACK`, `sprintf`, …). Anche `codice/lab07_create_fresh_database.m` include commenti sulle istruzioni `CREATE` e `INSERT`.
+Dall’`es02` in poi si usano le stesse definizioni dell’`es01` e si introducono nel codice le tecniche aggiuntive (`JOIN`, `try/catch`, `SAVEPOINT`/`ROLLBACK TO`, `sprintf`, …). Anche `codice/lab07_create_fresh_database.m` include commenti sulle istruzioni `CREATE` e `INSERT`.
 
 | File | Argomento |
 |------|-----------|
@@ -154,7 +154,7 @@ Dall’`es02` in poi si usano le stesse definizioni dell’`es01` e si introduco
 - **Chiavi esterne**: ogni risultato in `esami_lab` punta a una **visita** reale (`visita_id` → `visite.id`) e a un **tipo di test** del catalogo (`tipo_esame_id` → `tipi_esame.id`). Le visite collegano **paziente** e **medico**. In SQLite il controllo FK è attivo solo con `PRAGMA foreign_keys=ON` (come in `lab07_create_fresh_database` e negli script del lab).
 - **ON DELETE CASCADE** (catena paziente → visite → esami): eliminando un paziente, SQLite rimuove le sue visite e, grazie a un secondo `CASCADE` su `esami_lab`, anche tutti i risultati legati a quelle visite, evitando orfani.
 - **ON DELETE RESTRICT** (es. `medici.reparto_id`): impedisce di cancellare un `reparti` se esistono medici ancora assegnati — modello realistico di vincolo “amministrativo”.
-- **Transazioni** (`BEGIN` / `COMMIT` / `ROLLBACK`): raggruppano più comandi in un’unità logica; con `ROLLBACK` il database torna allo stato precedente, utile quando più tabelle devono aggiornarsi insieme.
+- **Transazioni** (`SAVEPOINT` / `ROLLBACK TO` / `RELEASE` nell’esercizio): raggruppano più comandi in un’unità logica; con `ROLLBACK TO` il database torna allo stato precedente, utile quando più tabelle devono aggiornarsi insieme. `SAVEPOINT` è usato perché è robusto anche se il driver MATLAB/SQLite ha già una transazione interna aperta.
 
 Approfondimento ufficiale SQLite sulle foreign key: [Foreign Key Support](https://www.sqlite.org/foreignkeys.html).
 
@@ -298,7 +298,7 @@ Questo comportamento rende gli esercizi indipendenti: se esegui prima `es11_upda
 - `es03` usa `GROUP BY` e `COUNT` per contare i risultati per paziente.
 - `es04` ed `es05` mostrano due modi di inserire righe: SQL testuale con `execute` e inserimento da `table` MATLAB con `sqlwrite`.
 - `es06`, `es07` ed `es08` fanno vedere gli errori o gli effetti dei vincoli: chiave primaria, chiave esterna e `ON DELETE CASCADE`.
-- `es09` mostra una transazione: `BEGIN`, inserimenti temporanei e `ROLLBACK`.
+- `es09` mostra una transazione: `SAVEPOINT`, inserimenti temporanei e `ROLLBACK TO`.
 - `es10` raccoglie query più ricche ma ancora leggibili: `DISTINCT`, `LIKE`, `IN`, `CASE`, `HAVING` e sottoquery.
 - `es11` mostra `UPDATE` e `DELETE` con verifica prima/dopo.
 - `es12` introduce `VIEW`, `INDEX`, `EXPLAIN QUERY PLAN` e `TRIGGER`.

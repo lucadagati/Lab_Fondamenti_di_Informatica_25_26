@@ -1,8 +1,8 @@
-% ESERCIZIO 9 — Transazione: BEGIN … ROLLBACK annulla tutto insieme
+% ESERCIZIO 9 — Transazione: SAVEPOINT … ROLLBACK annulla tutto insieme
 %
-% BEGIN apre una “finestra”: le modifiche sono provvisorie fino a COMMIT.
-% ROLLBACK annulla tutto il blocco. Qui inseriamo paziente + visita + risultato lab
-% e poi ROLLBACK: nessuna traccia resta nelle tre tabelle.
+% SAVEPOINT apre una “finestra” di lavoro anche se il driver MATLAB/SQLite ha già
+% una transazione interna aperta. ROLLBACK TO annulla tutto fino al savepoint.
+% Qui inseriamo paziente + visita + risultato lab e poi annulliamo tutto.
 %
 % last_insert_rowid() è una funzione SQLite: dopo un INSERT su pazienti, restituisce
 % l id auto-generato dell ultima riga inserita su questa connessione.
@@ -24,7 +24,7 @@ n0 = fetch(conn, ['SELECT COUNT(*) AS n FROM pazienti WHERE cognome = ''' cognom
 disp('--- Conteggio pazienti con cognome di test (prima, atteso 0) ---');
 disp(n0.n(1));
 
-execute(conn, 'BEGIN TRANSACTION;');
+execute(conn, 'SAVEPOINT lab07_transazione;');
 
 execute(conn, [ ...
     'INSERT INTO pazienti (nome, cognome, anno_nascita, sesso, reparto_id) ' ...
@@ -49,7 +49,8 @@ sqlEsame = sprintf([ ...
     ], idVisita);
 execute(conn, sqlEsame);
 
-execute(conn, 'ROLLBACK;');
+execute(conn, 'ROLLBACK TO lab07_transazione;');
+execute(conn, 'RELEASE lab07_transazione;');
 
 n1 = fetch(conn, ['SELECT COUNT(*) AS n FROM pazienti WHERE cognome = ''' cognomeTest ''';']);
 disp('--- Stesso conteggio dopo ROLLBACK (atteso ancora 0) ---');
