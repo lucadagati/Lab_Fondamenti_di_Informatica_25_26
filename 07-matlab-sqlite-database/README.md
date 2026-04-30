@@ -307,9 +307,11 @@ Questo comportamento rende gli esercizi indipendenti: se esegui prima `es11_upda
 
 ## 6) Query da provare nella Command Window MATLAB
 
-Questa sezione serve per sperimentare senza modificare gli esercizi. Imposta la **Current Folder** di MATLAB sulla cartella `07-matlab-sqlite-database`, poi copia i comandi nella Command Window.
+Questa sezione contiene esempi da copiare nella **Command Window** di MATLAB. L’obiettivo è vedere le operazioni principali che si possono fare su un database: lettura/interrogazione (**DQL**), modifica dei dati (**DML**) e modifica della struttura (**DDL**). Gli esempi DDL usano oggetti `demo_*`, così non alterano lo schema principale del laboratorio.
 
 ### Preparazione
+
+Imposta la **Current Folder** di MATLAB sulla cartella `07-matlab-sqlite-database`, poi esegui:
 
 ```matlab
 run('codice/init_lab07_database.m')
@@ -322,18 +324,36 @@ Cosa fa questo comando:
 - attiva il controllo delle chiavi esterne con `PRAGMA foreign_keys=ON`;
 - lascia disponibile anche `percorsoDb`, cioè il percorso del file `.db`.
 
-### 1. Leggere una tabella intera
+Se vuoi ripartire da zero in qualsiasi momento, riesegui lo stesso comando.
+
+### DQL: leggere e interrogare i dati
+
+DQL significa **Data Query Language**: sono le istruzioni usate per interrogare i dati, soprattutto `SELECT`.
+
+#### 1. Leggere una tabella intera
 
 ```matlab
 pazienti = sqlread(conn, 'pazienti');
 disp(pazienti)
 ```
 
-- `sqlread(conn, 'pazienti')` equivale a leggere tutta la tabella `pazienti`.
+- `sqlread(conn, 'pazienti')` legge tutta la tabella `pazienti`.
 - Il risultato è una `table` MATLAB.
-- `disp(...)` visualizza la tabella nella Command Window.
+- `disp(pazienti)` stampa il contenuto nella Command Window.
 
-### 2. Filtrare righe con `WHERE`
+#### 2. Scegliere solo alcune colonne con `SELECT`
+
+```matlab
+query = "SELECT nome, cognome, anno_nascita FROM pazienti";
+risultato = fetch(conn, query);
+disp(risultato)
+```
+
+- `SELECT nome, cognome, anno_nascita` indica le colonne da mostrare.
+- `FROM pazienti` indica la tabella da cui leggere.
+- `fetch(conn, query)` esegue la query SQL e restituisce una `table`.
+
+#### 3. Filtrare righe con `WHERE`
 
 ```matlab
 query = "SELECT nome, cognome, anno_nascita FROM pazienti WHERE anno_nascita >= 1990";
@@ -341,12 +361,10 @@ risultato = fetch(conn, query);
 disp(risultato)
 ```
 
-- `SELECT` indica quali colonne vogliamo vedere.
-- `FROM pazienti` indica la tabella sorgente.
-- `WHERE anno_nascita >= 1990` tiene solo i pazienti nati dal 1990 in poi.
-- `fetch(conn, query)` esegue la query e restituisce una `table`.
+- `WHERE` serve a selezionare solo le righe che rispettano una condizione.
+- `anno_nascita >= 1990` tiene i pazienti nati dal 1990 in poi.
 
-### 3. Ordinare con `ORDER BY`
+#### 4. Ordinare con `ORDER BY`
 
 ```matlab
 query = "SELECT cognome, nome, anno_nascita FROM pazienti ORDER BY cognome";
@@ -354,10 +372,43 @@ risultato = fetch(conn, query);
 disp(risultato)
 ```
 
-- `ORDER BY cognome` ordina le righe in base alla colonna `cognome`.
-- L’ordinamento rende più leggibile il risultato.
+- `ORDER BY cognome` ordina il risultato in base al cognome.
+- Di default l’ordine è crescente.
 
-### 4. Unire due tabelle con `JOIN`
+#### 5. Limitare il numero di righe con `LIMIT`
+
+```matlab
+query = "SELECT cognome, nome, anno_nascita FROM pazienti ORDER BY anno_nascita LIMIT 3";
+risultato = fetch(conn, query);
+disp(risultato)
+```
+
+- `ORDER BY anno_nascita` ordina dal paziente più anziano al più giovane.
+- `LIMIT 3` mostra solo le prime tre righe.
+
+#### 6. Cercare testo con `LIKE`
+
+```matlab
+query = "SELECT nome, cognome FROM pazienti WHERE cognome LIKE '%i%'";
+risultato = fetch(conn, query);
+disp(risultato)
+```
+
+- `LIKE` confronta testo in modo flessibile.
+- `%i%` significa: qualsiasi testo prima e dopo la lettera `i`.
+
+#### 7. Filtrare su più valori con `IN`
+
+```matlab
+query = "SELECT codice, nome, unita_ref FROM tipi_esame WHERE codice IN ('GLU', 'CHOL', 'TSH')";
+risultato = fetch(conn, query);
+disp(risultato)
+```
+
+- `IN (...)` evita di scrivere molte condizioni con `OR`.
+- Qui selezioniamo solo alcuni tipi di esame dal catalogo.
+
+#### 8. Collegare tabelle con `JOIN`
 
 ```matlab
 query = "SELECT p.cognome, p.nome, r.nome AS reparto FROM pazienti p LEFT JOIN reparti r ON r.id = p.reparto_id ORDER BY p.cognome";
@@ -368,10 +419,10 @@ disp(risultato)
 - `pazienti p` assegna l’alias `p` alla tabella `pazienti`.
 - `reparti r` assegna l’alias `r` alla tabella `reparti`.
 - `LEFT JOIN` mantiene anche i pazienti senza reparto.
-- `ON r.id = p.reparto_id` dice a SQLite come collegare le due tabelle.
+- `ON r.id = p.reparto_id` specifica la condizione di collegamento.
 - `AS reparto` rinomina la colonna nel risultato.
 
-### 5. Usare una vista già pronta
+#### 9. Usare una `VIEW` già pronta
 
 ```matlab
 query = "SELECT cognome, codice, esame, valore, unita FROM v_esami_completi ORDER BY cognome, codice";
@@ -379,11 +430,11 @@ risultato = fetch(conn, query);
 disp(risultato)
 ```
 
-- `v_esami_completi` è una `VIEW`: contiene già i `JOIN` principali.
-- Usarla permette di scrivere query più semplici.
-- La vista non duplica i dati: è una query salvata con un nome.
+- `v_esami_completi` è una vista già creata nello script di inizializzazione.
+- Una vista è una query salvata con un nome.
+- Usarla semplifica le interrogazioni perché nasconde i `JOIN` più lunghi.
 
-### 6. Trovare valori sopra range
+#### 10. Trovare valori sopra range
 
 ```matlab
 query = "SELECT cognome, codice, valore, valore_max FROM v_esami_completi WHERE valore_max IS NOT NULL AND valore > valore_max";
@@ -392,10 +443,9 @@ disp(risultato)
 ```
 
 - `valore_max IS NOT NULL` evita confronti con valori mancanti.
-- `valore > valore_max` seleziona risultati sopra il range di riferimento.
-- Questa query mostra un esempio semplice di controllo clinico sui dati.
+- `valore > valore_max` trova risultati sopra il limite massimo.
 
-### 7. Contare righe con `GROUP BY`
+#### 11. Contare righe con `GROUP BY`
 
 ```matlab
 query = "SELECT cognome, nome, COUNT(*) AS n_esami FROM v_esami_completi GROUP BY cognome, nome ORDER BY n_esami DESC";
@@ -404,11 +454,11 @@ disp(risultato)
 ```
 
 - `COUNT(*)` conta quante righe ci sono in ogni gruppo.
-- `GROUP BY cognome, nome` crea un gruppo per ogni paziente.
-- `AS n_esami` assegna un nome leggibile alla colonna calcolata.
-- `ORDER BY n_esami DESC` ordina dal numero più alto al più basso.
+- `GROUP BY cognome, nome` crea un gruppo per paziente.
+- `AS n_esami` assegna un nome alla colonna calcolata.
+- `ORDER BY n_esami DESC` ordina dal valore più alto al più basso.
 
-### 8. Filtrare gruppi con `HAVING`
+#### 12. Filtrare gruppi con `HAVING`
 
 ```matlab
 query = "SELECT cognome, nome, COUNT(*) AS n_esami FROM v_esami_completi GROUP BY cognome, nome HAVING COUNT(*) >= 4";
@@ -416,11 +466,11 @@ risultato = fetch(conn, query);
 disp(risultato)
 ```
 
-- `WHERE` filtra le singole righe prima del raggruppamento.
+- `WHERE` filtra le righe prima del raggruppamento.
 - `HAVING` filtra i gruppi dopo `GROUP BY`.
-- Qui restano solo i pazienti con almeno 4 risultati.
+- Qui restano solo i pazienti con almeno quattro risultati.
 
-### 9. Usare `CASE` per creare una colonna interpretativa
+#### 13. Creare una colonna interpretativa con `CASE`
 
 ```matlab
 query = "SELECT cognome, codice, valore, CASE WHEN valore_max IS NOT NULL AND valore > valore_max THEN 'alto' WHEN valore_min IS NOT NULL AND valore < valore_min THEN 'basso' ELSE 'nel range' END AS stato FROM v_esami_completi";
@@ -429,11 +479,189 @@ disp(risultato)
 ```
 
 - `CASE` funziona come un piccolo `if` dentro SQL.
-- `WHEN ... THEN ...` definisce le condizioni.
-- `ELSE` definisce il valore se nessuna condizione precedente è vera.
-- `END AS stato` chiude il `CASE` e assegna il nome `stato` alla nuova colonna.
+- `WHEN ... THEN ...` definisce una condizione e il valore da mostrare.
+- `ELSE` definisce il valore usato se nessuna condizione precedente è vera.
+- `END AS stato` chiude il `CASE` e chiama la nuova colonna `stato`.
 
-### 10. Chiudere la connessione
+#### 14. Usare una sottoquery
+
+```matlab
+query = "SELECT nome, cognome FROM pazienti WHERE id IN (SELECT paziente_id FROM visite)";
+risultato = fetch(conn, query);
+disp(risultato)
+```
+
+- La query interna `SELECT paziente_id FROM visite` produce una lista di pazienti con almeno una visita.
+- La query esterna usa `IN` per mostrare solo quei pazienti.
+
+### DML: inserire, modificare e cancellare dati
+
+DML significa **Data Manipulation Language**: comprende operazioni sui dati, come `INSERT`, `UPDATE` e `DELETE`.
+
+#### 15. Inserire una riga con `INSERT`
+
+```matlab
+execute(conn, "INSERT INTO reparti (nome, piano, descrizione) VALUES ('Radiologia', 1, 'Reparto di diagnostica per immagini')")
+query = "SELECT * FROM reparti WHERE nome = 'Radiologia'";
+risultato = fetch(conn, query);
+disp(risultato)
+```
+
+- `INSERT INTO reparti (...)` indica la tabella e le colonne da riempire.
+- `VALUES (...)` contiene i valori da inserire.
+- Dopo l’inserimento usiamo `SELECT` per verificare.
+
+#### 16. Inserire più righe da una `table` MATLAB con `sqlwrite`
+
+```matlab
+nuoviReparti = table( ...
+    {'Cardiologia'; 'Neurologia'}, ...
+    [6; 7], ...
+    {'Ambulatorio cardiologico'; 'Ambulatorio neurologico'}, ...
+    'VariableNames', {'nome', 'piano', 'descrizione'} ...
+    );
+sqlwrite(conn, 'reparti', nuoviReparti)
+risultato = fetch(conn, "SELECT * FROM reparti WHERE nome IN ('Cardiologia', 'Neurologia')");
+disp(risultato)
+```
+
+- `table(...)` costruisce dati tabellari in MATLAB.
+- `VariableNames` deve corrispondere ai nomi delle colonne SQL.
+- `sqlwrite(conn, 'reparti', nuoviReparti)` copia le righe MATLAB nel database.
+
+#### 17. Modificare righe con `UPDATE`
+
+```matlab
+execute(conn, "UPDATE pazienti SET reparto_id = 3 WHERE cognome = 'Moretti'")
+risultato = fetch(conn, "SELECT nome, cognome, reparto_id FROM pazienti WHERE cognome = 'Moretti'");
+disp(risultato)
+```
+
+- `UPDATE pazienti` indica la tabella da modificare.
+- `SET reparto_id = 3` assegna un nuovo valore.
+- `WHERE cognome = 'Moretti'` limita la modifica a una riga specifica.
+- Senza `WHERE`, l’aggiornamento potrebbe coinvolgere tutte le righe.
+
+#### 18. Cancellare righe con `DELETE`
+
+```matlab
+execute(conn, "DELETE FROM reparti WHERE nome = 'Radiologia'")
+risultato = fetch(conn, "SELECT * FROM reparti WHERE nome = 'Radiologia'");
+disp(risultato)
+```
+
+- `DELETE FROM reparti` indica la tabella da cui cancellare.
+- `WHERE nome = 'Radiologia'` limita la cancellazione alla riga scelta.
+- La verifica finale deve restituire una tabella vuota.
+
+#### 19. Usare una transazione con `SAVEPOINT`
+
+```matlab
+execute(conn, "SAVEPOINT prova_transazione")
+execute(conn, "INSERT INTO reparti (nome, piano, descrizione) VALUES ('Demo rollback', 9, 'Riga temporanea')")
+primaRollback = fetch(conn, "SELECT * FROM reparti WHERE nome = 'Demo rollback'");
+disp(primaRollback)
+execute(conn, "ROLLBACK TO prova_transazione")
+execute(conn, "RELEASE prova_transazione")
+dopoRollback = fetch(conn, "SELECT * FROM reparti WHERE nome = 'Demo rollback'");
+disp(dopoRollback)
+```
+
+- `SAVEPOINT` crea un punto a cui è possibile tornare.
+- L’`INSERT` aggiunge una riga provvisoria.
+- `ROLLBACK TO` annulla le modifiche fatte dopo il savepoint.
+- `RELEASE` chiude il savepoint.
+- La seconda verifica deve mostrare che la riga non esiste più.
+
+### DDL: creare e modificare la struttura del database
+
+DDL significa **Data Definition Language**: comprende istruzioni che definiscono o modificano la struttura, come `CREATE TABLE`, `ALTER TABLE`, `CREATE VIEW`, `CREATE INDEX`, `CREATE TRIGGER`, `DROP`.
+
+Per non alterare le tabelle principali, gli esempi usano nomi che iniziano con `demo_`. Gli esempi 20, 21 e 24 vanno eseguiti in ordine, perché `ALTER TABLE` e `TRIGGER` usano la tabella `demo_note` creata al punto 20.
+
+#### 20. Creare una tabella con `CREATE TABLE`
+
+```matlab
+execute(conn, "DROP TABLE IF EXISTS demo_note")
+execute(conn, "CREATE TABLE demo_note (id INTEGER PRIMARY KEY AUTOINCREMENT, testo TEXT NOT NULL, data_creazione TEXT DEFAULT CURRENT_TIMESTAMP)")
+risultato = fetch(conn, "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'demo_note'");
+disp(risultato)
+```
+
+- `DROP TABLE IF EXISTS demo_note` elimina la tabella demo se era già presente.
+- `CREATE TABLE demo_note (...)` crea una nuova tabella.
+- `id INTEGER PRIMARY KEY AUTOINCREMENT` crea una chiave primaria numerica automatica.
+- `testo TEXT NOT NULL` richiede un testo non nullo.
+- `DEFAULT CURRENT_TIMESTAMP` assegna automaticamente data e ora.
+
+#### 21. Aggiungere una colonna con `ALTER TABLE`
+
+```matlab
+execute(conn, "ALTER TABLE demo_note ADD COLUMN autore TEXT")
+info = fetch(conn, "PRAGMA table_info(demo_note)");
+disp(info)
+```
+
+- `ALTER TABLE demo_note` modifica la struttura della tabella.
+- `ADD COLUMN autore TEXT` aggiunge una nuova colonna testuale.
+- `PRAGMA table_info(...)` mostra le colonne della tabella.
+
+#### 22. Creare una vista con `CREATE VIEW`
+
+```matlab
+execute(conn, "DROP VIEW IF EXISTS demo_pazienti_recenti")
+execute(conn, "CREATE VIEW demo_pazienti_recenti AS SELECT nome, cognome, anno_nascita FROM pazienti WHERE anno_nascita >= 1990")
+risultato = fetch(conn, "SELECT * FROM demo_pazienti_recenti");
+disp(risultato)
+```
+
+- `CREATE VIEW` salva una query con un nome.
+- `demo_pazienti_recenti` può essere interrogata come se fosse una tabella.
+- La vista non copia i dati: ricalcola il risultato dalla query.
+
+#### 23. Creare un indice con `CREATE INDEX`
+
+```matlab
+execute(conn, "CREATE INDEX IF NOT EXISTS demo_idx_pazienti_cognome ON pazienti(cognome)")
+piano = fetch(conn, "EXPLAIN QUERY PLAN SELECT * FROM pazienti WHERE cognome = 'Verdi'");
+disp(piano)
+```
+
+- `CREATE INDEX` crea una struttura che può velocizzare le ricerche.
+- `ON pazienti(cognome)` indica la colonna indicizzata.
+- `EXPLAIN QUERY PLAN` mostra come SQLite pensa di eseguire la query.
+
+#### 24. Creare un trigger con `CREATE TRIGGER`
+
+```matlab
+execute(conn, "DROP TRIGGER IF EXISTS demo_log_note")
+execute(conn, "CREATE TRIGGER demo_log_note AFTER INSERT ON demo_note BEGIN INSERT INTO audit_log (tabella, operazione, riga_id, descrizione) VALUES ('demo_note', 'INSERT', NEW.id, 'Inserita nota demo'); END;")
+execute(conn, "INSERT INTO demo_note (testo, autore) VALUES ('Prima nota di test', 'studente')")
+logDemo = fetch(conn, "SELECT * FROM audit_log WHERE tabella = 'demo_note'");
+disp(logDemo)
+```
+
+- `CREATE TRIGGER` definisce un’azione automatica.
+- `AFTER INSERT ON demo_note` significa: dopo ogni inserimento in `demo_note`.
+- `NEW.id` indica l’id della nuova riga appena inserita.
+- Il trigger scrive automaticamente una riga in `audit_log`.
+
+#### 25. Eliminare oggetti demo con `DROP`
+
+```matlab
+execute(conn, "DROP TRIGGER IF EXISTS demo_log_note")
+execute(conn, "DROP VIEW IF EXISTS demo_pazienti_recenti")
+execute(conn, "DROP INDEX IF EXISTS demo_idx_pazienti_cognome")
+execute(conn, "DROP TABLE IF EXISTS demo_note")
+```
+
+- `DROP TRIGGER` elimina il trigger demo.
+- `DROP VIEW` elimina la vista demo.
+- `DROP INDEX` elimina l’indice demo.
+- `DROP TABLE` elimina la tabella demo.
+- `IF EXISTS` evita errori se l’oggetto non è presente.
+
+### Chiusura della connessione
 
 ```matlab
 close(conn)
