@@ -2,15 +2,8 @@
 %
 % Glossario: es01_apri_db_sqlread.m. sqlwrite = inserimento da table senza scrivere INSERT a mano.
 
-cartellaLab = builtin('pwd');
-if ~isfolder(fullfile(cartellaLab, 'codice'))
-    parentDir = fileparts(cartellaLab);
-    if isfolder(fullfile(parentDir, 'codice'))
-        cartellaLab = parentDir;
-    else
-        error('lab07:path', 'Esegui dalla cartella del lab o da codice/esercizi.');
-    end
-end
+cartellaScript = fileparts(mfilename('fullpath'));
+cartellaLab = fileparts(cartellaScript);
 addpath(fullfile(cartellaLab, 'codice'));
 
 run(fullfile(cartellaLab, 'codice', 'lab07_create_fresh_database.m'));

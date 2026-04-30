@@ -16,15 +16,8 @@
 %                        FOREIGN KEY su questa connessione (se no, SQLite le ignora).
 
 % --- Percorsi: dove siamo sul disco -----------------------------------------
-cartellaLab = builtin('pwd');
-if ~isfolder(fullfile(cartellaLab, 'codice'))
-    parentDir = fileparts(cartellaLab);
-    if isfolder(fullfile(parentDir, 'codice'))
-        cartellaLab = parentDir;
-    else
-        error('lab07:path', 'Esegui dalla cartella del lab o da codice/esercizi.');
-    end
-end
+cartellaScript = fileparts(mfilename('fullpath'));
+cartellaLab = fileparts(cartellaScript);
 addpath(fullfile(cartellaLab, 'codice'));
 
 % Ricrea da zero il file dati/lab07_biomed.db (tabelle + righe di esempio)

@@ -5,15 +5,8 @@
 % sqlwrite(conn, nomeTabellaDb, tableMatlab) : aggiunge in coda alla tabella SQL le righe
 %     della table MATLAB. I nomi delle colonne della table devono coincidere con il DB.
 
-cartellaLab = builtin('pwd');
-if ~isfolder(fullfile(cartellaLab, 'codice'))
-    parentDir = fileparts(cartellaLab);
-    if isfolder(fullfile(parentDir, 'codice'))
-        cartellaLab = parentDir;
-    else
-        error('lab07:path', 'Esegui dalla cartella del lab o da codice/esercizi.');
-    end
-end
+cartellaScript = fileparts(mfilename('fullpath'));
+cartellaLab = fileparts(cartellaScript);
 addpath(fullfile(cartellaLab, 'codice'));
 
 run(fullfile(cartellaLab, 'codice', 'lab07_create_fresh_database.m'));
@@ -21,13 +14,13 @@ percorsoDb = dbPath;
 conn = sqlite(percorsoDb);
 execute(conn, 'PRAGMA foreign_keys=ON;');  % glossario: es01
 
-% Visita id 6 = Marco Bianchi (paziente 2), data 2025-05-10. tipo_esame_id: 5=LDH, 4=PCR.
+% Visita id 14 = Marco Bianchi (paziente 2), data 2025-06-12. tipo_esame_id: 5=LDH, 4=PCR.
 nuoveRighe = table( ...
-    [6; 6], ...                        % visita_id (stessa visita, due test)
+    [14; 14], ...                      % visita_id (stessa visita, due test)
     [5; 4], ...                        % tipo_esame_id (LDH, PCR)
     [230; 0.4], ...                    % valore
     {'U/L'; 'mg/dL'}, ...              % unita
-    {'2025-05-10'; '2025-05-10'}, ...  % data_risultato
+    {'2025-06-12'; '2025-06-12'}, ...  % data_risultato
     'VariableNames', {'visita_id', 'tipo_esame_id', 'valore', 'unita', 'data_risultato'} ...
     );
 
@@ -36,7 +29,7 @@ sqlwrite(conn, 'esami_lab', nuoveRighe);
 queryVerifica = [ ...
     'SELECT e.*, t.codice, t.nome FROM esami_lab e ' ...
     'JOIN tipi_esame t ON t.id = e.tipo_esame_id ' ...
-    'WHERE e.visita_id = 6 AND t.codice IN (''LDH'', ''PCR'') ' ...
+    'WHERE e.visita_id = 14 AND t.codice IN (''LDH'', ''PCR'') ' ...
     'ORDER BY t.codice' ...
     ];
 dopoInsert = fetch(conn, queryVerifica);

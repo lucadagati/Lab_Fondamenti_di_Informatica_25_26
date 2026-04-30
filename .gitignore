@@ -31,3 +31,6 @@ __pycache__/
 
 # Lab 7 – database SQLite generato localmente
 07-matlab-sqlite-database/dati/*.db
+
+# Lab 7 – slide/materiale binario locale, non pubblicato su GitHub
+07-matlab-sqlite-database/slides/

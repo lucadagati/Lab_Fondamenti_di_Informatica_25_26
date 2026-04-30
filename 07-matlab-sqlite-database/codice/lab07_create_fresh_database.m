@@ -8,20 +8,8 @@
 % Variabile esportata nello workspace chiamante:
 %   dbPath  -> percorso completo del file .db creato
 
-labDir = builtin('pwd');
-if ~(isfolder(fullfile(labDir, 'codice')) && isfolder(fullfile(labDir, 'dati')) )
-    parentDir = fileparts(labDir);
-    if isfolder(fullfile(parentDir, 'codice')) && isfolder(fullfile(parentDir, 'dati'))
-        labDir = parentDir;
-    else
-        candidate = fullfile(labDir, '07-matlab-sqlite-database');
-        if isfolder(fullfile(candidate, 'codice')) && isfolder(fullfile(candidate, 'dati'))
-            labDir = candidate;
-        else
-            error('lab07:path', 'Cartella lab non trovata partendo da pwd.');
-        end
-    end
-end
+cartellaScript = fileparts(mfilename('fullpath'));
+labDir = fileparts(cartellaScript);
 datiDir = fullfile(labDir, 'dati');
 if ~isfolder(datiDir)
     mkdir(datiDir);
@@ -99,19 +87,40 @@ execute(conn, [ ...
     ');' ...
     ]);
 
+execute(conn, [ ...
+    'CREATE TABLE audit_log (' ...
+    'id INTEGER PRIMARY KEY AUTOINCREMENT,' ...
+    'tabella TEXT NOT NULL,' ...
+    'operazione TEXT NOT NULL,' ...
+    'riga_id INTEGER,' ...
+    'descrizione TEXT,' ...
+    'data_evento TEXT DEFAULT CURRENT_TIMESTAMP' ...
+    ');' ...
+    ]);
+
 execute(conn, 'INSERT INTO reparti (nome, piano, descrizione) VALUES (''Biochimica clinica'', 2, ''Laboratorio centrale: biochimica, immunologia, ormoni'');');
 execute(conn, 'INSERT INTO reparti (nome, piano, descrizione) VALUES (''Ematologia'', 4, ''Emocromo, coagulazione, emoglobinurie'');');
 execute(conn, 'INSERT INTO reparti (nome, piano, descrizione) VALUES (''Medicina interna'', 3, ''Degenza e follow-up metabolico'');');
+execute(conn, 'INSERT INTO reparti (nome, piano, descrizione) VALUES (''Endocrinologia'', 5, ''Ambulatorio diabete, tiroide e metabolismo'');');
+execute(conn, 'INSERT INTO reparti (nome, piano, descrizione) VALUES (''Pronto soccorso'', 0, ''Accessi urgenti e prime valutazioni cliniche'');');
 
 execute(conn, 'INSERT INTO medici (nome, cognome, reparto_id, specialita) VALUES (''Anna'', ''Rossi'', 1, ''Patologia clinica'');');
 execute(conn, 'INSERT INTO medici (nome, cognome, reparto_id, specialita) VALUES (''Luca'', ''Gallo'', 1, ''Endocrinologia e diabetologia'');');
 execute(conn, 'INSERT INTO medici (nome, cognome, reparto_id, specialita) VALUES (''Chiara'', ''Marta'', 3, ''Medicina interna'');');
 execute(conn, 'INSERT INTO medici (nome, cognome, reparto_id, specialita) VALUES (''Filippo'', ''Neri'', 2, ''Ematologia clinica'');');
+execute(conn, 'INSERT INTO medici (nome, cognome, reparto_id, specialita) VALUES (''Serena'', ''Conti'', 4, ''Endocrinologia'');');
+execute(conn, 'INSERT INTO medici (nome, cognome, reparto_id, specialita) VALUES (''Davide'', ''Russo'', 5, ''Medicina d urgenza'');');
 
 execute(conn, 'INSERT INTO pazienti (nome, cognome, anno_nascita, sesso, reparto_id) VALUES (''Giulia'', ''Verdi'', 1992, ''F'', 1);');
 execute(conn, 'INSERT INTO pazienti (nome, cognome, anno_nascita, sesso, reparto_id) VALUES (''Marco'', ''Bianchi'', 1985, ''M'', 1);');
 execute(conn, 'INSERT INTO pazienti (nome, cognome, anno_nascita, sesso, reparto_id) VALUES (''Laura'', ''Neri'', 2001, ''F'', 2);');
 execute(conn, 'INSERT INTO pazienti (nome, cognome, anno_nascita, sesso, reparto_id) VALUES (''Paolo'', ''Blu'', 1978, ''M'', 3);');
+execute(conn, 'INSERT INTO pazienti (nome, cognome, anno_nascita, sesso, reparto_id) VALUES (''Sara'', ''Romano'', 1968, ''F'', 4);');
+execute(conn, 'INSERT INTO pazienti (nome, cognome, anno_nascita, sesso, reparto_id) VALUES (''Ahmed'', ''Khan'', 1998, ''M'', 5);');
+execute(conn, 'INSERT INTO pazienti (nome, cognome, anno_nascita, sesso, reparto_id) VALUES (''Elena'', ''Costa'', 1955, ''F'', 3);');
+execute(conn, 'INSERT INTO pazienti (nome, cognome, anno_nascita, sesso, reparto_id) VALUES (''Marta'', ''Greco'', 2010, ''F'', 2);');
+execute(conn, 'INSERT INTO pazienti (nome, cognome, anno_nascita, sesso, reparto_id) VALUES (''Nicola'', ''Ferrari'', 1970, ''M'', 4);');
+execute(conn, 'INSERT INTO pazienti (nome, cognome, anno_nascita, sesso, reparto_id) VALUES (''Irene'', ''Moretti'', 1989, ''F'', NULL);');
 
 execute(conn, 'INSERT INTO tipi_esame (codice, nome, unita_ref, valore_min, valore_max) VALUES (''GLU'', ''Glicemia'', ''mg/dL'', 70, 100);');
 execute(conn, 'INSERT INTO tipi_esame (codice, nome, unita_ref, valore_min, valore_max) VALUES (''HGB'', ''Emoglobina'', ''g/dL'', 12.0, 16.0);');
@@ -121,6 +130,12 @@ execute(conn, 'INSERT INTO tipi_esame (codice, nome, unita_ref, valore_min, valo
 execute(conn, 'INSERT INTO tipi_esame (codice, nome, unita_ref, valore_min, valore_max) VALUES (''FERR'', ''Ferritina'', ''ng/mL'', 20, 300);');
 execute(conn, 'INSERT INTO tipi_esame (codice, nome, unita_ref, valore_min, valore_max) VALUES (''CREA'', ''Creatinina'', ''umol/L'', 59, 104);');
 execute(conn, 'INSERT INTO tipi_esame (codice, nome, unita_ref, valore_min, valore_max) VALUES (''PAS'', ''Pressione sistolica'', ''mmHg'', 90, 140);');
+execute(conn, 'INSERT INTO tipi_esame (codice, nome, unita_ref, valore_min, valore_max) VALUES (''WBC'', ''Leucociti'', ''10^9/L'', 4.0, 10.0);');
+execute(conn, 'INSERT INTO tipi_esame (codice, nome, unita_ref, valore_min, valore_max) VALUES (''PLT'', ''Piastrine'', ''10^9/L'', 150, 450);');
+execute(conn, 'INSERT INTO tipi_esame (codice, nome, unita_ref, valore_min, valore_max) VALUES (''ALT'', ''ALT'', ''U/L'', NULL, 45);');
+execute(conn, 'INSERT INTO tipi_esame (codice, nome, unita_ref, valore_min, valore_max) VALUES (''TSH'', ''TSH'', ''mIU/L'', 0.4, 4.0);');
+execute(conn, 'INSERT INTO tipi_esame (codice, nome, unita_ref, valore_min, valore_max) VALUES (''NA'', ''Sodio'', ''mmol/L'', 135, 145);');
+execute(conn, 'INSERT INTO tipi_esame (codice, nome, unita_ref, valore_min, valore_max) VALUES (''K'', ''Potassio'', ''mmol/L'', 3.5, 5.1);');
 
 execute(conn, 'INSERT INTO visite (paziente_id, medico_id, data_visita, motivo) VALUES (1, 1, ''2025-01-10'', ''Controllo metabolico e profilo lipidico'');');
 execute(conn, 'INSERT INTO visite (paziente_id, medico_id, data_visita, motivo) VALUES (1, 2, ''2025-03-02'', ''Follow-up glicemia e colesterolo'');');
@@ -128,6 +143,14 @@ execute(conn, 'INSERT INTO visite (paziente_id, medico_id, data_visita, motivo) 
 execute(conn, 'INSERT INTO visite (paziente_id, medico_id, data_visita, motivo) VALUES (3, 3, ''2025-04-01'', ''Screening pre-operatorio'');');
 execute(conn, 'INSERT INTO visite (paziente_id, medico_id, data_visita, motivo) VALUES (4, 4, ''2025-04-05'', ''Controllo post-dimissioni'');');
 execute(conn, 'INSERT INTO visite (paziente_id, medico_id, data_visita, motivo) VALUES (2, 2, ''2025-05-10'', ''Visita ambulatoriale diabetologica'');');
+execute(conn, 'INSERT INTO visite (paziente_id, medico_id, data_visita, motivo) VALUES (5, 5, ''2025-05-12'', ''Controllo tiroideo e metabolismo'');');
+execute(conn, 'INSERT INTO visite (paziente_id, medico_id, data_visita, motivo) VALUES (6, 6, ''2025-05-13'', ''Accesso urgente per disidratazione'');');
+execute(conn, 'INSERT INTO visite (paziente_id, medico_id, data_visita, motivo) VALUES (7, 3, ''2025-05-14'', ''Controllo insufficienza renale lieve'');');
+execute(conn, 'INSERT INTO visite (paziente_id, medico_id, data_visita, motivo) VALUES (8, 4, ''2025-05-15'', ''Emocromo pediatrico di controllo'');');
+execute(conn, 'INSERT INTO visite (paziente_id, medico_id, data_visita, motivo) VALUES (9, 5, ''2025-06-01'', ''Follow-up diabete tipo 2'');');
+execute(conn, 'INSERT INTO visite (paziente_id, medico_id, data_visita, motivo) VALUES (10, 1, ''2025-06-03'', ''Screening generale annuale'');');
+execute(conn, 'INSERT INTO visite (paziente_id, medico_id, data_visita, motivo) VALUES (1, 1, ''2025-06-10'', ''Ricontrollo dopo dieta'');');
+execute(conn, 'INSERT INTO visite (paziente_id, medico_id, data_visita, motivo) VALUES (2, 5, ''2025-06-12'', ''Secondo follow-up glicemico'');');
 
 execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (1, 1, 92.0, ''mg/dL'', ''2025-01-10'', NULL);');
 execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (1, 7, 88.0, ''umol/L'', ''2025-01-10'', ''eGFR stabile'');');
@@ -141,5 +164,45 @@ execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, d
 execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (5, 2, 13.2, ''g/dL'', ''2025-04-05'', NULL);');
 execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (5, 4, 2.1, ''mg/dL'', ''2025-04-05'', ''infiammazione lieve'');');
 execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (1, 3, 178.0, ''mg/dL'', ''2025-01-10'', ''primo campione del profilo'');');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (6, 1, 119.0, ''mg/dL'', ''2025-05-10'', ''controllo a digiuno'');');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (6, 5, 230.0, ''U/L'', ''2025-05-10'', NULL);');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (6, 4, 0.4, ''mg/dL'', ''2025-05-10'', NULL);');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (7, 12, 5.8, ''mIU/L'', ''2025-05-12'', ''TSH lievemente alto'');');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (7, 1, 101.0, ''mg/dL'', ''2025-05-12'', NULL);');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (8, 13, 132.0, ''mmol/L'', ''2025-05-13'', ''iponatriemia lieve'');');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (8, 14, 3.2, ''mmol/L'', ''2025-05-13'', ''potassio basso'');');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (8, 7, 110.0, ''umol/L'', ''2025-05-13'', ''disidratazione sospetta'');');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (9, 7, 118.0, ''umol/L'', ''2025-05-14'', ''sopra range'');');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (9, 13, 139.0, ''mmol/L'', ''2025-05-14'', NULL);');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (9, 14, 4.7, ''mmol/L'', ''2025-05-14'', NULL);');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (10, 9, 7.2, ''10^9/L'', ''2025-05-15'', NULL);');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (10, 10, 310.0, ''10^9/L'', ''2025-05-15'', NULL);');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (10, 2, 12.4, ''g/dL'', ''2025-05-15'', NULL);');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (11, 1, 142.0, ''mg/dL'', ''2025-06-01'', ''valore alto'');');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (11, 3, 222.0, ''mg/dL'', ''2025-06-01'', ''sopra soglia'');');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (11, 6, 340.0, ''ng/mL'', ''2025-06-01'', ''sopra range'');');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (12, 1, 83.0, ''mg/dL'', ''2025-06-03'', NULL);');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (12, 11, 32.0, ''U/L'', ''2025-06-03'', NULL);');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (12, 12, 2.1, ''mIU/L'', ''2025-06-03'', NULL);');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (13, 1, 96.0, ''mg/dL'', ''2025-06-10'', ''miglioramento'');');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (13, 3, 181.0, ''mg/dL'', ''2025-06-10'', NULL);');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (14, 1, 111.0, ''mg/dL'', ''2025-06-12'', ''da ricontrollare'');');
+execute(conn, 'INSERT INTO esami_lab (visita_id, tipo_esame_id, valore, unita, data_risultato, note) VALUES (14, 8, 136.0, ''mmHg'', ''2025-06-12'', NULL);');
+
+execute(conn, 'CREATE INDEX idx_visite_paziente ON visite(paziente_id);');
+execute(conn, 'CREATE INDEX idx_esami_visita ON esami_lab(visita_id);');
+execute(conn, 'CREATE INDEX idx_esami_tipo ON esami_lab(tipo_esame_id);');
+execute(conn, [ ...
+    'CREATE VIEW v_esami_completi AS ' ...
+    'SELECT e.id AS esame_id, p.cognome, p.nome, v.data_visita, m.cognome AS medico, ' ...
+    'r.nome AS reparto, t.codice, t.nome AS esame, e.valore, e.unita, ' ...
+    't.valore_min, t.valore_max, e.data_risultato, e.note ' ...
+    'FROM esami_lab e ' ...
+    'JOIN visite v ON v.id = e.visita_id ' ...
+    'JOIN pazienti p ON p.id = v.paziente_id ' ...
+    'JOIN medici m ON m.id = v.medico_id ' ...
+    'LEFT JOIN reparti r ON r.id = p.reparto_id ' ...
+    'JOIN tipi_esame t ON t.id = e.tipo_esame_id;' ...
+    ]);
 
 close(conn);

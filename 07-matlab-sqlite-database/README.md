@@ -61,7 +61,11 @@ In questo laboratorio SQLite è proprio questo: un **file relazionale** (`dati/l
 - Capire **schema relazionale** esteso a più tabelle (chiavi, vincoli `FOREIGN KEY`, `CASCADE` / `RESTRICT`, tipi SQLite).
 - Scrivere interrogazioni **SELECT** con **WHERE**, **JOIN**, **GROUP BY**.
 - Eseguire **INSERT** con `execute` e inserimenti tabellari con `sqlwrite`.
+- Applicare operazioni di modifica (`UPDATE`, `DELETE`) con controlli prima/dopo.
+- Vedere oggetti SQL usati nella progettazione fisica e applicativa: `VIEW`, `INDEX`, `TRIGGER`.
 - Aprire un file **`.db`**, leggere risultati come `table` MATLAB e chiudere la connessione in modo ordinato.
+
+Collegamento con le slide in `slides/`: il lab riprende il percorso **requisiti → progettazione concettuale → progettazione logica → realizzazione SQL**, usando un esempio biomedico normalizzato. I file `es10`–`es12` coprono anche aspetti più operativi del linguaggio SQL: vincoli, interrogazioni avanzate, aggiornamenti, viste, indici e trigger.
 
 ---
 
@@ -86,14 +90,15 @@ Se restituisce `0`, installare/abilitare il toolbox o usare il percorso alternat
 | Percorso | Contenuto |
 |----------|-----------|
 | `sql/lab07_schema.sql` | Script SQL portabile (stesso schema dei dati di esempio; utile con `sqlite3`) |
-| `codice/lab07_create_fresh_database.m` | Funzione che **elimina e ricrea** `dati/lab07_biomed.db` (schema + insert) |
-| `codice/init_lab07_database.m` | Punto di ingresso: chiama la funzione sopra e stampa il path del file creato |
+| `codice/lab07_create_fresh_database.m` | Script che **elimina e ricrea** `dati/lab07_biomed.db` (schema + dati di esempio) |
+| `codice/init_lab07_database.m` | Punto di ingresso: esegue lo script sopra e stampa il path del file creato |
 | `codice/demo_connessione_lettura.m` | Demo breve: `sqlread` + `fetch` con `JOIN` |
 | `codice/demo_sqlwrite_inserimento.m` | Demo breve: `sqlwrite` + verifica |
-| `esercizi/` | Nove esercizi MATLAB (`es01`–`es09`); ogni esecuzione rigenera il database di esempio |
+| `esercizi/` | Dodici esercizi MATLAB (`es01`–`es12`); ogni esecuzione rigenera il database di esempio |
 | `dati/` | Qui viene creato `lab07_biomed.db` (non versionato; vedi `.gitignore` del repo) |
+| `slides/` | Slide di riferimento sulla progettazione e sull’uso dei database |
 
-Ogni file in `esercizi/` e nelle `demo` aggiunge `codice` al path MATLAB, esegue `run(fullfile(cartellaLab, 'codice', 'lab07_create_fresh_database.m'))`, poi usa `dbPath` e applica le operazioni descritte nello stesso file.
+Ogni file in `esercizi/` e nelle `demo` ricava la cartella del lab dalla posizione del file `.m` avviato con **Run**, aggiunge `codice` al path MATLAB, esegue `run(fullfile(cartellaLab, 'codice', 'lab07_create_fresh_database.m'))`, poi usa `dbPath` e applica le operazioni descritte nello stesso file.
 
 ---
 
@@ -114,7 +119,7 @@ run('codice/init_lab07_database.m')
 
 ## 5) Esercizi
 
-La cartella `esercizi/` contiene nove file MATLAB, da `es01_apri_db_sqlread.m` a `es09_transazione_coerenza.m`. Ogni file può essere eseguito indipendentemente dagli altri e, all’avvio, ricrea il database di esempio, così i risultati sono riproducibili.
+La cartella `esercizi/` contiene dodici file MATLAB, da `es01_apri_db_sqlread.m` a `es12_view_index_trigger.m`. Ogni file può essere eseguito indipendentemente dagli altri e, all’avvio, ricrea il database di esempio, così i risultati sono riproducibili.
 
 **Glossario nel codice (`PRAGMA`, `sqlite`, `fetch`, …)**  
 Nel file **`esercizi/es01_apri_db_sqlread.m`** trovi all’inizio un blocco di commenti che spiega, punto per punto:
@@ -139,6 +144,9 @@ Dall’`es02` in poi si usano le stesse definizioni dell’`es01` e si introduco
 | `esercizi/es07_integrita_referenziale_fk.m` | **Foreign key**: niente risultati per `visita_id` inesistente |
 | `esercizi/es08_delete_cascade.m` | **ON DELETE CASCADE**: coerenza dopo cancellazione paziente |
 | `esercizi/es09_transazione_coerenza.m` | **Transazione + ROLLBACK**: modifiche annullate insieme |
+| `esercizi/es10_query_avanzate.m` | Query avanzate: `DISTINCT`, `LIKE`, `IN`, `CASE`, `HAVING`, sottoquery |
+| `esercizi/es11_update_delete.m` | `UPDATE` e `DELETE` controllati con verifiche prima/dopo |
+| `esercizi/es12_view_index_trigger.m` | `VIEW`, `INDEX`, `EXPLAIN QUERY PLAN` e `TRIGGER` |
 
 ### Chiavi, integrità referenziale e coerenza
 
@@ -154,6 +162,52 @@ Approfondimento ufficiale SQLite sulle foreign key: [Foreign Key Support](https:
 
 Il file `lab07_biomed.db` modella in modo semplificato un contesto **LIS / cartella clinica**: reparti e personale, pazienti, catalogo prestazioni, visite (contesto in cui si richiedono esami) e infine i **risultati numerici** collegati alla visita e al tipo di test.
 
+### Dalla progettazione concettuale allo schema relazionale
+
+Le slide sulla progettazione dei database insistono su un passaggio importante: non si parte subito dal codice SQL, ma prima si chiarisce **quali informazioni** vogliamo rappresentare e **come sono collegate**. Nel lab il dominio scelto è un piccolo sistema informativo biomedico, simile a un LIS semplificato.
+
+**Requisiti informali del mini-sistema**
+
+- L’ospedale è organizzato in `reparti`.
+- Ogni `medico` appartiene a un reparto.
+- Ogni `paziente` può essere associato a un reparto di riferimento.
+- Un paziente può effettuare più `visite`.
+- Ogni visita è seguita da un medico.
+- Durante una visita possono essere prodotti più risultati di laboratorio.
+- Ogni risultato fa riferimento a un tipo di esame del catalogo (`tipi_esame`), dove sono registrati nome, codice, unità di misura e range di riferimento.
+
+**Entità principali**
+
+- `reparti`: rappresenta le unità organizzative.
+- `medici`: rappresenta il personale medico.
+- `pazienti`: rappresenta l’anagrafica clinica minima.
+- `visite`: rappresenta l’evento clinico che collega paziente e medico.
+- `tipi_esame`: rappresenta il catalogo degli esami disponibili.
+- `esami_lab`: rappresenta i risultati misurati.
+- `audit_log`: tabella tecnica usata per mostrare i trigger.
+
+**Perché non mettere tutto in una sola tabella?**  
+Una tabella unica con paziente, medico, reparto, nome esame e valore ripeterebbe molte informazioni. Ad esempio, il nome del paziente e il nome dell’esame comparirebbero in tante righe. Questo genera ridondanza e possibili anomalie: se cambia il nome di un reparto dovresti correggerlo in molti punti. Separare le entità in tabelle collegate riduce duplicazioni e rende più chiaro il significato dei dati.
+
+**Traduzione logica in tabelle**
+
+- Ogni entità diventa una tabella.
+- Ogni tabella ha una **chiave primaria** (`id`) per identificare in modo univoco ogni riga.
+- Le relazioni uno-a-molti diventano **chiavi esterne**:
+  - `medici.reparto_id` collega un medico al suo reparto.
+  - `pazienti.reparto_id` collega un paziente a un reparto di riferimento.
+  - `visite.paziente_id` collega la visita al paziente.
+  - `visite.medico_id` collega la visita al medico.
+  - `esami_lab.visita_id` collega un risultato alla visita.
+  - `esami_lab.tipo_esame_id` collega il risultato al tipo di esame.
+
+**Scelte sui vincoli**
+
+- `ON DELETE CASCADE` tra `pazienti`, `visite` ed `esami_lab`: se elimino un paziente nel lab, elimino automaticamente anche visite e risultati collegati.
+- `ON DELETE RESTRICT` su medici e tipi di esame: non è possibile eliminare un medico o un tipo di esame se esistono dati clinici collegati.
+- `CHECK` su `pazienti.sesso`: accetta solo valori controllati (`M`, `F`, `X`).
+- `UNIQUE` su `tipi_esame.codice`: due tipi di esame non possono avere lo stesso codice.
+
 | Tabella | Ruolo |
 |---------|--------|
 | `reparti` | Unità organizzative (laboratorio, ematologia, medicina interna): contesto in cui lavorano medici e, opzionalmente, dove è seguito il paziente. |
@@ -162,6 +216,7 @@ Il file `lab07_biomed.db` modella in modo semplificato un contesto **LIS / carte
 | `tipi_esame` | Catalogo dei test (codice univoco, nome, unità di riferimento, range min/max didattici). |
 | `visite` | Incontro **paziente–medico** in una data, con motivo della visita; è il “contenitore” logico delle richieste/risposte di laboratorio in questo esempio. |
 | `esami_lab` | Una riga = un valore misurato: FK a `visite` (`CASCADE` alla cancellazione della visita o, a catena, del paziente) e a `tipi_esame` (`RESTRICT`: non si cancella un tipo se esistono ancora risultati). |
+| `audit_log` | Tabella di log usata per mostrare il funzionamento di un `TRIGGER` sugli aggiornamenti. |
 
 ```mermaid
 erDiagram
@@ -171,6 +226,14 @@ erDiagram
     medici ||--o{ visite : "segue"
     visite ||--o{ esami_lab : "produce risultati"
     tipi_esame ||--o{ esami_lab : "classifica"
+    audit_log {
+        int id PK
+        string tabella
+        string operazione
+        int riga_id
+        string descrizione
+        string data_evento
+    }
     reparti {
         int id PK
         string nome
@@ -226,7 +289,7 @@ Prima di ogni esercizio il database viene ricreato da zero, così ogni Run è ri
 flowchart TD
     A[Avvio script .m] --> B["run(.../lab07_create_fresh_database.m)"]
     B --> C["Elimina lab07_biomed.db se esiste"]
-    C --> D["CREATE TABLE (6 tabelle + FK)"]
+    C --> D["CREATE TABLE (7 tabelle + FK)"]
     D --> E["INSERT dati di esempio"]
     E --> F["conn = sqlite(dbPath)"]
     F --> F2["PRAGMA foreign_keys=ON"]
@@ -254,6 +317,9 @@ flowchart LR
     subgraph es05["es05 — bulk da table"]
         e5a["table MATLAB 2 righe"] --> e5b["sqlwrite → esami_lab"]
     end
+    subgraph es10["es10 — query avanzate"]
+        e10a["DISTINCT / LIKE / IN / CASE"] --> e10b["HAVING + sottoquery"]
+    end
 ```
 
 Esercizi su **vincoli e coerenza** (dopo le letture/scritture di base):
@@ -271,6 +337,12 @@ flowchart TB
     end
     subgraph es09["es09 — transazione"]
         s9["BEGIN + INSERT paziente/visita/esame + ROLLBACK"] --> r9["nessuna traccia residua"]
+    end
+    subgraph es11["es11 — update/delete"]
+        s11["UPDATE e DELETE con WHERE"] --> r11["verifica prima/dopo"]
+    end
+    subgraph es12["es12 — oggetti SQL"]
+        s12["VIEW + INDEX + TRIGGER"] --> r12["query comoda, piano, audit_log"]
     end
 ```
 
@@ -298,11 +370,154 @@ flowchart TD
     es06 --> es07["es07 integrità FK"]
     es07 --> es08["es08 DELETE CASCADE"]
     es08 --> es09["es09 transazione ROLLBACK"]
+    es09 --> es10["es10 query avanzate"]
+    es10 --> es11["es11 UPDATE / DELETE"]
+    es11 --> es12["es12 VIEW / INDEX / TRIGGER"]
 ```
 
 ---
 
-## 6) Riferimenti MATLAB (ufficiali)
+## 6) Query da provare nella Command Window MATLAB
+
+Questa sezione serve per sperimentare senza modificare gli esercizi. Imposta la **Current Folder** di MATLAB sulla cartella `07-matlab-sqlite-database`, poi copia i comandi nella Command Window.
+
+### Preparazione
+
+```matlab
+run('codice/init_lab07_database.m')
+conn = sqlite(fullfile('dati', 'lab07_biomed.db'));
+execute(conn, 'PRAGMA foreign_keys=ON;')
+```
+
+Cosa fanno questi comandi:
+
+- `run(...)` esegue lo script che crea da zero il file `dati/lab07_biomed.db`.
+- `sqlite(...)` apre una connessione MATLAB verso quel file.
+- `execute(..., 'PRAGMA foreign_keys=ON;')` attiva il controllo delle chiavi esterne per questa connessione.
+
+### 1. Leggere una tabella intera
+
+```matlab
+pazienti = sqlread(conn, 'pazienti');
+disp(pazienti)
+```
+
+- `sqlread(conn, 'pazienti')` equivale a leggere tutta la tabella `pazienti`.
+- Il risultato è una `table` MATLAB.
+- `disp(...)` visualizza la tabella nella Command Window.
+
+### 2. Filtrare righe con `WHERE`
+
+```matlab
+query = "SELECT nome, cognome, anno_nascita FROM pazienti WHERE anno_nascita >= 1990";
+risultato = fetch(conn, query);
+disp(risultato)
+```
+
+- `SELECT` indica quali colonne vogliamo vedere.
+- `FROM pazienti` indica la tabella sorgente.
+- `WHERE anno_nascita >= 1990` tiene solo i pazienti nati dal 1990 in poi.
+- `fetch(conn, query)` esegue la query e restituisce una `table`.
+
+### 3. Ordinare con `ORDER BY`
+
+```matlab
+query = "SELECT cognome, nome, anno_nascita FROM pazienti ORDER BY cognome";
+risultato = fetch(conn, query);
+disp(risultato)
+```
+
+- `ORDER BY cognome` ordina le righe in base alla colonna `cognome`.
+- L’ordinamento rende più leggibile il risultato.
+
+### 4. Unire due tabelle con `JOIN`
+
+```matlab
+query = "SELECT p.cognome, p.nome, r.nome AS reparto FROM pazienti p LEFT JOIN reparti r ON r.id = p.reparto_id ORDER BY p.cognome";
+risultato = fetch(conn, query);
+disp(risultato)
+```
+
+- `pazienti p` assegna l’alias `p` alla tabella `pazienti`.
+- `reparti r` assegna l’alias `r` alla tabella `reparti`.
+- `LEFT JOIN` mantiene anche i pazienti senza reparto.
+- `ON r.id = p.reparto_id` dice a SQLite come collegare le due tabelle.
+- `AS reparto` rinomina la colonna nel risultato.
+
+### 5. Usare una vista già pronta
+
+```matlab
+query = "SELECT cognome, codice, esame, valore, unita FROM v_esami_completi ORDER BY cognome, codice";
+risultato = fetch(conn, query);
+disp(risultato)
+```
+
+- `v_esami_completi` è una `VIEW`: contiene già i `JOIN` principali.
+- Usarla permette di scrivere query più semplici.
+- La vista non duplica i dati: è una query salvata con un nome.
+
+### 6. Trovare valori sopra range
+
+```matlab
+query = "SELECT cognome, codice, valore, valore_max FROM v_esami_completi WHERE valore_max IS NOT NULL AND valore > valore_max";
+risultato = fetch(conn, query);
+disp(risultato)
+```
+
+- `valore_max IS NOT NULL` evita confronti con valori mancanti.
+- `valore > valore_max` seleziona risultati sopra il range di riferimento.
+- Questa query mostra un esempio semplice di controllo clinico sui dati.
+
+### 7. Contare righe con `GROUP BY`
+
+```matlab
+query = "SELECT cognome, nome, COUNT(*) AS n_esami FROM v_esami_completi GROUP BY cognome, nome ORDER BY n_esami DESC";
+risultato = fetch(conn, query);
+disp(risultato)
+```
+
+- `COUNT(*)` conta quante righe ci sono in ogni gruppo.
+- `GROUP BY cognome, nome` crea un gruppo per ogni paziente.
+- `AS n_esami` assegna un nome leggibile alla colonna calcolata.
+- `ORDER BY n_esami DESC` ordina dal numero più alto al più basso.
+
+### 8. Filtrare gruppi con `HAVING`
+
+```matlab
+query = "SELECT cognome, nome, COUNT(*) AS n_esami FROM v_esami_completi GROUP BY cognome, nome HAVING COUNT(*) >= 4";
+risultato = fetch(conn, query);
+disp(risultato)
+```
+
+- `WHERE` filtra le singole righe prima del raggruppamento.
+- `HAVING` filtra i gruppi dopo `GROUP BY`.
+- Qui restano solo i pazienti con almeno 4 risultati.
+
+### 9. Usare `CASE` per creare una colonna interpretativa
+
+```matlab
+query = "SELECT cognome, codice, valore, CASE WHEN valore_max IS NOT NULL AND valore > valore_max THEN 'alto' WHEN valore_min IS NOT NULL AND valore < valore_min THEN 'basso' ELSE 'nel range' END AS stato FROM v_esami_completi";
+risultato = fetch(conn, query);
+disp(risultato)
+```
+
+- `CASE` funziona come un piccolo `if` dentro SQL.
+- `WHEN ... THEN ...` definisce le condizioni.
+- `ELSE` definisce il valore se nessuna condizione precedente è vera.
+- `END AS stato` chiude il `CASE` e assegna il nome `stato` alla nuova colonna.
+
+### 10. Chiudere la connessione
+
+```matlab
+close(conn)
+```
+
+- `close(conn)` libera il file `.db`.
+- È buona pratica chiudere la connessione alla fine delle prove.
+
+---
+
+## 7) Riferimenti MATLAB (ufficiali)
 
 - [MATLAB Interface to SQLite](https://www.mathworks.com/help/database/matlab-interface-to-sqlite.html)
 - [`sqlite`](https://www.mathworks.com/help/database/ref/sqlite.html) — connessione a file `.db`
@@ -313,7 +528,7 @@ flowchart TD
 
 ---
 
-## 7) Opzionale: creare il DB con `sqlite3` (terminale)
+## 8) Opzionale: creare il DB con `sqlite3` (terminale)
 
 Su macOS/Linux (con [SQLite](https://www.sqlite.org/) installato):
 
@@ -326,7 +541,7 @@ Poi in MATLAB puoi aprire lo stesso file con `sqlite(fullfile('dati','lab07_biom
 
 ---
 
-## 8) Senza Database Toolbox (solo concettuale / alternativa)
+## 9) Senza Database Toolbox (solo concettuale / alternativa)
 
 - Eseguire query con `sqlite3` e reindirizzare l’output su **CSV**, poi `readtable` in MATLAB (perde l’obiettivo “live” SQL in sessione, ma utile in ambienti con licenza limitata).
 - In alternativa didattica: usare **MATLAB Online** o laboratorio con toolbox abilitato.
