@@ -281,99 +281,27 @@ erDiagram
     }
 ```
 
-### Flusso comune a tutti gli script (reset + connessione)
+### Come lanciare gli esercizi
 
-Prima di ogni esercizio il database viene ricreato da zero, così ogni Run è ripetibile e isolato:
+Per eseguire un esercizio in MATLAB:
 
-```mermaid
-flowchart TD
-    A[Avvio script .m] --> B["run(.../lab07_create_fresh_database.m)"]
-    B --> C["Elimina lab07_biomed.db se esiste"]
-    C --> D["CREATE TABLE (7 tabelle + FK)"]
-    D --> E["INSERT dati di esempio"]
-    E --> F["conn = sqlite(dbPath)"]
-    F --> F2["PRAGMA foreign_keys=ON"]
-    F2 --> G{Esercizio}
-    G --> H["Operazioni SQL / MATLAB"]
-    H --> I["close(conn)"]
-```
+1. Apri la cartella `07-matlab-sqlite-database` come **Current Folder**, oppure apri direttamente il file `.m` in `esercizi/`.
+2. Premi **Run** sul file scelto, ad esempio `esercizi/es03_join_groupby.m`.
+3. Ogni esercizio ricrea il database di esempio, apre una connessione `conn`, esegue la query o l’operazione prevista, stampa il risultato e chiude la connessione.
 
-### Cosa fa ogni esercizio sul database
+Questo comportamento rende gli esercizi indipendenti: se esegui prima `es11_update_delete.m` e poi `es02_fetch_where.m`, il secondo riparte comunque dal database iniziale.
 
-```mermaid
-flowchart LR
-    subgraph es01["es01 — lettura tabella"]
-        e1a["sqlread(conn,'pazienti')"] --> e1b["table T in workspace"]
-    end
-    subgraph es02["es02 — filtro WHERE"]
-        e2a["fetch: JOIN esami + tipi + visite"] --> e2b["solo glicemia ≥ 100"]
-    end
-    subgraph es03["es03 — JOIN + GROUP BY"]
-        e3a["pazienti ↔ visite ↔ esami_lab"] --> e3b["COUNT per paziente"]
-    end
-    subgraph es04["es04 — INSERT testuale"]
-        e4a["execute(INSERT …)"] --> e4b["nuova riga esami_lab (FK visita+tipo)"]
-    end
-    subgraph es05["es05 — bulk da table"]
-        e5a["table MATLAB 2 righe"] --> e5b["sqlwrite → esami_lab"]
-    end
-    subgraph es10["es10 — query avanzate"]
-        e10a["DISTINCT / LIKE / IN / CASE"] --> e10b["HAVING + sottoquery"]
-    end
-```
+### Cosa osservare durante gli esercizi
 
-Esercizi su **vincoli e coerenza** (dopo le letture/scritture di base):
-
-```mermaid
-flowchart TB
-    subgraph es06["es06 — chiave primaria"]
-        s6["INSERT con id duplicato"] --> r6["errore: PK"]
-    end
-    subgraph es07["es07 — foreign key"]
-        s7["INSERT esame visita_id=9999"] --> r7["errore: FK"]
-    end
-    subgraph es08["es08 — CASCADE"]
-        s8["DELETE paziente"] --> r8["visite ed esami a catena"]
-    end
-    subgraph es09["es09 — transazione"]
-        s9["BEGIN + INSERT paziente/visita/esame + ROLLBACK"] --> r9["nessuna traccia residua"]
-    end
-    subgraph es11["es11 — update/delete"]
-        s11["UPDATE e DELETE con WHERE"] --> r11["verifica prima/dopo"]
-    end
-    subgraph es12["es12 — oggetti SQL"]
-        s12["VIEW + INDEX + TRIGGER"] --> r12["query comoda, piano, audit_log"]
-    end
-```
-
-Relazione tra **join** dell’esercizio 3 e le tabelle coinvolte:
-
-```mermaid
-flowchart LR
-    P[pazienti] -->|p.id = v.paziente_id| V[visite]
-    V -->|v.id = e.visita_id| E[esami_lab]
-    E --> Q["COUNT(e.id) GROUP BY p.id"]
-    P --> Q
-```
-
-### Sequenza consigliata (dipendenze concettuali)
-
-Dal più “passivo” (solo lettura intera tabella) al più “attivo” (scrittura multipla):
-
-```mermaid
-flowchart TD
-    es01["es01 sqlread"] --> es02["es02 fetch + WHERE"]
-    es02 --> es03["es03 JOIN + GROUP BY"]
-    es03 --> es04["es04 execute INSERT"]
-    es04 --> es05["es05 sqlwrite bulk"]
-    es05 --> es06["es06 chiave primaria"]
-    es06 --> es07["es07 integrità FK"]
-    es07 --> es08["es08 DELETE CASCADE"]
-    es08 --> es09["es09 transazione ROLLBACK"]
-    es09 --> es10["es10 query avanzate"]
-    es10 --> es11["es11 UPDATE / DELETE"]
-    es11 --> es12["es12 VIEW / INDEX / TRIGGER"]
-```
+- `es01` mostra la lettura di una tabella intera con `sqlread`.
+- `es02` introduce `SELECT`, `WHERE` e `JOIN` per filtrare le glicemie.
+- `es03` usa `GROUP BY` e `COUNT` per contare i risultati per paziente.
+- `es04` ed `es05` mostrano due modi di inserire righe: SQL testuale con `execute` e inserimento da `table` MATLAB con `sqlwrite`.
+- `es06`, `es07` ed `es08` fanno vedere gli errori o gli effetti dei vincoli: chiave primaria, chiave esterna e `ON DELETE CASCADE`.
+- `es09` mostra una transazione: `BEGIN`, inserimenti temporanei e `ROLLBACK`.
+- `es10` raccoglie query più ricche ma ancora leggibili: `DISTINCT`, `LIKE`, `IN`, `CASE`, `HAVING` e sottoquery.
+- `es11` mostra `UPDATE` e `DELETE` con verifica prima/dopo.
+- `es12` introduce `VIEW`, `INDEX`, `EXPLAIN QUERY PLAN` e `TRIGGER`.
 
 ---
 

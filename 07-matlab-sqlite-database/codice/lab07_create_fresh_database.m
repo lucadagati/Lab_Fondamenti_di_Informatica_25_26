@@ -17,6 +17,14 @@ end
 
 dbPath = fullfile(datiDir, 'lab07_biomed.db');
 
+if exist('conn', 'var')
+    try
+        close(conn);
+    catch
+    end
+    clear conn
+end
+
 if isfile(dbPath)
     delete(dbPath);
 end
