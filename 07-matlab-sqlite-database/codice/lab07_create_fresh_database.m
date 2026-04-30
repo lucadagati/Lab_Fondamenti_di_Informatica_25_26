@@ -21,7 +21,7 @@ if isfile(dbPath)
     delete(dbPath);
 end
 
-conn = sqlite(dbPath);
+conn = sqlite(dbPath, 'create');
 execute(conn, 'PRAGMA foreign_keys=ON;');
 
 execute(conn, [ ...
