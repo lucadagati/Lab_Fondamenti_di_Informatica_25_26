@@ -7,7 +7,7 @@ Università degli Studi di Messina – Anno accademico 2025/26
 
 ---
 
-Questo repository raccoglie i **laboratori** del corso. Ogni laboratorio è in una cartella numerata; all’interno trovi la guida, l’**installazione dei tool** (quando serve) e le istruzioni passo-passo. Il **Lab 1** è dedicato a crittografia e sicurezza informatica; il **Lab 2** a VS Code, coding assistito in modalità agentica e un percorso fino a **Jupyter** con Python; il **Lab 3** a **MATLAB** e strutture di controllo con esercizi, hint e soluzioni; il **Lab 4** a Python in notebook Jupyter, riusando l’ambiente predisposto nel Lab 2; il **Lab 5** a MATLAB bioinformatica, HL7 e NCBI; il **Lab 6** a MATLAB su file formattati, RegEx/Patterns, Live Scripts e grafici; il **Lab 7** a database relazionali con **SQLite** e interfaccia **MATLAB** (Database Toolbox).
+Questo repository raccoglie i **laboratori** del corso. Ogni laboratorio è in una cartella numerata; all’interno trovi la guida, l’**installazione dei tool** (quando serve) e le istruzioni passo-passo. Il **Lab 1** è dedicato a crittografia e sicurezza informatica; il **Lab 2** a VS Code, coding assistito in modalità agentica e un percorso fino a **Jupyter** con Python; il **Lab 3** a **MATLAB** e strutture di controllo con esercizi, hint e soluzioni; il **Lab 4** a Python in notebook Jupyter, riusando l’ambiente predisposto nel Lab 2; il **Lab 5** a MATLAB bioinformatica, HL7 e NCBI; il **Lab 6** a MATLAB su file formattati, RegEx/Patterns, Live Scripts e grafici; il **Lab 7** a database relazionali con **SQLite** e interfaccia **MATLAB** (Database Toolbox); il **Lab 8** a progettazione di basi di dati con crescita guidata del diagramma **E-R** e ristrutturazione verso il modello logico.
 
 ---
 
@@ -24,6 +24,7 @@ flowchart TD
     ROOT --> LAB5[05-matlab-bioinfo-hl7-ncbi]
     ROOT --> LAB6[06-matlab-data-regex-livescript]
     ROOT --> LAB7[07-matlab-sqlite-database]
+    ROOT --> LAB8[08-progettazione-er]
 
     LAB1 --> L1README[README.md - guida e installazione]
     LAB1 --> L1PWD[passwords.txt]
@@ -48,6 +49,7 @@ flowchart TD
     LAB7 --> L7CODE[codice/]
     LAB7 --> L7EX[esercizi/]
     LAB7 --> L7DATI[dati/]
+    LAB8 --> L8README[README.md - guida Lab 8]
 ```
 
 ```
@@ -86,13 +88,15 @@ Lab_Biomed/
 │   ├── esercizi/
 │   ├── soluzioni/
 │   └── live_scripts/
-└── 07-matlab-sqlite-database/         ← Lab 7: SQLite, SQL, Database Toolbox da MATLAB
+├── 07-matlab-sqlite-database/         ← Lab 7: SQLite, SQL, Database Toolbox da MATLAB
     ├── README.md
     ├── sql/
     ├── dati/
     ├── codice/
     ├── esercizi/
     └── script_init_db.sh
+└── 08-progettazione-er/               ← Lab 8: progettazione concettuale/logica, ER step-by-step
+    └── README.md
 ```
 
 ---
@@ -108,7 +112,8 @@ Lab_Biomed/
 | 5 | [05-matlab-bioinfo-hl7-ncbi](05-matlab-bioinfo-hl7-ncbi/README.md) | MATLAB: bioinformatica, HL7, NCBI; codice di riferimento dalle slide L15/L16 |
 | 6 | [06-matlab-data-regex-livescript](06-matlab-data-regex-livescript/README.md) | MATLAB: CSV/XLS/XML, RegEx/Patterns, Live Scripts, grafici ed export |
 | 7 | [07-matlab-sqlite-database](07-matlab-sqlite-database/README.md) | SQLite e SQL; accesso da MATLAB (`sqlite`, `fetch`, `sqlread`, `execute`, `sqlwrite`) |
-| 8, … | *(in arrivo)* | Saranno aggiunti nella stessa struttura (es. `08-nome-lab/`) |
+| 8 | [08-progettazione-er](08-progettazione-er/README.md) | Progettazione database: dal testo ai requisiti, crescita del diagramma E-R, ristrutturazione e schema finale |
+| 9, … | *(in arrivo)* | Saranno aggiunti nella stessa struttura (es. `09-nome-lab/`) |
 
 Apri la cartella del laboratorio assegnato e segui il **README** al suo interno (installazione dei tool e svolgimento).
 
