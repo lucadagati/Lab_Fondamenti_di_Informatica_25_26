@@ -30,14 +30,8 @@ Al termine del laboratorio, lo studente e in grado di:
 
 ## Scenario
 
-Dominio: societa di formazione.
-
-Concetti principali da modellare:
-- partecipanti;
-- docenti;
-- corsi ed edizioni;
-- lezioni;
-- datori di lavoro e storico impieghi.
+Ogni esercizio della cartella `esercizi/` propone un dominio diverso (sanita, logistica, servizi).
+Il metodo resta invariato: dal testo ai requisiti, dallo schema concettuale alla ristrutturazione logica, fino a schema fisico e SQL.
 
 ## Flusso operativo
 
@@ -63,44 +57,38 @@ Strategia consigliata (coerente con il flusso NARE):
 - dettagliare per iterazioni;
 - integrare i sottoschemi in un E-R finale.
 
-Schema scheletro:
-
-```mermaid
-erDiagram
-    PARTECIPANTE }o--o{ CORSO : partecipa
-    DOCENTE }o--o{ CORSO : insegna
-```
-
-Evoluzione con EDIZIONE_CORSO e LEZIONE:
-
-```mermaid
-erDiagram
-    CORSO ||--o{ EDIZIONE_CORSO : ha
-    EDIZIONE_CORSO ||--|{ LEZIONE : composta_da
-    PARTECIPANTE }o--o{ EDIZIONE_CORSO : frequenta
-    DOCENTE }o--o{ EDIZIONE_CORSO : docenza
-```
-
-Evoluzione con storico impieghi:
-
-```mermaid
-erDiagram
-    PARTECIPANTE ||--o| IMPIEGO_CORRENTE : ha
-    PARTECIPANTE ||--o{ IMPIEGO_PASSATO : ha
-    DATORE_LAVORO ||--o{ IMPIEGO_CORRENTE : coinvolto
-    DATORE_LAVORO ||--o{ IMPIEGO_PASSATO : coinvolto
-```
-
-Rappresentazione alternativa (Chen semplificata, utile per una resa grafica piu vicina ai diagrammi da slide):
+Schema metodologico (neutro):
 
 ```mermaid
 flowchart LR
-    P[PARTECIPANTE] --- F{FREQUENZA}
-    E[EDIZIONE_CORSO] --- F
-    D[DOCENTE] --- X{DOCENZA}
-    E --- X
-    C[CORSO] --- H{HA}
-    E --- H
+  T[Testo problema] --> R[Requisiti strutturati]
+  R --> D0[Schema scheletro D0]
+  D0 --> D1[Evoluzione D1]
+  D1 --> D2[Evoluzione D2]
+  D2 --> Dn[Schema concettuale finale]
+```
+
+Evoluzione per raffinamenti successivi:
+
+```mermaid
+flowchart TB
+  A0[Entita principali e attributi chiave]
+  A1[Relazioni base e cardinalita]
+  A2[Casi avanzati: identificazione esterna]
+  A3[Casi avanzati: relazione ricorsiva]
+  A4[Casi avanzati: relazione ternaria]
+  A0 --> A1 --> A2 --> A3 --> A4
+```
+
+Consegna della fase concettuale:
+
+```mermaid
+flowchart LR
+  E1[Diagramma ER completo]
+  E2[Cardinalita min/max]
+  E3[Identificatori]
+  E4[Attributi composti/multivalore]
+  E1 --> E2 --> E3 --> E4
 ```
 
 ### Fase 3 - Progettazione logica
@@ -145,84 +133,16 @@ Output atteso:
 - query operative principali (SELECT/UPDATE);
 - verifica minima con casi di test.
 
-## Diagramma E-R finale (ristrutturato)
+## Diagramma di flusso finale (ristrutturazione)
 
 ```mermaid
-erDiagram
-    CORSO ||--o{ EDIZIONE_CORSO : ha
-    EDIZIONE_CORSO ||--|{ LEZIONE : composta_da
-
-    PARTECIPANTE }o--o{ FREQUENZA : frequenta
-    EDIZIONE_CORSO }o--o{ FREQUENZA : include
-
-    DOCENTE }o--o{ DOCENZA : eroga
-    EDIZIONE_CORSO }o--o{ DOCENZA : prevede
-
-    PARTECIPANTE ||--o| IMPIEGO_CORRENTE : ha
-    PARTECIPANTE ||--o{ IMPIEGO_PASSATO : ha
-    DATORE_LAVORO ||--o{ IMPIEGO_CORRENTE : coinvolto
-    DATORE_LAVORO ||--o{ IMPIEGO_PASSATO : coinvolto
-
-    PARTECIPANTE {
-      int id_partecipante PK
-      string codice_fiscale
-      string cognome
-      int eta
-      string sesso
-      string citta_nascita
-      string tipo_partecipante
-    }
-
-    DOCENTE {
-      int id_docente PK
-      string cognome
-      int eta
-      string citta_nascita
-    }
-
-    CORSO {
-      string codice_corso PK
-      string titolo
-    }
-
-    EDIZIONE_CORSO {
-      int id_edizione PK
-      date data_inizio
-      date data_fine
-    }
-
-    LEZIONE {
-      int id_lezione PK
-      string giorno_settimana
-      string aula
-      string orario
-    }
-
-    DATORE_LAVORO {
-      int id_datore PK
-      string nome
-      string indirizzo
-      string telefono
-    }
-
-    FREQUENZA {
-      int voto_finale
-      string stato
-    }
-
-    DOCENZA {
-      string tipo_docenza
-    }
-
-    IMPIEGO_CORRENTE {
-      date data_inizio
-    }
-
-    IMPIEGO_PASSATO {
-      date data_inizio
-      date data_fine
-    }
+flowchart LR
+    C[Schema concettuale finale] --> L[Schema logico ristrutturato]
+    L --> P[Schema fisico: tipi, vincoli, indici]
+    P --> S[Implementazione SQL: DDL, DML, query]
 ```
+
+Nota: il diagramma ER completo e caso-specifico e si trova nei singoli file in `esercizi/`.
 
 ## Materiale esercizi
 
