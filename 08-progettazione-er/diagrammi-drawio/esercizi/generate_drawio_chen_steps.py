@@ -459,10 +459,10 @@ def generate(name, spec):
     diagram = SubElement(mxfile, 'diagram', name='Page-1', id=name)
 
     entity_count = len(entities)
-    cols = 1
-    rows = entity_count
-    page_w = 3200
-    page_h = max(3200, 500 + rows * 620)
+    cols = min(2, max(1, entity_count))
+    rows = (entity_count + cols - 1) // cols
+    page_w = max(4600, 800 + cols * 1400)
+    page_h = max(3600, 700 + rows * 1100)
 
     model = SubElement(diagram, 'mxGraphModel', dx='1600', dy='1000', grid='1', gridSize='10', guides='1', tooltips='1', connect='1', arrows='1', fold='1', page='1', pageScale='1', pageWidth=str(page_w), pageHeight=str(page_h), math='0', shadow='0')
     root = SubElement(model, 'root')
@@ -470,28 +470,38 @@ def generate(name, spec):
     SubElement(root, 'mxCell', id='1', parent='0')
 
     entity_pos = {}
-    w, h = 280, 120
-    sx, sy, dx, dy = 520, 260, 0, 520
+    entity_boxes = {}
+    w, h = 300, 130
+    sx, sy, dx, dy = 360, 320, 1350, 980
+
+    def overlaps(a, b):
+        ax, ay, aw, ah = a
+        bx, by, bw, bh = b
+        return ax < bx + bw and ax + aw > bx and ay < by + bh and ay + ah > by
+
+    def collides(box, occupied):
+        return any(overlaps(box, o) for o in occupied)
 
     eid = 2
     for i, (ename, attrs) in enumerate(entities.items()):
         x = sx + (i % cols) * dx
         y = sy + (i // cols) * dy
         entity_pos[ename] = (x, y)
+        entity_boxes[ename] = (x, y, w, h)
         cid = f'e{eid}'; eid += 1
         cell = SubElement(root, 'mxCell', id=cid, value=ename, style='rounded=0;whiteSpace=wrap;html=1;fontStyle=1;strokeWidth=2;', vertex='1', parent='1')
         SubElement(cell, 'mxGeometry', x=str(x), y=str(y), width=str(w), height=str(h), attrib={'as': 'geometry'})
 
         # Keep attributes around each entity with fixed slots to avoid overlaps.
-        slots = [(-380, -160), (430, -160), (-380, 140), (430, 140), (0, -250), (0, 240)]
-        for k, (aname, is_pk) in enumerate(attrs[:4]):
+        slots = [(-420, -180), (470, -180), (-420, 170), (470, 170), (0, -300), (0, 280)]
+        for k, (aname, is_pk) in enumerate(attrs[:3]):
             aid = f'e{eid}'; eid += 1
             ox, oy = slots[k % len(slots)]
             ax = x + ox
             ay = y + oy
             aval = mklabel(aname, underline=is_pk)
             attr = SubElement(root, 'mxCell', id=aid, value=aval, style='ellipse;whiteSpace=wrap;html=1;strokeWidth=1.5;', vertex='1', parent='1')
-            SubElement(attr, 'mxGeometry', x=str(ax), y=str(ay), width='250', height='60', attrib={'as': 'geometry'})
+            SubElement(attr, 'mxGeometry', x=str(ax), y=str(ay), width='270', height='64', attrib={'as': 'geometry'})
             cid2 = f'e{eid}'; eid += 1
             edge = SubElement(root, 'mxCell', id=cid2, value='', style='endArrow=none;html=1;strokeWidth=1.2;', edge='1', parent='1', source=cid, target=aid)
             SubElement(edge, 'mxGeometry', relative='1', attrib={'as': 'geometry'})
@@ -503,6 +513,19 @@ def generate(name, spec):
             rect_ids[c.attrib['value']] = c.attrib['id']
 
     rel_pair_offsets = {}
+    relationship_boxes = []
+    attr_boxes = []
+    for c in root.findall('mxCell'):
+        if c.attrib.get('vertex') != '1':
+            continue
+        st = c.attrib.get('style', '')
+        if not st.startswith('ellipse'):
+            continue
+        g = c.find('mxGeometry')
+        if g is None:
+            continue
+        attr_boxes.append((float(g.attrib.get('x', '0')), float(g.attrib.get('y', '0')), float(g.attrib.get('width', '0')), float(g.attrib.get('height', '0'))))
+
     for rel_idx, (rname, e1, c1, c2, e2) in enumerate(relationships):
         x1, y1 = entity_pos[e1]
         x2, y2 = entity_pos[e2]
@@ -513,11 +536,26 @@ def generate(name, spec):
         pair_index = rel_pair_offsets.get(pair_key, 0)
         rel_pair_offsets[pair_key] = pair_index + 1
 
-        rw, rh = 230, 120
-        rel_col = rel_idx % 2
-        base_x = 1260 + rel_col * 320
-        rx = base_x + (pair_index * 40)
-        ry = 180 + rel_idx * 220
+        rw, rh = 240, 130
+        midx, midy = (c1x + c2x) / 2, (c1y + c2y) / 2
+        vx, vy = c2x - c1x, c2y - c1y
+        norm = (vx * vx + vy * vy) ** 0.5 or 1.0
+        px, py = -vy / norm, vx / norm
+
+        candidates = [(midx - rw / 2, midy - rh / 2)]
+        for step in (90, 170, 250, 330):
+            candidates.append((midx + px * step - rw / 2, midy + py * step - rh / 2))
+            candidates.append((midx - px * step - rw / 2, midy - py * step - rh / 2))
+
+        occupied = list(entity_boxes.values()) + attr_boxes + relationship_boxes
+        rx, ry = candidates[0]
+        for cand in candidates:
+            box = (cand[0], cand[1], rw, rh)
+            if not collides(box, occupied):
+                rx, ry = cand
+                break
+
+        relationship_boxes.append((rx, ry, rw, rh))
 
         rid = f'e{eid}'; eid += 1
         rel = SubElement(root, 'mxCell', id=rid, value=rname, style='rhombus;whiteSpace=wrap;html=1;strokeWidth=2;', vertex='1', parent='1')
