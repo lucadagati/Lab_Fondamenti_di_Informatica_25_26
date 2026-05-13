@@ -48,8 +48,8 @@ Nel primo passo si rappresenta il servizio minimo della piattaforma: la video-vi
 
 ```mermaid
 flowchart LR
-    P[PAZIENTE] -->|effettua| VV[VIDEO_VISITA]
-    VV -->|con| M[MEDICO]
+    P[PAZIENTE] -->|1:N effettua| VV[VIDEO_VISITA]
+    VV -->|N:1 con| M[MEDICO]
 ```
 
 ### Evoluzione con dispositivi e misure (D1)
@@ -57,11 +57,11 @@ Nel secondo passo la piattaforma evolve in sistema di monitoraggio. Le misure do
 
 ```mermaid
 flowchart LR
-    P[PAZIENTE] -->|effettua| VV[VIDEO_VISITA]
-    VV -->|con| M[MEDICO]
-    P -->|usa| D[DISPOSITIVO]
-    D -->|registra| MS[MISURA]
-    P -->|produce storicamente| MS
+    P[PAZIENTE] -->|1:N effettua| VV[VIDEO_VISITA]
+    VV -->|N:1 con| M[MEDICO]
+    P -->|1:N usa| D[DISPOSITIVO]
+    D -->|1:N registra| MS[MISURA]
+    P -->|1:N produce storicamente| MS
 ```
 
 ### Evoluzione con piani terapeutici e alert (D2)
@@ -69,14 +69,25 @@ Nel terzo passo si aggiungono gli elementi decisionali del dominio. Il piano ter
 
 ```mermaid
 flowchart LR
-    P[PAZIENTE] -->|segue| PT[PIANO_TERAPEUTICO]
-    M[MEDICO] -->|definisce| PT
-    P -->|usa| D[DISPOSITIVO]
-    D -->|registra| MS[MISURA]
-    P -->|produce storicamente| MS
-    MS -->|genera| A[ALERT]
-    PT -->|fornisce soglie e obiettivi| A
+    P[PAZIENTE] -->|1:N segue| PT[PIANO_TERAPEUTICO]
+    M[MEDICO] -->|1:N definisce| PT
+    P -->|1:N usa| D[DISPOSITIVO]
+    D -->|1:N registra| MS[MISURA]
+    P -->|1:N produce storicamente| MS
+    MS -->|1:N genera| A[ALERT]
+    PT -->|1:N fornisce soglie e obiettivi| A
 ```
+
+Diagrammi Draw.io progressivi (ER Chen):
+
+![D0 concettuale - Esercizio 3](../diagrammi-drawio/esercizi/03-d0-concettuale.svg)
+![D1 concettuale - Esercizio 3](../diagrammi-drawio/esercizi/03-d1-concettuale.svg)
+![D2 concettuale - Esercizio 3](../diagrammi-drawio/esercizi/03-d2-concettuale.svg)
+
+Sorgenti modificabili:
+- [03-d0-concettuale.drawio](../diagrammi-drawio/esercizi/03-d0-concettuale.drawio)
+- [03-d1-concettuale.drawio](../diagrammi-drawio/esercizi/03-d1-concettuale.drawio)
+- [03-d2-concettuale.drawio](../diagrammi-drawio/esercizi/03-d2-concettuale.drawio)
 
 ### Consegna concettuale
 Definisci:
@@ -121,6 +132,11 @@ erDiagram
     MISURA ||--o{ ALERT : genera
     PIANO_TERAPEUTICO ||--o{ ALERT : contestualizza
 ```
+Versione Draw.io (SVG):
+
+![Schema ER ristrutturato - Esercizio 3](../diagrammi-drawio/esercizi/03-er-finale.svg)
+
+Sorgente modificabile: [03-er-finale.drawio](../diagrammi-drawio/esercizi/03-er-finale.drawio)
 
 ### Output richiesto
 - tabella volumi e tabella operazioni;

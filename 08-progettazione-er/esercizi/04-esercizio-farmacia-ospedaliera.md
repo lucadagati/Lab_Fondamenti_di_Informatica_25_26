@@ -48,8 +48,8 @@ Lo schema scheletro rappresenta il cuore logistico del dominio: farmaco, lotto e
 
 ```mermaid
 flowchart LR
-    F[FARMACO] -->|contenuto in| L[LOTTO]
-    L -->|stoccato in| R[REPARTO]
+    F[FARMACO] -->|1:N contenuto in| L[LOTTO]
+    L -->|N:M stoccato in| R[REPARTO]
 ```
 
 ### Evoluzione con prescrizioni (D1)
@@ -57,10 +57,10 @@ Nel secondo passo si introduce la prescrizione, che collega il processo logistic
 
 ```mermaid
 flowchart LR
-    M[MEDICO] -->|prescrive| P[PRESCRIZIONE]
-    P -->|include| F[FARMACO]
-    F -->|contenuto in| L[LOTTO]
-    L -->|stoccato in| R[REPARTO]
+    M[MEDICO] -->|1:N prescrive| P[PRESCRIZIONE]
+    P -->|N:M include| F[FARMACO]
+    F -->|1:N contenuto in| L[LOTTO]
+    L -->|N:M stoccato in| R[REPARTO]
 ```
 
 ### Evoluzione con paziente, dispensazione e movimenti (D2)
@@ -68,14 +68,25 @@ Nel terzo passo si completa la catena di tracciabilita. La dispensazione viene r
 
 ```mermaid
 flowchart LR
-    M[MEDICO] -->|prescrive| P[PRESCRIZIONE]
-    P -->|riguarda| PA[PAZIENTE]
-    P -->|evasa da| D[DISPENSAZIONE]
-    D -->|usa lotto| L[LOTTO]
-    L -->|di| F[FARMACO]
-    D -->|genera| MV[MOVIMENTO]
-    MV -->|verso o da| R[REPARTO]
+    M[MEDICO] -->|1:N prescrive| P[PRESCRIZIONE]
+    P -->|N:1 riguarda| PA[PAZIENTE]
+    P -->|1:N evasa da| D[DISPENSAZIONE]
+    D -->|N:1 usa lotto| L[LOTTO]
+    L -->|N:1 di| F[FARMACO]
+    D -->|1:N genera| MV[MOVIMENTO]
+    MV -->|N:1 verso o da| R[REPARTO]
 ```
+
+Diagrammi Draw.io progressivi (ER Chen):
+
+![D0 concettuale - Esercizio 4](../diagrammi-drawio/esercizi/04-d0-concettuale.svg)
+![D1 concettuale - Esercizio 4](../diagrammi-drawio/esercizi/04-d1-concettuale.svg)
+![D2 concettuale - Esercizio 4](../diagrammi-drawio/esercizi/04-d2-concettuale.svg)
+
+Sorgenti modificabili:
+- [04-d0-concettuale.drawio](../diagrammi-drawio/esercizi/04-d0-concettuale.drawio)
+- [04-d1-concettuale.drawio](../diagrammi-drawio/esercizi/04-d1-concettuale.drawio)
+- [04-d2-concettuale.drawio](../diagrammi-drawio/esercizi/04-d2-concettuale.drawio)
 
 ### Consegna concettuale
 Definisci:
@@ -122,6 +133,11 @@ erDiagram
     LOTTO ||--o{ DISPENSAZIONE : utilizzato
     DISPENSAZIONE ||--o{ MOVIMENTO : produce
 ```
+Versione Draw.io (SVG):
+
+![Schema ER ristrutturato - Esercizio 4](../diagrammi-drawio/esercizi/04-er-finale.svg)
+
+Sorgente modificabile: [04-er-finale.drawio](../diagrammi-drawio/esercizi/04-er-finale.drawio)
 
 ### Output richiesto
 - tabella volumi;

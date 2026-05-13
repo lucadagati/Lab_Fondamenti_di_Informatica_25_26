@@ -59,11 +59,11 @@ Nel primo passo si individuano solo le entita principali e gli attributi chiave.
 
 ```mermaid
 flowchart LR
-    M[MAGAZZINO\nPK: cod_magazzino\nindirizzo(via, cap)\ncitta]
-    D[DIPARTIMENTO\n(nome_dipartimento)]
-    I[IMPIEGATO\nPK: codice_fiscale\ncognome\ndata_inizio_contratto]
-    P[PRODOTTO\nPK: cod_prodotto\nnome\ncosto]
-    F[FORNITORE\nPK: piva\nnome_fornitore]
+    M["MAGAZZINO<br/>PK: cod_magazzino<br/>indirizzo: via, cap<br/>citta"]
+    D["DIPARTIMENTO<br/>nome_dipartimento"]
+    I["IMPIEGATO<br/>PK: codice_fiscale<br/>cognome<br/>data_inizio_contratto"]
+    P["PRODOTTO<br/>PK: cod_prodotto<br/>nome<br/>costo"]
+    F["FORNITORE<br/>PK: piva<br/>nome_fornitore"]
 ```
 
 Spiegazione D0:
@@ -76,8 +76,8 @@ Nel secondo passo si inseriscono le relazioni strutturali di appartenenza e affe
 
 ```mermaid
 flowchart LR
-    M[MAGAZZINO] -->|contiene| D[DIPARTIMENTO]
-    I[IMPIEGATO] -->|afferisce a| D
+    M[MAGAZZINO] -->|1:N contiene| D[DIPARTIMENTO]
+    I[IMPIEGATO] -->|N:1 afferisce a| D
 ```
 
 Spiegazione D1:
@@ -90,7 +90,7 @@ Nel terzo passo si inserisce la composizione dei prodotti complessi.
 
 ```mermaid
 flowchart LR
-    P1[PRODOTTO (composto)] -->|composizione| P2[PRODOTTO (componente)]
+    P1[PRODOTTO composto] -->|N:M composizione| P2[PRODOTTO componente]
 ```
 
 Spiegazione D2:
@@ -103,10 +103,23 @@ Nel quarto passo si modella la fornitura come relazione n-aria, evitando di spez
 
 ```mermaid
 flowchart LR
-    FO[FORNITORE] --> FU{FORNITURA\nquantita}
-    PR[PRODOTTO] --> FU
-    DI[DIPARTIMENTO] --> FU
+    FO[FORNITORE] -->|1:N| FU{FORNITURA\nquantita}
+    PR[PRODOTTO] -->|1:N| FU
+    DI[DIPARTIMENTO] -->|1:N| FU
 ```
+
+Diagrammi Draw.io progressivi (ER Chen):
+
+![D0 concettuale - Esercizio 6](../diagrammi-drawio/esercizi/06-d0-concettuale.svg)
+![D1 concettuale - Esercizio 6](../diagrammi-drawio/esercizi/06-d1-concettuale.svg)
+![D2 concettuale - Esercizio 6](../diagrammi-drawio/esercizi/06-d2-concettuale.svg)
+![D3 concettuale - Esercizio 6](../diagrammi-drawio/esercizi/06-d3-concettuale.svg)
+
+Sorgenti modificabili:
+- [06-d0-concettuale.drawio](../diagrammi-drawio/esercizi/06-d0-concettuale.drawio)
+- [06-d1-concettuale.drawio](../diagrammi-drawio/esercizi/06-d1-concettuale.drawio)
+- [06-d2-concettuale.drawio](../diagrammi-drawio/esercizi/06-d2-concettuale.drawio)
+- [06-d3-concettuale.drawio](../diagrammi-drawio/esercizi/06-d3-concettuale.drawio)
 
 Spiegazione D3:
 - FORNITURA collega contemporaneamente fornitore, prodotto e dipartimento;
@@ -160,6 +173,11 @@ erDiagram
     PRODOTTO ||--o{ FORNITURA : riguarda
     DIPARTIMENTO ||--o{ FORNITURA : riceve
 ```
+Versione Draw.io (SVG):
+
+![Schema ER ristrutturato - Esercizio 6](../diagrammi-drawio/esercizi/06-er-finale.svg)
+
+Sorgente modificabile: [06-er-finale.drawio](../diagrammi-drawio/esercizi/06-er-finale.drawio)
 
 ### Output richiesto
 - tabella dei volumi;

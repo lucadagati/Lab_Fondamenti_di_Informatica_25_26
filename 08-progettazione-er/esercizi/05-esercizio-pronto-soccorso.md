@@ -48,8 +48,8 @@ Nel primo passo si rappresenta l'evento centrale del dominio: l'accesso. Tutte l
 
 ```mermaid
 flowchart LR
-    P[PAZIENTE] -->|accede| A[ACCESSO]
-    A -->|preso in carico da| M[MEDICO]
+    P[PAZIENTE] -->|1:N accede| A[ACCESSO]
+    A -->|N:1 preso in carico da| M[MEDICO]
 ```
 
 ### Evoluzione con triage e aree (D1)
@@ -57,10 +57,10 @@ Nel secondo passo il triage viene separato dall'accesso, perche puo essere ripet
 
 ```mermaid
 flowchart LR
-    P[PAZIENTE] -->|accede| A[ACCESSO]
-    A -->|assegnato a| AR[AREA]
-    A -->|sottoposto a| T[TRIAGE]
-    T -->|eseguito da| M[MEDICO]
+    P[PAZIENTE] -->|1:N accede| A[ACCESSO]
+    A -->|N:1 assegnato a| AR[AREA]
+    A -->|1:N sottoposto a| T[TRIAGE]
+    T -->|N:1 eseguito da| M[MEDICO]
 ```
 
 ### Evoluzione con visita, esami ed esito (D2)
@@ -68,14 +68,25 @@ Nel terzo passo si rappresenta l'intero percorso del paziente in pronto soccorso
 
 ```mermaid
 flowchart LR
-    P[PAZIENTE] -->|accede| A[ACCESSO]
-    A -->|assegnato a| AR[AREA]
-    A -->|sottoposto a| T[TRIAGE]
-    T -->|eseguito da| M[MEDICO]
-    A -->|seguito da| V[VISITA]
-    V -->|richiede| E[ESAME]
-    A -->|si chiude con| ES[ESITO]
+    P[PAZIENTE] -->|1:N accede| A[ACCESSO]
+    A -->|N:1 assegnato a| AR[AREA]
+    A -->|1:N sottoposto a| T[TRIAGE]
+    T -->|N:1 eseguito da| M[MEDICO]
+    A -->|1:N seguito da| V[VISITA]
+    V -->|N:M richiede| E[ESAME]
+    A -->|1:1 si chiude con| ES[ESITO]
 ```
+
+Diagrammi Draw.io progressivi (ER Chen):
+
+![D0 concettuale - Esercizio 5](../diagrammi-drawio/esercizi/05-d0-concettuale.svg)
+![D1 concettuale - Esercizio 5](../diagrammi-drawio/esercizi/05-d1-concettuale.svg)
+![D2 concettuale - Esercizio 5](../diagrammi-drawio/esercizi/05-d2-concettuale.svg)
+
+Sorgenti modificabili:
+- [05-d0-concettuale.drawio](../diagrammi-drawio/esercizi/05-d0-concettuale.drawio)
+- [05-d1-concettuale.drawio](../diagrammi-drawio/esercizi/05-d1-concettuale.drawio)
+- [05-d2-concettuale.drawio](../diagrammi-drawio/esercizi/05-d2-concettuale.drawio)
 
 ### Consegna concettuale
 Definisci:
@@ -121,6 +132,11 @@ erDiagram
     ESAME ||--o{ RICHIESTA_ESAME : classifica
     ACCESSO ||--|| ESITO : termina_con
 ```
+Versione Draw.io (SVG):
+
+![Schema ER ristrutturato - Esercizio 5](../diagrammi-drawio/esercizi/05-er-finale.svg)
+
+Sorgente modificabile: [05-er-finale.drawio](../diagrammi-drawio/esercizi/05-er-finale.drawio)
 
 ### Output richiesto
 - tabella dei volumi;

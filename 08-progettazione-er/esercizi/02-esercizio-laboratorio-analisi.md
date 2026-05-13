@@ -57,8 +57,8 @@ Nel primo passo si definisce lo schema scheletro. L'obiettivo e distinguere chia
 
 ```mermaid
 flowchart LR
-    P[PAZIENTE] -->|richiede| R[RICHIESTA]
-    R -->|genera| C[CAMPIONE]
+    P[PAZIENTE] -->|1:N richiede| R[RICHIESTA]
+    R -->|1:N genera| C[CAMPIONE]
 ```
 
 Significato del passo D0:
@@ -71,12 +71,12 @@ Nel secondo passo si distinguono il tipo di analisi e l'esecuzione concreta. Que
 
 ```mermaid
 flowchart LR
-    P[PAZIENTE] -->|richiede| R[RICHIESTA]
-    R -->|genera| C[CAMPIONE]
-    C -->|supporta| E[ESAME]
-    C -->|produce| RS[RISULTATO]
-    RS -->|riferito a| E
-    RS -->|eseguito con| ST[STRUMENTO]
+    P[PAZIENTE] -->|1:N richiede| R[RICHIESTA]
+    R -->|1:N genera| C[CAMPIONE]
+    C -->|N:M supporta| E[ESAME]
+    C -->|1:N produce| RS[RISULTATO]
+    RS -->|N:1 riferito a| E
+    RS -->|N:1 eseguito con| ST[STRUMENTO]
 ```
 
 Significato del passo D1:
@@ -89,15 +89,26 @@ Nel terzo passo si completa il contesto clinico e documentale. Il medico prescri
 
 ```mermaid
 flowchart LR
-    P[PAZIENTE] -->|richiede| R[RICHIESTA]
-    MP[MEDICO_PRESCRITTORE] -->|prescrive| R
-    R -->|genera| C[CAMPIONE]
-    C -->|supporta| E[ESAME]
-    C -->|produce| RS[RISULTATO]
-    RS -->|riferito a| E
-    RS -->|eseguito con| ST[STRUMENTO]
-    RS -->|incluso in| RF[REFERTO]
+    P[PAZIENTE] -->|1:N richiede| R[RICHIESTA]
+    MP[MEDICO_PRESCRITTORE] -->|1:N prescrive| R
+    R -->|1:N genera| C[CAMPIONE]
+    C -->|N:M supporta| E[ESAME]
+    C -->|1:N produce| RS[RISULTATO]
+    RS -->|N:1 riferito a| E
+    RS -->|N:1 eseguito con| ST[STRUMENTO]
+    RS -->|N:1 incluso in| RF[REFERTO]
 ```
+
+Diagrammi Draw.io progressivi (ER Chen):
+
+![D0 concettuale - Esercizio 2](../diagrammi-drawio/esercizi/02-d0-concettuale.svg)
+![D1 concettuale - Esercizio 2](../diagrammi-drawio/esercizi/02-d1-concettuale.svg)
+![D2 concettuale - Esercizio 2](../diagrammi-drawio/esercizi/02-d2-concettuale.svg)
+
+Sorgenti modificabili:
+- [02-d0-concettuale.drawio](../diagrammi-drawio/esercizi/02-d0-concettuale.drawio)
+- [02-d1-concettuale.drawio](../diagrammi-drawio/esercizi/02-d1-concettuale.drawio)
+- [02-d2-concettuale.drawio](../diagrammi-drawio/esercizi/02-d2-concettuale.drawio)
 
 Significato del passo D2:
 - si separa il livello della prescrizione clinica dal livello della refertazione;
@@ -147,6 +158,11 @@ erDiagram
     STRUMENTO ||--o{ RISULTATO : esegue
     REFERTO ||--o{ RISULTATO : include
 ```
+Versione Draw.io (SVG):
+
+![Schema ER ristrutturato - Esercizio 2](../diagrammi-drawio/esercizi/02-er-finale.svg)
+
+Sorgente modificabile: [02-er-finale.drawio](../diagrammi-drawio/esercizi/02-er-finale.drawio)
 
 ### Output richiesto
 - tabella dei volumi;

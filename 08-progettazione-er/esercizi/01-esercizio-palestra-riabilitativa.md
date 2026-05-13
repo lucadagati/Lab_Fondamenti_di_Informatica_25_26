@@ -57,8 +57,8 @@ Nel primo passo si costruisce uno schema scheletro che rappresenta il flusso min
 
 ```mermaid
 flowchart LR
-    P[PAZIENTE] -->|segue| PR[PROGRAMMA]
-    PR -->|include| S[SEDUTA]
+    P[PAZIENTE] -->|1:N segue| PR[PROGRAMMA]
+    PR -->|1:N include| S[SEDUTA]
 ```
 
 Significato del passo D0:
@@ -71,10 +71,10 @@ Nel secondo passo si aggiunge il fisioterapista. Questa scelta e necessaria per 
 
 ```mermaid
 flowchart LR
-    P[PAZIENTE] -->|segue| PR[PROGRAMMA]
-    PR -->|include| S[SEDUTA]
-    PR -->|ha referente| F[FISIOTERAPISTA]
-    S -->|condotta da| F
+    P[PAZIENTE] -->|1:N segue| PR[PROGRAMMA]
+    PR -->|1:N include| S[SEDUTA]
+    PR -->|N:1 ha referente| F[FISIOTERAPISTA]
+    S -->|N:1 condotta da| F
 ```
 
 Significato del passo D1:
@@ -87,13 +87,13 @@ Nel terzo passo si introduce la parte di monitoraggio. Le valutazioni non sono s
 
 ```mermaid
 flowchart LR
-    P[PAZIENTE] -->|segue| PR[PROGRAMMA]
-    PR -->|include| S[SEDUTA]
-    PR -->|ha referente| F[FISIOTERAPISTA]
-    S -->|condotta da| F
-    P -->|riceve| V[VALUTAZIONE]
-    PR -->|prevede| V
-    V -->|misura| I[INDICATORE_CLINICO]
+    P[PAZIENTE] -->|1:N segue| PR[PROGRAMMA]
+    PR -->|1:N include| S[SEDUTA]
+    PR -->|N:1 ha referente| F[FISIOTERAPISTA]
+    S -->|N:1 condotta da| F
+    P -->|1:N riceve| V[VALUTAZIONE]
+    PR -->|1:N prevede| V
+    V -->|1:N misura| I[INDICATORE_CLINICO]
 ```
 
 Significato del passo D2:
@@ -106,14 +106,27 @@ Nel quarto passo si consolida il modello concettuale. Non si introducono necessa
 
 ```mermaid
 flowchart LR
-    P[PAZIENTE] -->|segue| PR[PROGRAMMA]
-    PR -->|include| S[SEDUTA]
-    S -->|condotta da| F[FISIOTERAPISTA]
-    PR -->|ha referente| F
-    P -->|riceve| V[VALUTAZIONE]
-    PR -->|prevede| V
-    V -->|misura| I[INDICATORE_CLINICO]
+    P[PAZIENTE] -->|1:N segue| PR[PROGRAMMA]
+    PR -->|1:N include| S[SEDUTA]
+    S -->|N:1 condotta da| F[FISIOTERAPISTA]
+    PR -->|N:1 ha referente| F
+    P -->|1:N riceve| V[VALUTAZIONE]
+    PR -->|1:N prevede| V
+    V -->|1:N misura| I[INDICATORE_CLINICO]
 ```
+
+Diagrammi Draw.io progressivi (ER Chen):
+
+![D0 concettuale - Esercizio 1](../diagrammi-drawio/esercizi/01-d0-concettuale.svg)
+![D1 concettuale - Esercizio 1](../diagrammi-drawio/esercizi/01-d1-concettuale.svg)
+![D2 concettuale - Esercizio 1](../diagrammi-drawio/esercizi/01-d2-concettuale.svg)
+![D3 concettuale - Esercizio 1](../diagrammi-drawio/esercizi/01-d3-concettuale.svg)
+
+Sorgenti modificabili:
+- [01-d0-concettuale.drawio](../diagrammi-drawio/esercizi/01-d0-concettuale.drawio)
+- [01-d1-concettuale.drawio](../diagrammi-drawio/esercizi/01-d1-concettuale.drawio)
+- [01-d2-concettuale.drawio](../diagrammi-drawio/esercizi/01-d2-concettuale.drawio)
+- [01-d3-concettuale.drawio](../diagrammi-drawio/esercizi/01-d3-concettuale.drawio)
 
 ### Consegna concettuale
 Produci uno schema E-R completo con:
@@ -165,6 +178,11 @@ erDiagram
     VALUTAZIONE ||--o{ MISURA_VALUTAZIONE : contiene
     TIPO_INDICATORE ||--o{ MISURA_VALUTAZIONE : classifica
 ```
+Versione Draw.io (SVG):
+
+![Schema ER ristrutturato - Esercizio 1](../diagrammi-drawio/esercizi/01-er-finale.svg)
+
+Sorgente modificabile: [01-er-finale.drawio](../diagrammi-drawio/esercizi/01-er-finale.drawio)
 
 ### Output logico richiesto
 Presenta:
