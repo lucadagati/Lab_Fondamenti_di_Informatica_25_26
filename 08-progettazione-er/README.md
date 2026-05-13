@@ -232,6 +232,7 @@ Cartella esercizi del Lab 8:
 - esercizi/03-esercizio-telemedicina.md
 - esercizi/04-esercizio-farmacia-ospedaliera.md
 - esercizi/05-esercizio-pronto-soccorso.md
+- esercizi/06-esercizio-citylogistics.md
 
 File diagrammi:
 - diagrammi-er.md
