@@ -9,8 +9,16 @@
 % 3) Richiamare una seconda funzione locale per errore assoluto.
 % 4) Stampare input, output cubico ed errore con disp.
 
-vettore = [1 2 3 4 5];                                   % Definisce il vettore di ingresso su cui calcolare il cubo.
-target = [1 8 27 65 130];                                % Definisce un vettore target con cui confrontare il risultato ottenuto.
+vettore=[]
+target=[]
+dimensione = input("Inserisci la dimensione degli array")
+for i=1:dimensione
+    vettore(i)=input("Inserisci elemento per vettore di riferimento")
+end
+for i=1:dimensione
+    target(i)=input("Inserisci elemento per vettore di target")
+end
+
 risultato = cubo(vettore);                               % Richiama la funzione locale cubo per ottenere la trasformazione x^3.
 errore = errore_assoluto(risultato, target);             % Richiama la funzione locale che calcola la distanza assoluta elemento per elemento.
 
