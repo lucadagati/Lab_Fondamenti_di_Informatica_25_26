@@ -16,9 +16,7 @@ L'obiettivo è modellare un workflow realistico di telemedicina domiciliare o di
 
 ## Contesto scientifico
 
-Ispirato a lavori recenti su monitoraggio remoto del paziente e sistemi IoT sanitari, tra cui:
-
-Siddiqui, M. U. A. et al. (2021). IoT-Based Real-Time Patient Health Monitoring System. IEEE Access, 9, 124316–124325. DOI: https://doi.org/10.1109/ACCESS.2021.3109084
+Il progetto si colloca nel filone del telemonitoraggio remoto del paziente e dei sistemi IoT sanitari, con attenzione a storicizzazione, analisi dei segnali e supporto alle decisioni cliniche.
 
 ## Funzionalità principali
 
