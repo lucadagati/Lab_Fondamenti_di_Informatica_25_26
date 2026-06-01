@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Nuovo paziente — HealthMonitor IoT{% endblock %}
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Dashboard</a></li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.patients') }}">Pazienti</a></li>
+  <li class="breadcrumb-item active">Nuovo</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="bi bi-person-plus-fill me-2 text-primary"></i>Registra nuovo paziente</h5>
+      </div>
+      <div class="card-body">
+        <form action="{{ url_for('main.add_patient') }}" method="post" novalidate>
+
+          <div class="mb-3">
+            <label for="name" class="form-label fw-semibold">Nome e cognome <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="name" name="name" required
+                   placeholder="Es. Mario Rossi" maxlength="100" />
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-sm-4">
+              <label for="age" class="form-label">Età</label>
+              <input type="number" class="form-control" id="age" name="age" min="0" max="130" />
+            </div>
+            <div class="col-sm-4">
+              <label for="gender" class="form-label">Genere</label>
+              <select class="form-select" id="gender" name="gender">
+                <option value="">—</option>
+                <option value="M">M</option>
+                <option value="F">F</option>
+                <option value="Altro">Altro</option>
+              </select>
+            </div>
+            <div class="col-sm-4"><!-- spacer --></div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-sm-6">
+              <label for="weight_kg" class="form-label">Peso (kg)</label>
+              <input type="number" step="0.1" class="form-control" id="weight_kg"
+                     name="weight_kg" min="1" max="300" />
+            </div>
+            <div class="col-sm-6">
+              <label for="height_cm" class="form-label">Altezza (cm)</label>
+              <input type="number" step="0.1" class="form-control" id="height_cm"
+                     name="height_cm" min="30" max="250" />
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="notes" class="form-label">Note cliniche</label>
+            <textarea class="form-control" id="notes" name="notes" rows="3"
+                      placeholder="Patologie note, terapie, annotazioni…"></textarea>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-lg me-1"></i>Salva paziente
+            </button>
+            <a href="{{ url_for('main.patients') }}" class="btn btn-outline-secondary">Annulla</a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

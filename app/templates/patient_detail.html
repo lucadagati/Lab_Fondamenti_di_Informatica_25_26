@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}{{ patient.name }} — HealthMonitor IoT{% endblock %}
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Dashboard</a></li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.patients') }}">Pazienti</a></li>
+  <li class="breadcrumb-item active">{{ patient.name }}</li>
+{% endblock %}
+
+{% block content %}
+
+<!-- Patient header -->
+<div class="card mb-4 shadow-sm">
+  <div class="card-body d-flex align-items-start gap-4">
+    <div class="patient-avatar">
+      <i class="bi bi-person-circle text-primary" style="font-size:3.5rem"></i>
+    </div>
+    <div class="flex-grow-1">
+      <h4 class="fw-bold mb-1">{{ patient.name }}</h4>
+      <div class="d-flex flex-wrap gap-3 text-muted small">
+        {% if patient.age %}<span><i class="bi bi-calendar me-1"></i>{{ patient.age }} anni</span>{% endif %}
+        {% if patient.gender %}<span><i class="bi bi-person me-1"></i>{{ patient.gender }}</span>{% endif %}
+        {% if patient.weight_kg %}<span><i class="bi bi-speedometer me-1"></i>{{ patient.weight_kg }} kg</span>{% endif %}
+        {% if patient.height_cm %}<span><i class="bi bi-rulers me-1"></i>{{ patient.height_cm }} cm</span>{% endif %}
+        {% if patient.bmi %}<span>BMI: <strong>{{ patient.bmi }}</strong></span>{% endif %}
+      </div>
+      {% if patient.notes %}
+      <p class="mt-2 mb-0 small text-secondary fst-italic">{{ patient.notes }}</p>
+      {% endif %}
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('main.patient_timeline', patient_id=patient.id) }}" class="btn btn-sm btn-outline-success">
+        <i class="bi bi-graph-up-arrow me-1"></i>Timeline
+      </a>
+      <a href="{{ url_for('main.simulate') }}?pid={{ patient.id }}" class="btn btn-sm btn-outline-primary">
+        <i class="bi bi-cpu me-1"></i>Simula
+      </a>
+      <form action="{{ url_for('main.delete_patient', patient_id=patient.id) }}" method="post"
+            onsubmit="return confirm('Eliminare il paziente e tutte le sessioni associate?')">
+        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash me-1"></i>Elimina</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Sessions list -->
+<div class="d-flex align-items-center mb-3">
+  <h5 class="fw-semibold mb-0"><i class="bi bi-activity me-2 text-success"></i>Sessioni di monitoraggio</h5>
+  <span class="badge bg-secondary ms-2">{{ sessions | length }}</span>
+  <div class="ms-auto d-flex gap-2">
+    <a href="{{ url_for('main.simulate') }}" class="btn btn-sm btn-primary">
+      <i class="bi bi-plus-lg me-1"></i>Nuova simulazione
+    </a>
+    <a href="{{ url_for('main.upload') }}" class="btn btn-sm btn-outline-primary">
+      <i class="bi bi-upload me-1"></i>Carica CSV
+    </a>
+  </div>
+</div>
+
+<div class="card table-card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Dispositivo</th>
+          <th>Inizio</th>
+          <th>Fine</th>
+          <th>Durata</th>
+          <th>Misurazioni</th>
+          <th>Alert</th>
+          <th>Note</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sess in sessions %}
+        <tr>
+          <td class="text-muted small">#{{ sess.id }}</td>
+          <td><code class="small">{{ get_device_label(sess.device_id) }}</code></td>
+          <td class="small">{{ sess.start_time.strftime('%d/%m/%Y %H:%M') }}</td>
+          <td class="small text-muted">{{ sess.end_time.strftime('%H:%M') if sess.end_time else '—' }}</td>
+          <td class="small">{{ sess.duration_minutes or '—' }} min</td>
+          <td>{{ sess.n_measurements }}</td>
+          <td>
+            {% set na = sess.n_alerts %}
+            {% set nc = sess.alerts | selectattr('severity', 'eq', 'critical') | list | length %}
+            {% if na > 0 %}
+              <span class="badge bg-danger me-1">{{ nc }} crit.</span>
+              <span class="badge bg-warning text-dark">{{ na - nc }} warn.</span>
+            {% else %}
+              <span class="badge bg-success">0</span>
+            {% endif %}
+          </td>
+          <td class="small text-muted" style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+            {{ sess.notes or '—' }}
+          </td>
+          <td>
+            <a href="{{ url_for('main.session_detail', session_id=sess.id) }}"
+               class="btn btn-sm btn-outline-primary me-1" title="Analisi">
+              <i class="bi bi-graph-up"></i>
+            </a>
+            <form action="{{ url_for('main.delete_session', session_id=sess.id) }}" method="post"
+                  class="d-inline" onsubmit="return confirm('Eliminare questa sessione?')">
+              <button class="btn btn-sm btn-outline-danger" title="Elimina">
+                <i class="bi bi-trash"></i>
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="9" class="text-center text-muted py-4">
+            Nessuna sessione.
+            <a href="{{ url_for('main.simulate') }}">Simula dei dati</a> o
+            <a href="{{ url_for('main.upload') }}">carica un CSV</a>.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+{% block title %}Timeline terapeutica — {{ patient.name }}{% endblock %}
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Dashboard</a></li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.patients') }}">Pazienti</a></li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.patient_detail', patient_id=patient.id) }}">{{ patient.name }}</a></li>
+  <li class="breadcrumb-item active">Timeline terapeutica</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center mb-4 flex-wrap gap-3">
+  <div>
+    <h4 class="fw-bold mb-1"><i class="bi bi-graph-up-arrow me-2 text-primary"></i>Timeline terapeutica</h4>
+    <div class="small text-muted">Evoluzione clinica longitudinale del paziente, con diagnosi AI, trend ML e outcome atteso.</div>
+  </div>
+  <div class="ms-auto">
+    <a href="{{ url_for('main.patient_timeline_pdf', patient_id=patient.id) }}" class="btn btn-primary btn-sm me-2">
+      <i class="bi bi-file-earmark-pdf me-1"></i>Esporta PDF
+    </a>
+    <a href="{{ url_for('main.patient_detail', patient_id=patient.id) }}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-left me-1"></i>Torna al paziente
+    </a>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card stat-card h-100">
+      <div class="card-body">
+        <div class="small text-muted">Sessioni longitudinali</div>
+        <div class="display-6 fw-bold">{{ sessions|length }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card h-100">
+      <div class="card-body">
+        <div class="small text-muted">Ultima diagnosi persistita</div>
+        <div class="fs-4 fw-semibold text-capitalize">{{ sessions[-1].assessment.diagnosis_label if sessions and sessions[-1].assessment else 'n/d' }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card h-100">
+      <div class="card-body">
+        <div class="small text-muted">Outcome atteso corrente</div>
+        <div class="small fw-semibold">{{ sessions[-1].assessment.therapy_expected_outcome if sessions and sessions[-1].assessment else 'n/d' }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-8">
+    <div class="chart-card card shadow-sm">
+      <div class="card-header bg-white fw-semibold">Evoluzione di rischio, alert e confidenza diagnostica</div>
+      <div class="card-body p-2">
+        <div id="timeline-metrics" style="height:320px"></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="chart-card card shadow-sm h-100">
+      <div class="card-header bg-white fw-semibold">Distribuzione dei trend ML</div>
+      <div class="card-body p-2">
+        <div id="timeline-trends" style="height:320px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-12">
+    <div class="chart-card card shadow-sm">
+      <div class="card-header bg-white fw-semibold">Forecast longitudinali</div>
+      <div class="card-body p-2">
+        <div id="timeline-forecast" style="height:300px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card table-card">
+  <div class="card-header bg-white fw-semibold">Storico terapeutico e decisionale</div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Sessione</th>
+          <th>Data</th>
+          <th>Device</th>
+          <th>Diagnosi AI</th>
+          <th>Trend ML</th>
+          <th>Alert</th>
+          <th>Outcome atteso</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sess in sessions %}
+        <tr>
+          <td>#{{ sess.id }}</td>
+          <td class="small">{{ sess.start_time.strftime('%d/%m/%Y %H:%M') }}</td>
+          <td class="small text-muted">{{ get_device_label(sess.device_id) }}</td>
+          <td class="text-capitalize">{{ sess.assessment.diagnosis_label if sess.assessment else 'n/d' }}</td>
+          <td>
+            {% if sess.assessment %}
+            <span class="badge bg-light text-dark border text-capitalize">{{ (sess.assessment.trend_prediction or {}).get('label', 'n/d') }}</span>
+            {% else %}n/d{% endif %}
+          </td>
+          <td>
+            <span class="badge bg-danger me-1">{{ sess.alerts | selectattr('severity', 'eq', 'critical') | list | length }}</span>
+            <span class="badge bg-warning text-dark">{{ sess.alerts | selectattr('severity', 'eq', 'warning') | list | length }}</span>
+          </td>
+          <td class="small text-muted">{{ sess.assessment.therapy_expected_outcome if sess.assessment else 'n/d' }}</td>
+          <td>
+            <a href="{{ url_for('main.session_detail', session_id=sess.id) }}" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-eye"></i>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const rows = {{ timeline_json | safe }};
+const baseLayout = {
+  margin: { t: 12, r: 20, b: 50, l: 45 },
+  paper_bgcolor: 'transparent',
+  plot_bgcolor: '#f8fafc',
+  font: { family: "'Segoe UI', system-ui, sans-serif", size: 11 },
+};
+const config = { responsive: true, displayModeBar: false };
+const dates = rows.map(row => row.timestamp);
+const riskMap = { low: 1, medium: 2, high: 3 };
+const trendCounts = rows.reduce((acc, row) => {
+  acc[row.trend_label] = (acc[row.trend_label] || 0) + 1;
+  return acc;
+}, {});
+
+Plotly.newPlot('timeline-metrics', [
+  {
+    x: dates,
+    y: rows.map(row => riskMap[row.risk_level] || 0),
+    mode: 'lines+markers',
+    name: 'Rischio',
+    line: { color: '#dc2626', width: 2 },
+  },
+  {
+    x: dates,
+    y: rows.map(row => row.alert_count),
+    mode: 'lines+markers',
+    name: 'Alert totali',
+    yaxis: 'y2',
+    line: { color: '#f59e0b', width: 2 },
+  },
+  {
+    x: dates,
+    y: rows.map(row => Math.round((row.diagnosis_confidence || 0) * 100)),
+    mode: 'lines+markers',
+    name: 'Confidenza diagnosi (%)',
+    yaxis: 'y3',
+    line: { color: '#2563eb', width: 2 },
+  },
+], {
+  ...baseLayout,
+  xaxis: { title: 'Sessioni nel tempo' },
+  yaxis: { title: 'Rischio', tickvals: [1,2,3], ticktext: ['low', 'medium', 'high'] },
+  yaxis2: { title: 'Alert', overlaying: 'y', side: 'right' },
+  yaxis3: { title: 'Confidenza %', anchor: 'free', overlaying: 'y', side: 'right', position: 0.92 },
+  legend: { orientation: 'h', y: -0.2 },
+}, config);
+
+Plotly.newPlot('timeline-trends', [{
+  labels: Object.keys(trendCounts),
+  values: Object.values(trendCounts),
+  type: 'pie',
+  hole: 0.45,
+  marker: { colors: ['#16a34a', '#2563eb', '#dc2626', '#94a3b8'] },
+}], {
+  ...baseLayout,
+  margin: { t: 20, r: 10, b: 10, l: 10 },
+}, config);
+
+Plotly.newPlot('timeline-forecast', [
+  {
+    x: dates,
+    y: rows.map(row => row.forecast_hr),
+    mode: 'lines+markers',
+    name: 'Forecast FC',
+    line: { color: '#dc2626', width: 2 },
+  },
+  {
+    x: dates,
+    y: rows.map(row => row.forecast_spo2),
+    mode: 'lines+markers',
+    name: 'Forecast SpO₂',
+    line: { color: '#16a34a', width: 2 },
+  },
+  {
+    x: dates,
+    y: rows.map(row => row.forecast_temp),
+    mode: 'lines+markers',
+    name: 'Forecast Temp',
+    line: { color: '#d97706', width: 2 },
+  },
+], {
+  ...baseLayout,
+  xaxis: { title: 'Sessioni nel tempo' },
+  yaxis: { title: 'Valore previsto' },
+  legend: { orientation: 'h', y: -0.2 },
+}, config);
+</script>
+{% endblock %}

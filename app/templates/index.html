@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — HealthMonitor IoT{% endblock %}
+
+{% block content %}
+<h4 class="fw-bold mb-4"><i class="bi bi-speedometer2 me-2 text-primary"></i>Dashboard</h4>
+
+<!-- ── Stats ── -->
+<div class="row g-3 mb-4">
+
+  <div class="col-sm-6 col-xl-3">
+    <div class="card stat-card h-100">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="stat-icon bg-primary-subtle text-primary">
+          <i class="bi bi-people-fill"></i>
+        </div>
+        <div>
+          <div class="fs-2 fw-bold lh-1">{{ n_patients }}</div>
+          <div class="small text-muted">Pazienti</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-xl-3">
+    <div class="card stat-card h-100">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="stat-icon bg-success-subtle text-success">
+          <i class="bi bi-activity"></i>
+        </div>
+        <div>
+          <div class="fs-2 fw-bold lh-1">{{ n_sessions }}</div>
+          <div class="small text-muted">Sessioni</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-xl-3">
+    <div class="card stat-card h-100">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="stat-icon bg-warning-subtle text-warning">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <div>
+          <div class="fs-2 fw-bold lh-1">{{ n_alerts }}</div>
+          <div class="small text-muted">Alert totali</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-xl-3">
+    <div class="card stat-card h-100">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="stat-icon bg-danger-subtle text-danger">
+          <i class="bi bi-shield-exclamation"></i>
+        </div>
+        <div>
+          <div class="fs-2 fw-bold lh-1">{{ n_critical }}</div>
+          <div class="small text-muted">Alert critici</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="alert alert-primary border-0 shadow-sm mb-4">
+  <div class="fw-semibold mb-1">Clinical decision support per telemonitoraggio domiciliare</div>
+  <div class="small mb-0">
+    Il sistema combina parametri vitali, profilo attività, storico paziente e dispositivo acquisitore per produrre
+    alert contestuali, una diagnosi assistita explainable e una previsione del rischio a breve termine.
+  </div>
+</div>
+
+<!-- ── Tables ── -->
+<div class="row g-3">
+
+  <!-- Recent alerts -->
+  <div class="col-lg-7">
+    <div class="card table-card h-100">
+      <div class="card-header bg-white d-flex align-items-center">
+        <i class="bi bi-bell-fill text-warning me-2"></i>
+        <span class="fw-semibold">Alert recenti</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Severità</th>
+              <th>Tipo</th>
+              <th>Messaggio</th>
+              <th>Paziente</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for alert in recent_alerts %}
+            <tr>
+              <td>
+                <span class="badge {{ 'bg-danger' if alert.severity == 'critical' else 'bg-warning text-dark' }}">
+                  {{ alert.severity }}
+                </span>
+              </td>
+              <td><code class="small">{{ alert.type }}</code></td>
+              <td class="small">{{ alert.message }}</td>
+              <td>
+                <a href="{{ url_for('main.patient_detail', patient_id=alert.session.patient_id) }}" class="text-decoration-none small">
+                  {{ alert.session.patient.name }}
+                </a>
+              </td>
+              <td class="small text-muted">{{ alert.timestamp.strftime('%d/%m %H:%M') }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" class="text-center text-muted py-3">Nessun alert</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent sessions -->
+  <div class="col-lg-5">
+    <div class="card table-card h-100">
+      <div class="card-header bg-white d-flex align-items-center">
+        <i class="bi bi-clock-history text-primary me-2"></i>
+        <span class="fw-semibold">Sessioni recenti</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Paziente</th>
+              <th>Device</th>
+              <th>Inizio</th>
+              <th>Durata</th>
+              <th>Alert</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for sess in recent_sessions %}
+            <tr>
+              <td class="small fw-medium">{{ sess.patient.name }}</td>
+              <td class="small text-muted">{{ get_device_label(sess.device_id) }}</td>
+              <td class="small text-muted">{{ sess.start_time.strftime('%d/%m %H:%M') }}</td>
+              <td class="small">{{ sess.duration_minutes or '—' }} min</td>
+              <td>
+                <span class="badge {{ 'bg-danger' if sess.n_alerts > 0 else 'bg-success' }}">
+                  {{ sess.n_alerts }}
+                </span>
+              </td>
+              <td>
+                <a href="{{ url_for('main.session_detail', session_id=sess.id) }}" class="btn btn-sm btn-outline-primary py-0">
+                  <i class="bi bi-graph-up"></i>
+                </a>
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="text-center text-muted py-3">Nessuna sessione</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% if device_usage %}
+<div class="card table-card mt-4">
+  <div class="card-header bg-white fw-semibold">Distribuzione dispositivi</div>
+  <div class="card-body">
+    <div class="row g-3">
+      {% for label, count in device_usage.items() %}
+      <div class="col-sm-6 col-lg-3">
+        <div class="border rounded-3 p-3 h-100 bg-light-subtle">
+          <div class="small text-muted">Device</div>
+          <div class="fw-semibold">{{ label }}</div>
+          <div class="display-6 lh-1 mt-2">{{ count }}</div>
+          <div class="small text-muted">sessioni registrate</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,521 @@
+{% extends "base.html" %}
+{% block title %}Sessione #{{ sess.id }} — HealthMonitor IoT{% endblock %}
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Dashboard</a></li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.patients') }}">Pazienti</a></li>
+  <li class="breadcrumb-item">
+    <a href="{{ url_for('main.patient_detail', patient_id=sess.patient_id) }}">{{ sess.patient.name }}</a>
+  </li>
+  <li class="breadcrumb-item active">Sessione #{{ sess.id }}</li>
+{% endblock %}
+
+{% block content %}
+
+<!-- ── Header ── -->
+<div class="card mb-4 shadow-sm">
+  <div class="card-body d-flex align-items-start gap-3 flex-wrap">
+    <div>
+      <h5 class="fw-bold mb-1">
+        <i class="bi bi-activity me-2 text-success"></i>Sessione #{{ sess.id }}
+        <span class="badge bg-secondary ms-1 fs-6 fw-normal">{{ get_device_label(sess.device_id) }}</span>
+      </h5>
+      <div class="small text-muted">
+        <i class="bi bi-clock me-1"></i>
+        {{ sess.start_time.strftime('%d/%m/%Y %H:%M') }}
+        {% if sess.end_time %} → {{ sess.end_time.strftime('%H:%M') }}{% endif %}
+        &nbsp;|&nbsp;{{ sess.duration_minutes or '—' }} min
+        &nbsp;|&nbsp;{{ sess.n_measurements }} misurazioni
+      </div>
+      {% if sess.notes %}<div class="small text-secondary mt-1 fst-italic">{{ sess.notes }}</div>{% endif %}
+    </div>
+    <div class="ms-auto d-flex gap-2 align-items-start">
+      <a href="{{ url_for('main.session_report_pdf', session_id=sess.id) }}" class="btn btn-sm btn-outline-primary">
+        <i class="bi bi-file-earmark-pdf me-1"></i>PDF
+      </a>
+      <a href="{{ url_for('main.patient_detail', patient_id=sess.patient_id) }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Torna al paziente
+      </a>
+      <form action="{{ url_for('main.delete_session', session_id=sess.id) }}" method="post"
+            onsubmit="return confirm('Eliminare questa sessione?')">
+        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+  <div class="card-header bg-white d-flex align-items-center">
+    <i class="bi bi-database-check text-primary me-2"></i>
+    <span class="fw-semibold">Audit numerico persistito</span>
+  </div>
+  <div class="card-body">
+    <div class="row g-3 small">
+      <div class="col-lg-6">
+        <div class="border rounded-3 p-3 h-100 bg-light-subtle">
+          <div class="fw-semibold mb-2">Feature estratte</div>
+          <div class="d-flex flex-wrap gap-2">
+            <span class="badge bg-light text-dark border">HR mean {{ ai_assessment.audit_features.hr_mean }}</span>
+            <span class="badge bg-light text-dark border">HR std {{ ai_assessment.audit_features.hr_std }}</span>
+            <span class="badge bg-light text-dark border">SpO₂ mean {{ ai_assessment.audit_features.spo2_mean }}</span>
+            <span class="badge bg-light text-dark border">Temp mean {{ ai_assessment.audit_features.temp_mean }}</span>
+            <span class="badge bg-light text-dark border">Risk score {{ ai_assessment.audit_features.clinical_risk_score }}</span>
+            <span class="badge bg-light text-dark border">Warn {{ ai_assessment.audit_features.warning_alerts }}</span>
+            <span class="badge bg-light text-dark border">Critical {{ ai_assessment.audit_features.critical_alerts }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="border rounded-3 p-3 h-100 bg-light-subtle">
+          <div class="fw-semibold mb-2">Forecast snapshot</div>
+          <div class="d-flex flex-wrap gap-2">
+            <span class="badge bg-light text-dark border">Window {{ ai_assessment.audit_forecast.window_minutes }} min</span>
+            <span class="badge bg-light text-dark border">HR {{ ai_assessment.audit_forecast.heart_rate }}</span>
+            <span class="badge bg-light text-dark border">SpO₂ {{ ai_assessment.audit_forecast.spo2 }}</span>
+            <span class="badge bg-light text-dark border">Temp {{ ai_assessment.audit_forecast.temperature }}</span>
+            <span class="badge bg-light text-dark border">Slope HR {{ ai_assessment.audit_forecast.heart_rate_slope }}</span>
+            <span class="badge bg-light text-dark border">Model {{ ai_assessment.audit_forecast.model_name }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-7">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-header bg-white d-flex align-items-center">
+        <i class="bi bi-cpu-fill text-primary me-2"></i>
+        <span class="fw-semibold">Diagnosi assistita AI</span>
+        <span class="badge ms-auto {{ 'bg-danger' if ai_assessment.risk_level == 'high' else 'bg-warning text-dark' if ai_assessment.risk_level == 'medium' else 'bg-success' }}">
+          rischio {{ ai_assessment.risk_level }}
+        </span>
+      </div>
+      <div class="card-body">
+        <div class="d-flex align-items-end gap-4 flex-wrap mb-3">
+          <div>
+            <div class="small text-muted">Classificazione prevalente</div>
+            <div class="fs-4 fw-bold text-capitalize">{{ ai_assessment.label }}</div>
+          </div>
+          <div>
+            <div class="small text-muted">Confidenza</div>
+            <div class="fs-5 fw-semibold">{{ (ai_assessment.confidence * 100) | round(0) }}%</div>
+          </div>
+          <div>
+            <div class="small text-muted">Storico disponibile</div>
+            <div class="fs-5 fw-semibold">{{ ai_assessment.metrics.history_sessions }} sessioni</div>
+          </div>
+        </div>
+        <ul class="small mb-0 ps-3">
+          {% for item in ai_assessment.rationale %}
+          <li>{{ item }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-header bg-white d-flex align-items-center">
+        <i class="bi bi-graph-up-arrow text-success me-2"></i>
+        <span class="fw-semibold">Forecast a {{ ai_assessment.forecast.window_minutes }} minuti</span>
+      </div>
+      <div class="card-body small">
+        <div class="row g-3 mb-3">
+          <div class="col-4"><div class="text-muted">FC</div><div class="fs-5 fw-semibold">{{ ai_assessment.forecast.heart_rate }} bpm</div></div>
+          <div class="col-4"><div class="text-muted">SpO₂</div><div class="fs-5 fw-semibold">{{ ai_assessment.forecast.spo2 }}%</div></div>
+          <div class="col-4"><div class="text-muted">Temp.</div><div class="fs-5 fw-semibold">{{ ai_assessment.forecast.temperature }} °C</div></div>
+        </div>
+        <div class="small text-muted mb-2">Delta rispetto al baseline storico</div>
+        <div class="d-flex flex-wrap gap-2">
+          <span class="badge bg-light text-dark border">FC {{ '%+.1f'|format(ai_assessment.history_delta.hr_mean) }}</span>
+          <span class="badge bg-light text-dark border">SpO₂ {{ '%+.1f'|format(ai_assessment.history_delta.spo2_mean) }}</span>
+          <span class="badge bg-light text-dark border">Temp {{ '%+.2f'|format(ai_assessment.history_delta.temp_mean) }}</span>
+          <span class="badge bg-light text-dark border">Attività {{ '%+.2f'|format(ai_assessment.history_delta.activity_mean) }}</span>
+        </div>
+        <hr />
+        <div class="small text-muted">Previsione di esito basata su machine learning</div>
+        <div class="d-flex align-items-end gap-3 flex-wrap mt-1 mb-2">
+          <div class="fs-5 fw-semibold text-capitalize">{{ ai_assessment.trend_prediction.label }}</div>
+          <div class="small text-muted">confidenza {{ (ai_assessment.trend_prediction.confidence * 100) | round(0) }}%</div>
+        </div>
+        <div class="small text-muted mb-2">Modello: {{ ai_assessment.trend_prediction.model_name }}{% if ai_assessment.trend_prediction.n_transitions %} · transizioni storiche: {{ ai_assessment.trend_prediction.n_transitions }}{% endif %}</div>
+        <div class="d-flex flex-wrap gap-2">
+          {% for label, score in ai_assessment.trend_prediction.scores.items() %}
+          <span class="badge bg-light text-dark border text-capitalize">{{ label }} {{ (score * 100) | round(0) }}%</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+  <div class="card-header bg-white d-flex align-items-center">
+    <i class="bi bi-capsule-pill text-primary me-2"></i>
+    <span class="fw-semibold">Terapie e azioni suggerite</span>
+  </div>
+  <div class="card-body">
+    <div class="alert alert-light border small mb-3">
+      <strong>Esito atteso:</strong> {{ ai_assessment.therapy_plan.expected_outcome }}.
+    </div>
+    <div class="row g-3">
+      {% for item in ai_assessment.therapy_plan['items'] %}
+      <div class="col-lg-4">
+        <div class="border rounded-3 p-3 h-100 bg-light-subtle">
+          <div class="small text-uppercase text-muted mb-1">{{ item.category }}</div>
+          <div class="fw-semibold mb-2">{{ item.title }}</div>
+          <div class="small text-muted">{{ item.details }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- ── Vital-sign summary cards ── -->
+{% set analysis = analysis_json | tojson | safe %}
+<div class="row g-3 mb-4" id="statsCards">
+
+  <div class="col-6 col-md-3">
+    <div class="card vital-stat border-0 shadow-sm">
+      <div class="vital-icon text-danger"><i class="bi bi-heart-pulse-fill fs-4"></i></div>
+      <div class="vital-value" id="hr-mean">—</div>
+      <div class="vital-label">FC media (bpm)</div>
+      <div class="vital-range small text-muted" id="hr-range">— / —</div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-3">
+    <div class="card vital-stat border-0 shadow-sm">
+      <div class="vital-icon text-success"><i class="bi bi-lungs-fill fs-4"></i></div>
+      <div class="vital-value" id="spo2-mean">—</div>
+      <div class="vital-label">SpO₂ media (%)</div>
+      <div class="vital-range small text-muted" id="spo2-range">— / —</div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-3">
+    <div class="card vital-stat border-0 shadow-sm">
+      <div class="vital-icon text-warning"><i class="bi bi-thermometer-half fs-4"></i></div>
+      <div class="vital-value" id="temp-mean">—</div>
+      <div class="vital-label">Temp. media (°C)</div>
+      <div class="vital-range small text-muted" id="temp-range">— / —</div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-3">
+    <div class="card vital-stat border-0 shadow-sm">
+      <div class="vital-icon text-primary"><i class="bi bi-lightning-charge-fill fs-4"></i></div>
+      <div class="vital-value text-{{ 'danger' if n_critical > 0 else 'success' }}">{{ n_critical + n_warning }}</div>
+      <div class="vital-label">Alert totali</div>
+      <div class="vital-range small">
+        <span class="badge bg-danger">{{ n_critical }} critici</span>
+        <span class="badge bg-warning text-dark">{{ n_warning }} warning</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Charts ── -->
+<div class="row g-3 mb-3">
+
+  <!-- Heart Rate -->
+  <div class="col-12">
+    <div class="chart-card card shadow-sm">
+      <div class="card-header bg-white d-flex align-items-center small">
+        <i class="bi bi-heart-pulse-fill text-danger me-2"></i>
+        <span class="fw-semibold">Frequenza Cardiaca</span>
+        <span class="ms-auto text-muted">Soglie: 60–100 bpm</span>
+      </div>
+      <div class="card-body p-2">
+        <div id="chart-hr" style="height:260px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SpO2 + Temperature -->
+  <div class="col-md-6">
+    <div class="chart-card card shadow-sm h-100">
+      <div class="card-header bg-white d-flex align-items-center small">
+        <i class="bi bi-lungs-fill text-success me-2"></i>
+        <span class="fw-semibold">SpO₂</span>
+        <span class="ms-auto text-muted">Soglia min: 95%</span>
+      </div>
+      <div class="card-body p-2">
+        <div id="chart-spo2" style="height:240px"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="chart-card card shadow-sm h-100">
+      <div class="card-header bg-white d-flex align-items-center small">
+        <i class="bi bi-thermometer-half text-warning me-2"></i>
+        <span class="fw-semibold">Temperatura corporea</span>
+        <span class="ms-auto text-muted">36.0–37.5 °C</span>
+      </div>
+      <div class="card-body p-2">
+        <div id="chart-temp" style="height:240px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity + Alert distribution -->
+  <div class="col-md-6">
+    <div class="chart-card card shadow-sm h-100">
+      <div class="card-header bg-white small fw-semibold">
+        <i class="bi bi-bar-chart-fill text-primary me-2"></i>Livello di attività
+      </div>
+      <div class="card-body p-2">
+        <div id="chart-activity" style="height:240px"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="chart-card card shadow-sm h-100">
+      <div class="card-header bg-white small fw-semibold">
+        <i class="bi bi-pie-chart-fill text-secondary me-2"></i>Distribuzione alert
+      </div>
+      <div class="card-body p-2">
+        <div id="chart-alerts" style="height:240px"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="chart-card card shadow-sm">
+      <div class="card-header bg-white d-flex align-items-center small">
+        <i class="bi bi-heart-pulse text-danger me-2"></i>
+        <span class="fw-semibold">ECG sintetico mono-derivazione</span>
+        <span class="ms-auto text-muted">derivato dal profilo della sessione e dal device</span>
+      </div>
+      <div class="card-body p-2">
+        <div id="chart-ecg" style="height:240px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Box plots -->
+  <div class="col-12">
+    <div class="chart-card card shadow-sm">
+      <div class="card-header bg-white small fw-semibold">
+        <i class="bi bi-distribute-vertical text-info me-2"></i>Distribuzione parametri vitali (box plot)
+      </div>
+      <div class="card-body p-2">
+        <div id="chart-box" style="height:260px"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Alerts table ── -->
+{% if alerts %}
+<div class="card table-card mt-2">
+  <div class="card-header bg-white d-flex align-items-center">
+    <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+    <span class="fw-semibold">Alert rilevati</span>
+    <span class="badge bg-secondary ms-2">{{ alerts | length }}</span>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover table-sm align-middle mb-0">
+      <thead class="table-light">
+        <tr><th>Severità</th><th>Tipo</th><th>Messaggio</th><th>Timestamp</th></tr>
+      </thead>
+      <tbody>
+        {% for a in alerts %}
+        <tr class="{{ 'table-danger' if a.severity == 'critical' else 'table-warning' }}">
+          <td>
+            <span class="badge {{ 'bg-danger' if a.severity == 'critical' else 'bg-warning text-dark' }}">
+              {{ a.severity }}
+            </span>
+          </td>
+          <td><code class="small">{{ a.type }}</code></td>
+          <td class="small">{{ a.message }}</td>
+          <td class="small text-muted">{{ a.timestamp.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+// ── Load analysis data ──────────────────────────────────────────────────────
+const A = {{ analysis_json | safe }};
+
+// Plotly common layout defaults
+const baseLayout = {
+  margin: { t: 10, r: 20, b: 50, l: 55 },
+  paper_bgcolor: 'transparent',
+  plot_bgcolor: '#f8fafc',
+  font: { family: "'Segoe UI', system-ui, sans-serif", size: 11 },
+  xaxis: { title: 'Tempo', tickangle: -30 },
+  legend: { orientation: 'h', y: -0.25 },
+};
+const config = { responsive: true, displayModeBar: false };
+
+function refLine(x0, x1, y, color, dash='dash') {
+  return { type:'line', x0, x1, y0:y, y1:y, line:{ color, dash, width:1 } };
+}
+
+// ── Heart Rate ──────────────────────────────────────────────────────────────
+if (A.timestamps && A.heart_rate) {
+  const ts = A.timestamps;
+  const hrStats = A.heart_rate.stats;
+
+  // fill stats cards
+  document.getElementById('hr-mean').textContent  = hrStats.mean ?? '—';
+  document.getElementById('hr-range').textContent = `min ${hrStats.min} / max ${hrStats.max}`;
+
+  Plotly.newPlot('chart-hr', [
+    { x: ts, y: A.heart_rate.raw,    mode: 'lines', name: 'FC raw',
+      line: { color: '#fca5a5', width: 1 }, opacity: 0.7 },
+    { x: ts, y: A.heart_rate.smooth, mode: 'lines', name: 'FC smoothed',
+      line: { color: '#dc2626', width: 2 } },
+  ], {
+    ...baseLayout,
+    yaxis: { title: 'bpm', range: [30, 200] },
+    shapes: [
+      refLine(ts[0], ts[ts.length-1], 60,  '#22c55e'),
+      refLine(ts[0], ts[ts.length-1], 100, '#f97316'),
+      refLine(ts[0], ts[ts.length-1], 40,  '#dc2626', 'dot'),
+      refLine(ts[0], ts[ts.length-1], 150, '#dc2626', 'dot'),
+    ],
+    annotations: [
+      { x: ts[0], y: 60,  xanchor:'left', showarrow:false, text:'min normale', font:{size:9, color:'#22c55e'} },
+      { x: ts[0], y: 100, xanchor:'left', showarrow:false, text:'max normale', font:{size:9, color:'#f97316'} },
+    ],
+  }, config);
+}
+
+// ── SpO2 ────────────────────────────────────────────────────────────────────
+if (A.timestamps && A.spo2) {
+  const ts = A.timestamps;
+  const s = A.spo2.stats;
+  document.getElementById('spo2-mean').textContent  = s.mean ?? '—';
+  document.getElementById('spo2-range').textContent = `min ${s.min} / max ${s.max}`;
+
+  Plotly.newPlot('chart-spo2', [
+    { x: ts, y: A.spo2.raw,    mode: 'lines', name: 'SpO₂ raw',
+      line: { color: '#86efac', width: 1 }, opacity: 0.7 },
+    { x: ts, y: A.spo2.smooth, mode: 'lines', name: 'SpO₂ smoothed',
+      line: { color: '#16a34a', width: 2 } },
+  ], {
+    ...baseLayout,
+    yaxis: { title: '%', range: [84, 101] },
+    shapes: [
+      refLine(ts[0], ts[ts.length-1], 95, '#f97316'),
+      refLine(ts[0], ts[ts.length-1], 90, '#dc2626', 'dot'),
+    ],
+  }, config);
+}
+
+// ── Temperature ─────────────────────────────────────────────────────────────
+if (A.timestamps && A.temperature) {
+  const ts = A.timestamps;
+  const s = A.temperature.stats;
+  document.getElementById('temp-mean').textContent  = s.mean ?? '—';
+  document.getElementById('temp-range').textContent = `min ${s.min} / max ${s.max}`;
+
+  Plotly.newPlot('chart-temp', [
+    { x: ts, y: A.temperature.raw,    mode: 'lines', name: 'Temp. raw',
+      line: { color: '#fcd34d', width: 1 }, opacity: 0.7 },
+    { x: ts, y: A.temperature.smooth, mode: 'lines', name: 'Temp. smoothed',
+      line: { color: '#d97706', width: 2 } },
+  ], {
+    ...baseLayout,
+    yaxis: { title: '°C', range: [33.5, 40] },
+    shapes: [
+      refLine(ts[0], ts[ts.length-1], 36.0, '#22c55e'),
+      refLine(ts[0], ts[ts.length-1], 37.5, '#f97316'),
+      refLine(ts[0], ts[ts.length-1], 38.5, '#dc2626', 'dot'),
+    ],
+  }, config);
+}
+
+// ── Activity ────────────────────────────────────────────────────────────────
+if (A.timestamps && A.activity) {
+  Plotly.newPlot('chart-activity', [
+    { x: A.timestamps, y: A.activity.raw, type: 'bar', name: 'Attività',
+      marker: { color: '#6366f1' } },
+  ], {
+    ...baseLayout,
+    yaxis: { title: 'Livello (0–1)', range: [0, 1.1] },
+  }, config);
+}
+
+// ── ECG preview ─────────────────────────────────────────────────────────────
+if (A.ecg_preview && A.ecg_preview.values && A.ecg_preview.values.length) {
+  Plotly.newPlot('chart-ecg', [{
+    x: A.ecg_preview.timestamps,
+    y: A.ecg_preview.values,
+    mode: 'lines',
+    line: { color: '#b91c1c', width: 1.4 },
+    name: 'ECG',
+  }], {
+    ...baseLayout,
+    xaxis: { title: 'Tempo (s)' },
+    yaxis: { title: 'mV' },
+    showlegend: false,
+  }, config);
+} else {
+  document.getElementById('chart-ecg').innerHTML =
+    '<div class="text-center text-muted py-5">Il dispositivo selezionato non dispone di modulo ECG.</div>';
+}
+
+// ── Box plots ───────────────────────────────────────────────────────────────
+const boxTraces = [];
+if (A.heart_rate) boxTraces.push({
+  y: A.heart_rate.raw.filter(v => v !== null),
+  type: 'box', name: 'FC (bpm)', marker: { color: '#dc2626' }, boxpoints: 'outliers',
+});
+if (A.spo2) boxTraces.push({
+  y: A.spo2.raw.filter(v => v !== null),
+  type: 'box', name: 'SpO₂ (%)', marker: { color: '#16a34a' }, boxpoints: 'outliers',
+});
+if (A.temperature) boxTraces.push({
+  y: A.temperature.raw.filter(v => v !== null),
+  type: 'box', name: 'Temp. (°C)', marker: { color: '#d97706' }, boxpoints: 'outliers',
+});
+if (boxTraces.length) {
+  Plotly.newPlot('chart-box', boxTraces, {
+    ...baseLayout,
+    xaxis: { title: '' },
+    yaxis: { title: 'Valore' },
+    showlegend: false,
+  }, config);
+}
+
+// ── Alert pie ───────────────────────────────────────────────────────────────
+const nCrit = {{ n_critical }};
+const nWarn = {{ n_warning }};
+if (nCrit + nWarn > 0) {
+  Plotly.newPlot('chart-alerts', [{
+    values: [nCrit, nWarn],
+    labels: ['Critici', 'Warning'],
+    type: 'pie',
+    hole: 0.45,
+    marker: { colors: ['#dc2626', '#f59e0b'] },
+    textinfo: 'value+percent',
+  }], {
+    ...baseLayout,
+    margin: { t: 10, r: 10, b: 10, l: 10 },
+    showlegend: true,
+    legend: { orientation: 'h', y: -0.1 },
+  }, config);
+} else {
+  document.getElementById('chart-alerts').innerHTML =
+    '<div class="text-center text-success py-5"><i class="bi bi-check-circle-fill fs-2"></i><br>Nessun alert rilevato</div>';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block title %}Simula dati — HealthMonitor IoT{% endblock %}
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Dashboard</a></li>
+  <li class="breadcrumb-item active">Simula dati</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="bi bi-cpu-fill me-2 text-primary"></i>Genera sessione simulata</h5>
+      </div>
+      <div class="card-body">
+
+        <p class="text-muted small mb-4">
+          Il simulatore genera sessioni di telemonitoraggio con contesto clinico, variabilità fisiologica e profilo
+          dispositivo. Ogni sessione serve a stimare rischio, diagnosi assistita e previsione di deterioramento,
+          non a mostrare semplici serie casuali di parametri vitali.
+        </p>
+
+        <form action="{{ url_for('main.simulate') }}" method="post">
+
+          <div class="mb-3">
+            <label for="patient_id" class="form-label fw-semibold">
+              Paziente <span class="text-danger">*</span>
+            </label>
+            <select class="form-select" id="patient_id" name="patient_id" required>
+              <option value="">— Seleziona —</option>
+              {% for p in patients %}
+              <option value="{{ p.id }}"
+                {% if request.args.get('pid') == p.id | string %}selected{% endif %}>
+                {{ p.name }}{% if p.age %} ({{ p.age }} anni){% endif %}
+              </option>
+              {% endfor %}
+            </select>
+            {% if not patients %}
+            <div class="form-text text-danger">
+              Nessun paziente disponibile.
+              <a href="{{ url_for('main.add_patient') }}">Aggiungine uno prima</a>.
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label for="scenario" class="form-label fw-semibold">Scenario clinico</label>
+            <select class="form-select" id="scenario" name="scenario">
+              <option value="normal">🟢 Normale — riposo</option>
+              <option value="exercise">🔵 Attività fisica</option>
+              <option value="stress">🟡 Stress / agitazione</option>
+              <option value="sleep">🌙 Sonno</option>
+              <option value="arrhythmia">🔴 Aritmia simulata</option>
+            </select>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-sm-4">
+              <label for="duration" class="form-label fw-semibold">Durata (min)</label>
+              <input type="number" class="form-control" id="duration" name="duration"
+                     value="60" min="5" max="480" />
+            </div>
+            <div class="col-sm-4">
+              <label for="interval" class="form-label fw-semibold">Intervallo (sec)</label>
+              <select class="form-select" id="interval" name="interval">
+                <option value="5">5 s</option>
+                <option value="10" selected>10 s</option>
+                <option value="30">30 s</option>
+                <option value="60">60 s</option>
+              </select>
+            </div>
+            <div class="col-sm-4">
+              <label for="device_id" class="form-label fw-semibold">Dispositivo medico</label>
+              <select class="form-select" id="device_id" name="device_id">
+                {% for key, profile in device_profiles.items() %}
+                <option value="{{ key }}" {% if key == default_device_key %}selected{% endif %}>{{ profile.label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div id="preview" class="alert alert-info small py-2 mb-4">
+            Verranno generate circa <strong id="nSamples">360</strong> misurazioni.
+          </div>
+
+          <div class="card bg-light border-0 mb-4">
+            <div class="card-body py-3 small">
+              <div class="fw-semibold mb-2">Capacità del dispositivo</div>
+              <div id="deviceCapabilities" class="text-muted"></div>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary" {% if not patients %}disabled{% endif %}>
+              <i class="bi bi-play-fill me-1"></i>Genera sessione
+            </button>
+            <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary">Annulla</a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+    <!-- Scenarios info card -->
+    <div class="card mt-3">
+      <div class="card-header bg-white fw-semibold small">
+        <i class="bi bi-info-circle me-1 text-info"></i>Dettaglio scenari
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-sm table-borderless mb-0 small">
+          <thead class="table-light">
+            <tr><th>Scenario</th><th>FC base (bpm)</th><th>SpO₂ base (%)</th><th>Temp. (°C)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Normale</td><td>72</td><td>98</td><td>36.6</td></tr>
+            <tr><td>Esercizio</td><td>115</td><td>97</td><td>37.5</td></tr>
+            <tr><td>Stress</td><td>95</td><td>97.5</td><td>36.9</td></tr>
+            <tr><td>Sonno</td><td>58</td><td>96.5</td><td>36.2</td></tr>
+            <tr><td>Aritmia</td><td>80 ± 20</td><td>96</td><td>36.8</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const deviceProfiles = {{ device_profiles | tojson }};
+
+function updatePreview() {
+  const dur = parseInt(document.getElementById('duration').value) || 60;
+  const intv = parseInt(document.getElementById('interval').value) || 10;
+  const n = Math.round(dur * 60 / intv);
+  document.getElementById('nSamples').textContent = n.toLocaleString('it-IT');
+}
+
+function updateDeviceInfo() {
+  const key = document.getElementById('device_id').value;
+  const profile = deviceProfiles[key];
+  document.getElementById('deviceCapabilities').textContent =
+    `${profile.label} · segnali: ${profile.signals.join(', ')} · ` +
+    `${profile.supports_ecg ? 'ECG disponibile' : 'ECG non disponibile'} · ` +
+    `intervalli supportati: ${profile.sampling_options.join(', ')} s`;
+}
+document.getElementById('duration').addEventListener('input', updatePreview);
+document.getElementById('interval').addEventListener('change', updatePreview);
+document.getElementById('device_id').addEventListener('change', updateDeviceInfo);
+updatePreview();
+updateDeviceInfo();
+</script>
+{% endblock %}

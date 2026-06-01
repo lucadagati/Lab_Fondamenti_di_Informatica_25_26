@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Dataset pubblici — HealthMonitor IoT{% endblock %}
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Dashboard</a></li>
+  <li class="breadcrumb-item active">Dataset pubblici</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="bi bi-database-add me-2 text-primary"></i>Importa dataset pubblico reale</h5>
+      </div>
+      <div class="card-body">
+        <p class="small text-muted mb-4">
+          Questa sezione consente di sostituire parte della simulazione sintetica con dataset reali PhysioNet.
+          Il sistema costruisce una sessione paziente persistente, salva eventuali waveform disponibili e deriva una serie temporale di frequenza cardiaca auditabile.
+        </p>
+
+        <form action="{{ url_for('main.public_datasets') }}" method="post">
+          <div class="mb-3">
+            <label for="patient_id" class="form-label fw-semibold">Paziente</label>
+            <select class="form-select" id="patient_id" name="patient_id" required>
+              <option value="">— Seleziona —</option>
+              {% for p in patients %}
+              <option value="{{ p.id }}">{{ p.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="dataset_key" class="form-label fw-semibold">Dataset pubblico</label>
+            <select class="form-select" id="dataset_key" name="dataset_key">
+              {% for key, dataset in datasets.items() %}
+              <option value="{{ key }}">{{ dataset.label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label for="record_name" class="form-label fw-semibold">Record dataset</label>
+              <select class="form-select" id="record_name" name="record_name">
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="duration_seconds" class="form-label fw-semibold">Durata import (s)</label>
+              <select class="form-select" id="duration_seconds" name="duration_seconds">
+                <option value="20">20 secondi</option>
+                <option value="30" selected>30 secondi</option>
+                <option value="45">45 secondi</option>
+                <option value="60">60 secondi</option>
+                <option value="90">90 secondi</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-cloud-download me-1"></i>Importa sessione reale
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card mt-3 shadow-sm">
+      <div class="card-header bg-white fw-semibold">Cosa viene importato</div>
+      <div class="card-body small">
+        <ul class="mb-0 ps-3">
+          <li>record ECG reale dal database PhysioNet MIT-BIH Arrhythmia</li>
+          <li>record PPG e respirazione reale dal dataset PhysioNet BIDMC</li>
+          <li>serie di frequenza cardiaca derivata dagli annotatori dei battiti</li>
+          <li>waveform ECG persistito nel database quando disponibile</li>
+          <li>assessment AI, trend ML e suggerimenti terapeutici persistiti come per le altre sessioni</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const datasetMap = {{ datasets | tojson }};
+const datasetSelect = document.getElementById('dataset_key');
+const recordSelect = document.getElementById('record_name');
+
+function refreshRecordOptions() {
+  const selected = datasetSelect.value;
+  const dataset = datasetMap[selected] || { records: {} };
+  recordSelect.innerHTML = '';
+  Object.entries(dataset.records || {}).forEach(([key, label], index) => {
+    const option = document.createElement('option');
+    option.value = key;
+    option.textContent = `${key} · ${label}`;
+    if (index === 0) {
+      option.selected = true;
+    }
+    recordSelect.appendChild(option);
+  });
+}
+
+datasetSelect.addEventListener('change', refreshRecordOptions);
+refreshRecordOptions();
+</script>
+{% endblock %}

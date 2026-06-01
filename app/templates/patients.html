@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Pazienti — HealthMonitor IoT{% endblock %}
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Dashboard</a></li>
+  <li class="breadcrumb-item active">Pazienti</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center mb-4">
+  <h4 class="fw-bold mb-0"><i class="bi bi-people-fill me-2 text-primary"></i>Pazienti</h4>
+  <a href="{{ url_for('main.add_patient') }}" class="btn btn-primary ms-auto">
+    <i class="bi bi-plus-lg me-1"></i>Nuovo paziente
+  </a>
+</div>
+
+<div class="card table-card">
+  <div class="card-header bg-white">
+    <input type="text" id="searchInput" class="form-control form-control-sm w-auto d-inline-block"
+           placeholder="Cerca paziente…" oninput="filterTable(this.value)" />
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0" id="patientTable">
+      <thead class="table-light">
+        <tr>
+          <th>#</th>
+          <th>Nome</th>
+          <th>Età</th>
+          <th>Genere</th>
+          <th>Peso</th>
+          <th>Altezza</th>
+          <th>BMI</th>
+          <th>Sessioni</th>
+          <th>Alert</th>
+          <th>Registrato il</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in patients %}
+        <tr>
+          <td class="text-muted small">{{ p.id }}</td>
+          <td class="fw-semibold">
+            <a href="{{ url_for('main.patient_detail', patient_id=p.id) }}" class="text-decoration-none">
+              {{ p.name }}
+            </a>
+          </td>
+          <td>{{ p.age or '—' }}</td>
+          <td>{{ p.gender or '—' }}</td>
+          <td>{{ p.weight_kg ~ ' kg' if p.weight_kg else '—' }}</td>
+          <td>{{ p.height_cm ~ ' cm' if p.height_cm else '—' }}</td>
+          <td>
+            {% if p.bmi %}
+              <span class="badge
+                {% if p.bmi < 18.5 %}bg-info text-dark
+                {% elif p.bmi < 25 %}bg-success
+                {% elif p.bmi < 30 %}bg-warning text-dark
+                {% else %}bg-danger{% endif %}">
+                {{ p.bmi }}
+              </span>
+            {% else %}—{% endif %}
+          </td>
+          <td>{{ p.sessions | length }}</td>
+          <td>
+            {% set n_alerts = p.sessions | sum(attribute='n_alerts') %}
+            <span class="badge {{ 'bg-danger' if n_alerts > 0 else 'bg-success' }}">{{ n_alerts }}</span>
+          </td>
+          <td class="small text-muted">{{ p.created_at.strftime('%d/%m/%Y') }}</td>
+          <td>
+            <a href="{{ url_for('main.patient_detail', patient_id=p.id) }}"
+               class="btn btn-sm btn-outline-primary me-1" title="Dettaglio">
+              <i class="bi bi-eye"></i>
+            </a>
+            <form action="{{ url_for('main.delete_patient', patient_id=p.id) }}"
+                  method="post" class="d-inline"
+                  onsubmit="return confirm('Eliminare il paziente e tutte le sue sessioni?')">
+              <button class="btn btn-sm btn-outline-danger" title="Elimina">
+                <i class="bi bi-trash"></i>
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="11" class="text-center text-muted py-4">
+            Nessun paziente registrato.
+            <a href="{{ url_for('main.add_patient') }}">Aggiungine uno</a>.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function filterTable(q) {
+  q = q.toLowerCase();
+  document.querySelectorAll('#patientTable tbody tr').forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+</script>
+{% endblock %}
