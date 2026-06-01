@@ -212,7 +212,7 @@ erDiagram
       }
 ```
 
-Versione SQL documentata: [database/schema.sql](/Users/lucadagati/Progetto_Biomed/database/schema.sql)
+Versione SQL documentata: [database/schema.sql](database/schema.sql)
 
 ## Catalogo dispositivi
 
@@ -494,7 +494,7 @@ Il sistema espone due export server-side:
 
 ## Query SQL di esempio
 
-In [database/schema.sql](/Users/lucadagati/Progetto_Biomed/database/schema.sql) sono incluse query per:
+In [database/schema.sql](database/schema.sql) sono incluse query per:
 
 - calcolare medie vitali per paziente
 - elencare alert critici recenti
