@@ -1,0 +1,5 @@
+# Opzionale — per i livelli Jupyter (installa in un venv consigliato)
+jupyter>=1.0.0
+ipykernel>=6.0.0
+pandas>=2.0.0
+matplotlib>=3.7.0

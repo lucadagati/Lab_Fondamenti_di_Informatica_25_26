@@ -1,0 +1,36 @@
+# .gitignore viene committato e pubblicato: è la prassi.
+# Definisce cosa NON versionare; tutti i collaboratori condividono le stesse regole.
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# File generati durante il laboratorio (gli studenti li creano localmente)
+referto.txt
+referto.enc
+referto_decifrato.txt
+referto_debole.enc
+chiave_privata.pem
+chiave_pubblica.pem
+messaggio.txt
+messaggio.enc
+messaggio_decifrato.txt
+firma.bin
+test_decifrato.txt
+test_sbagliato.txt
+
+# Lab 2 – Python / Jupyter (ambienti locali degli studenti)
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# Lab 7 – database SQLite generato localmente
+07-matlab-sqlite-database/dati/*.db
+
+# Lab 7 – slide/materiale binario locale, non pubblicato su GitHub
+07-matlab-sqlite-database/slides/

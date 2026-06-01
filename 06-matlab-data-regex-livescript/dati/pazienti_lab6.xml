@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pazienti>
+  <paziente id="P001"><nome>Anna</nome><eta>43</eta><bpm>78</bpm><spo2>98</spo2><sistolica>122</sistolica></paziente>
+  <paziente id="P002"><nome>Luca</nome><eta>67</eta><bpm>101</bpm><spo2>94</spo2><sistolica>146</sistolica></paziente>
+  <paziente id="P003"><nome>Maria</nome><eta>55</eta><bpm>88</bpm><spo2>97</spo2><sistolica>132</sistolica></paziente>
+</pazienti>

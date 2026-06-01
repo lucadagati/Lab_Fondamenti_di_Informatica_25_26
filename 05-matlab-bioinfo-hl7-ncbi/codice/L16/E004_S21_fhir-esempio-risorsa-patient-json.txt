@@ -1,0 +1,15 @@
+{
+  "resourceType": "Patient",     // tipo di risorsa FHIR
+  "id": "PAZ123456",           // identificativo logico (spesso mappato dal CF o MPI)
+  "name": [{                   // array: può esistere più di un "name" (uso ufficiale vs. social)
+    "family": "Rossi",
+    "given": ["Mario", "Giuseppe"]
+  }],
+  "gender": "male",            // administrative gender: male | female | other | unknown
+  "birthDate": "1975-03-15",   // formato ISO 8601 (solo data)
+  "address": [{                // residenza o domicilio; country = codice ISO a 2 lettere
+    "city": "Milano",
+    "postalCode": "20100",
+    "country": "IT"
+  }]
+}
