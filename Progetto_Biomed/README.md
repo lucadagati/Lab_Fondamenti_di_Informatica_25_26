@@ -417,8 +417,8 @@ Progetto_Biomed/
 ### 1. Clona il repository
 
 ```bash
-git clone https://github.com/<tuo-utente>/Progetto_Biomed.git
-cd Progetto_Biomed
+git clone https://github.com/lucadagati/Lab_Fondamenti_di_Informatica_25_26.git
+cd Lab_Fondamenti_di_Informatica_25_26/Progetto_Biomed
 ```
 
 ### 2. Crea e attiva l'ambiente virtuale
