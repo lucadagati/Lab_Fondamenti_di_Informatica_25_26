@@ -18,7 +18,7 @@
           Il sistema costruisce una sessione paziente persistente, salva eventuali waveform disponibili e deriva una serie temporale di frequenza cardiaca auditabile.
         </p>
 
-        <form action="{{ url_for('main.public_datasets') }}" method="post">
+        <form action="{{ url_for('main.public_datasets') }}" method="post" id="publicDatasetForm">
           <div class="mb-3">
             <label for="patient_id" class="form-label fw-semibold">Paziente</label>
             <select class="form-select" id="patient_id" name="patient_id" required>
@@ -47,19 +47,28 @@
             <div class="col-md-6">
               <label for="duration_seconds" class="form-label fw-semibold">Durata import (s)</label>
               <select class="form-select" id="duration_seconds" name="duration_seconds">
-                <option value="20">20 secondi</option>
-                <option value="30" selected>30 secondi</option>
-                <option value="45">45 secondi</option>
-                <option value="60">60 secondi</option>
-                <option value="90">90 secondi</option>
               </select>
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary">
+          <button type="submit" class="btn btn-primary" id="datasetImportButton">
             <i class="bi bi-cloud-download me-1"></i>Importa sessione reale
           </button>
         </form>
+
+        <div class="border rounded-3 p-3 mt-4 d-none" id="importProgressPanel">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="badge rounded-pill text-bg-primary" id="importProgressDot">
+              <i class="bi bi-circle-fill"></i>
+            </span>
+            <div class="small fw-semibold" id="importProgressLabel">Preparazione import</div>
+            <div class="small text-muted ms-auto" id="importProgressValue">0%</div>
+          </div>
+          <div class="progress" role="progressbar" aria-label="Download dataset" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" id="importProgressBar" style="width: 0%"></div>
+          </div>
+          <div class="small text-muted mt-2" id="importProgressMessage">In attesa dell'avvio del download.</div>
+        </div>
       </div>
     </div>
 
@@ -70,7 +79,9 @@
           <li>record ECG reale dal database PhysioNet MIT-BIH Arrhythmia</li>
           <li>record PPG e respirazione reale dal dataset PhysioNet BIDMC</li>
           <li>serie di frequenza cardiaca derivata dagli annotatori dei battiti</li>
-          <li>waveform ECG persistito nel database quando disponibile</li>
+          <li>waveform completo persistito nel database quando disponibile</li>
+          <li>visualizzazione ridotta a finestra recente o downsampling per non appesantire la sessione</li>
+          <li>metriche ECG/PPG calcolate sia globalmente sia su finestre scorrevoli</li>
           <li>assessment AI, trend ML e suggerimenti terapeutici persistiti come per le altre sessioni</li>
         </ul>
       </div>
@@ -84,10 +95,19 @@
 const datasetMap = {{ datasets | tojson }};
 const datasetSelect = document.getElementById('dataset_key');
 const recordSelect = document.getElementById('record_name');
+const durationSelect = document.getElementById('duration_seconds');
+const importForm = document.getElementById('publicDatasetForm');
+const importButton = document.getElementById('datasetImportButton');
+const importPanel = document.getElementById('importProgressPanel');
+const progressBar = document.getElementById('importProgressBar');
+const progressLabel = document.getElementById('importProgressLabel');
+const progressValue = document.getElementById('importProgressValue');
+const progressMessage = document.getElementById('importProgressMessage');
+const progressDot = document.getElementById('importProgressDot');
 
 function refreshRecordOptions() {
   const selected = datasetSelect.value;
-  const dataset = datasetMap[selected] || { records: {} };
+  const dataset = datasetMap[selected] || { records: {}, duration_options: [] };
   recordSelect.innerHTML = '';
   Object.entries(dataset.records || {}).forEach(([key, label], index) => {
     const option = document.createElement('option');
@@ -98,9 +118,99 @@ function refreshRecordOptions() {
     }
     recordSelect.appendChild(option);
   });
+
+  durationSelect.innerHTML = '';
+  (dataset.duration_options || []).forEach((item, index) => {
+    const option = document.createElement('option');
+    option.value = item.value;
+    option.textContent = item.label;
+    if (index === 0) {
+      option.selected = true;
+    }
+    durationSelect.appendChild(option);
+  });
 }
 
 datasetSelect.addEventListener('change', refreshRecordOptions);
 refreshRecordOptions();
+
+function updateProgressUI(progress, label, message, status='running') {
+  importPanel.classList.remove('d-none');
+  progressBar.style.width = `${progress}%`;
+  progressBar.textContent = `${progress}%`;
+  progressValue.textContent = `${progress}%`;
+  progressLabel.textContent = label;
+  progressMessage.textContent = message;
+
+  progressBar.classList.remove('bg-danger', 'bg-success');
+  progressDot.classList.remove('text-bg-danger', 'text-bg-success', 'text-bg-primary');
+  if (status === 'failed') {
+    progressBar.classList.add('bg-danger');
+    progressDot.classList.add('text-bg-danger');
+  } else if (status === 'completed') {
+    progressBar.classList.add('bg-success');
+    progressDot.classList.add('text-bg-success');
+  } else {
+    progressDot.classList.add('text-bg-primary');
+  }
+}
+
+async function pollImportJob(jobId) {
+  while (true) {
+    const response = await fetch(`/api/datasets/public/import-jobs/${jobId}`);
+    const payload = await response.json();
+    if (!response.ok) {
+      throw new Error(payload.error || 'Errore leggendo lo stato del job.');
+    }
+
+    updateProgressUI(
+      payload.progress ?? 0,
+      payload.status === 'completed' ? 'Import completato' : 'Import dataset remoto',
+      payload.error || payload.message || 'Download in corso',
+      payload.status
+    );
+
+    if (payload.status === 'completed' && payload.redirect_url) {
+      window.location.href = payload.redirect_url;
+      return;
+    }
+    if (payload.status === 'failed') {
+      importButton.disabled = false;
+      throw new Error(payload.error || 'Import fallito.');
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+}
+
+importForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  importButton.disabled = true;
+  updateProgressUI(1, 'Avvio import', 'Richiesta inviata al backend');
+
+  const formData = new FormData(importForm);
+  const payload = {
+    patient_id: formData.get('patient_id'),
+    dataset_key: formData.get('dataset_key'),
+    record_name: formData.get('record_name'),
+    duration_seconds: Number(formData.get('duration_seconds')),
+  };
+
+  try {
+    const response = await fetch('/api/datasets/public/import-jobs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || 'Impossibile avviare il download del dataset.');
+    }
+    await pollImportJob(data.job_id);
+  } catch (error) {
+    importButton.disabled = false;
+    updateProgressUI(100, 'Import fallito', error.message, 'failed');
+  }
+});
 </script>
 {% endblock %}

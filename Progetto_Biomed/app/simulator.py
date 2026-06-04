@@ -59,6 +59,7 @@ def generate_session_data(
     patient_age: Optional[int] = None,
     scenario: str = 'normal',
     device_key: str = 'smartwatch_vitals',
+    patient_profile: Optional[str] = None,
 ) -> list:
     """
     Generate synthetic wearable sensor data for one monitoring session.
@@ -79,6 +80,31 @@ def generate_session_data(
     params = dict(SCENARIOS.get(scenario, SCENARIOS['normal']))
     device_profile = get_device_profile(device_key)
     noise_factor = float(device_profile.get('noise_factor', 1.0))
+
+    if patient_profile == 'respiratory':
+        params['spo2_base'] = max(90.0, params['spo2_base'] - 2.2)
+        params['spo2_std'] *= 1.45
+        params['hr_base'] += 4
+    elif patient_profile == 'arrhythmic':
+        params['hr_std'] *= 1.35
+        params['hr_base'] += 3
+    elif patient_profile == 'metabolic':
+        params['hr_base'] += 6
+        params['temp_base'] += 0.1
+        params['activity_base'] = max(0.03, params['activity_base'] - 0.03)
+    elif patient_profile == 'sleep_rest':
+        params['hr_base'] = max(48, params['hr_base'] - 4)
+        params['activity_base'] = min(params['activity_base'], 0.06)
+    elif patient_profile == 'athlete':
+        params['hr_base'] = max(48, params['hr_base'] - 6)
+        params['hr_std'] = max(2.0, params['hr_std'] * 0.9)
+        params['activity_base'] += 0.05
+    elif patient_profile == 'autonomic_stress':
+        params['hr_base'] += 7
+        params['hr_std'] += 2
+    elif patient_profile == 'recovery':
+        params['hr_base'] += 2
+        params['activity_base'] = max(0.03, params['activity_base'] - 0.02)
 
     # Age-dependent HR correction (HR decreases ~0.2 bpm/year after 30)
     if patient_age and patient_age > 30:

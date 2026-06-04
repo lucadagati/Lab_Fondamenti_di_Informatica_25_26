@@ -4,6 +4,12 @@ from sklearn.ensemble import RandomForestClassifier
 from app.models import Session
 
 
+FEATURE_ORDER = [
+    'hr_mean', 'hr_std', 'spo2_mean', 'spo2_min', 'temp_mean', 'temp_max',
+    'activity_mean', 'critical_alerts', 'warning_alerts', 'n_measurements',
+]
+
+
 def _safe_float(value, default=0.0):
     return default if value is None else float(value)
 
@@ -67,11 +73,7 @@ def _trend_label(current_score, next_score):
     return 'stabile'
 
 
-def _train_trend_model(patient, session_obj, current_features, historical_sessions):
-    feature_order = [
-        'hr_mean', 'hr_std', 'spo2_mean', 'spo2_min', 'temp_mean', 'temp_max',
-        'activity_mean', 'critical_alerts', 'warning_alerts', 'n_measurements',
-    ]
+def _fit_trend_model():
     transitions_x = []
     transitions_y = []
 
@@ -94,7 +96,7 @@ def _train_trend_model(patient, session_obj, current_features, historical_sessio
             next_vector = _extract_session_features(next_measurements, next_alerts)
             current_score = _clinical_risk_score(current_vector)
             next_score = _clinical_risk_score(next_vector)
-            transitions_x.append([current_vector[name] for name in feature_order])
+            transitions_x.append([current_vector[name] for name in FEATURE_ORDER])
             transitions_y.append(_trend_label(current_score, next_score))
 
     if len(set(transitions_y)) < 2 or len(transitions_x) < 6:
@@ -107,7 +109,17 @@ def _train_trend_model(patient, session_obj, current_features, historical_sessio
         class_weight='balanced',
     )
     model.fit(transitions_x, transitions_y)
-    current_vector = [current_features[name] for name in feature_order]
+    return {
+        'model': model,
+        'feature_order': FEATURE_ORDER,
+        'n_transitions': len(transitions_x),
+        'model_name': 'RandomForestClassifier',
+    }
+
+
+def _predict_trend_from_model(current_features, trend_model_bundle):
+    current_vector = [current_features[name] for name in trend_model_bundle['feature_order']]
+    model = trend_model_bundle['model']
     probabilities = model.predict_proba([current_vector])[0]
     labels = model.classes_
     scores = {label: round(float(prob), 3) for label, prob in zip(labels, probabilities)}
@@ -117,8 +129,8 @@ def _train_trend_model(patient, session_obj, current_features, historical_sessio
         'label': predicted_label,
         'confidence': confidence,
         'scores': scores,
-        'n_transitions': len(transitions_x),
-        'model_name': 'RandomForestClassifier',
+        'n_transitions': trend_model_bundle['n_transitions'],
+        'model_name': trend_model_bundle['model_name'],
     }
 
 
@@ -142,7 +154,179 @@ def _rule_based_trend(current_features):
     }
 
 
-def _therapy_suggestions(label, risk_level, metrics, trend_prediction):
+def _predict_trend_with_fallback(current_features, trend_model_bundle=None):
+    if trend_model_bundle is not None:
+        return _predict_trend_from_model(current_features, trend_model_bundle)
+    return _rule_based_trend(current_features)
+
+
+def _scenario_adjustments(category, label):
+    adjustments = {
+        'hr_mean': 0.0,
+        'hr_std': 0.0,
+        'spo2_mean': 0.0,
+        'spo2_min': 0.0,
+        'temp_mean': 0.0,
+        'temp_max': 0.0,
+        'activity_mean': 0.0,
+        'critical_alerts_scale': 1.0,
+        'warning_alerts_scale': 1.0,
+        'response_strength': 0.32,
+        'narrative': 'Impatto atteso modesto sul profilo clinico a breve termine.',
+    }
+
+    if category == 'supportivo':
+        adjustments.update({
+            'hr_mean': -4.0,
+            'hr_std': -2.4,
+            'critical_alerts_scale': 0.82,
+            'warning_alerts_scale': 0.88,
+            'response_strength': 0.45,
+            'narrative': 'Riduzione attesa di trigger funzionali e instabilità emodinamica lieve.',
+        })
+    elif category == 'respiratorio':
+        adjustments.update({
+            'spo2_mean': 2.0,
+            'spo2_min': 2.6,
+            'hr_mean': -3.0,
+            'critical_alerts_scale': 0.70,
+            'warning_alerts_scale': 0.80,
+            'response_strength': 0.58,
+            'narrative': 'Miglioramento atteso dell’ossigenazione con riduzione del carico cardiorespiratorio.',
+        })
+    elif category == 'infettivo':
+        adjustments.update({
+            'temp_mean': -0.45,
+            'temp_max': -0.65,
+            'hr_mean': -2.5,
+            'critical_alerts_scale': 0.78,
+            'warning_alerts_scale': 0.85,
+            'response_strength': 0.52,
+            'narrative': 'Contenimento previsto del burden febbrile e della tachicardia associata.',
+        })
+    elif category == 'comportamentale':
+        adjustments.update({
+            'hr_mean': -5.5,
+            'hr_std': -1.8,
+            'activity_mean': -0.04,
+            'warning_alerts_scale': 0.82,
+            'response_strength': 0.40,
+            'narrative': 'Riduzione attesa del drive simpatico e della tachicardia a riposo.',
+        })
+    elif category == 'diagnostico':
+        adjustments.update({
+            'critical_alerts_scale': 0.96,
+            'warning_alerts_scale': 0.98,
+            'response_strength': 0.18,
+            'narrative': 'Il monitoraggio migliora l’identificazione precoce, ma l’effetto fisiologico diretto e limitato.',
+        })
+    elif category == 'follow-up':
+        adjustments.update({
+            'critical_alerts_scale': 0.94,
+            'warning_alerts_scale': 0.95,
+            'response_strength': 0.22,
+            'narrative': 'Follow-up conservativo: bassa modifica fisiologica, valore principale nel controllo evolutivo.',
+        })
+
+    if label == 'sospetta aritmia':
+        adjustments['hr_std'] -= 1.5
+    if label == 'rischio respiratorio':
+        adjustments['spo2_min'] += 0.6
+    if label == 'rischio infettivo':
+        adjustments['temp_max'] -= 0.15
+    return adjustments
+
+
+def _apply_treatment_scenario(current_features, metrics, risk_level, item, trend_model_bundle=None):
+    adjusted = dict(current_features)
+    scenario = _scenario_adjustments(item['category'], item.get('label_context'))
+    adjusted['hr_mean'] = max(35.0, adjusted['hr_mean'] + scenario['hr_mean'])
+    adjusted['hr_std'] = max(0.5, adjusted['hr_std'] + scenario['hr_std'])
+    adjusted['spo2_mean'] = min(100.0, max(80.0, adjusted['spo2_mean'] + scenario['spo2_mean']))
+    adjusted['spo2_min'] = min(adjusted['spo2_mean'], max(75.0, adjusted['spo2_min'] + scenario['spo2_min']))
+    adjusted['temp_mean'] = max(34.0, adjusted['temp_mean'] + scenario['temp_mean'])
+    adjusted['temp_max'] = max(adjusted['temp_mean'], adjusted['temp_max'] + scenario['temp_max'])
+    adjusted['activity_mean'] = min(1.0, max(0.0, adjusted['activity_mean'] + scenario['activity_mean']))
+    adjusted['critical_alerts'] = max(0.0, adjusted['critical_alerts'] * scenario['critical_alerts_scale'])
+    adjusted['warning_alerts'] = max(0.0, adjusted['warning_alerts'] * scenario['warning_alerts_scale'])
+
+    current_risk_score = _clinical_risk_score(current_features)
+    projected_risk_score = _clinical_risk_score(adjusted)
+    projected_trend = _predict_trend_with_fallback(adjusted, trend_model_bundle)
+
+    projected_risk_level = 'low'
+    if adjusted['spo2_min'] < 94 or adjusted['temp_max'] > 37.8 or adjusted['hr_mean'] > 118:
+        projected_risk_level = 'medium'
+    if adjusted['spo2_min'] < 92 or adjusted['temp_max'] > 38.3 or adjusted['hr_mean'] > 135:
+        projected_risk_level = 'high'
+
+    response_probability = round(min(0.95, max(0.15, scenario['response_strength'] + projected_trend['scores'].get('miglioramento', 0.0) * 0.45)), 2)
+    return {
+        'projected_risk_level': projected_risk_level,
+        'projected_risk_score': round(projected_risk_score, 3),
+        'risk_score_delta': round(projected_risk_score - current_risk_score, 3),
+        'response_probability': response_probability,
+        'projected_metrics': {
+            'heart_rate': round(adjusted['hr_mean'], 1),
+            'spo2': round(adjusted['spo2_mean'], 1),
+            'temperature': round(adjusted['temp_mean'], 2),
+        },
+        'trend_prediction': projected_trend,
+        'summary': scenario['narrative'],
+    }
+
+
+def _build_therapy_plan(items, label, risk_level, metrics, trend_prediction, current_features, trend_model_bundle=None):
+    enriched_items = []
+    for item in items[:3]:
+        enriched = dict(item)
+        enriched['label_context'] = label
+        enriched['scenario'] = _apply_treatment_scenario(
+            current_features,
+            metrics,
+            risk_level,
+            enriched,
+            trend_model_bundle=trend_model_bundle,
+        )
+        enriched_items.append(enriched)
+
+    expected = 'stabilità clinica attesa'
+    if trend_prediction['label'] == 'miglioramento':
+        expected = 'probabile miglioramento nel breve termine se il contesto resta invariato'
+    elif trend_prediction['label'] == 'peggioramento':
+        expected = 'probabile peggioramento nel breve termine; raccomandato incremento del monitoraggio'
+
+    if risk_level == 'high':
+        expected = 'alto rischio di deterioramento: indicata escalation clinica e revisione terapeutica rapida'
+
+    return {
+        'items': enriched_items,
+        'expected_outcome': expected,
+    }
+
+
+def build_therapy_plan_from_persisted(label, risk_level, metrics, trend_prediction, therapy_items, current_features):
+    plain_items = [
+        {
+            'title': item['title'],
+            'category': item['category'],
+            'details': item['details'],
+        }
+        for item in therapy_items
+    ]
+    trend_model_bundle = _fit_trend_model()
+    return _build_therapy_plan(
+        plain_items,
+        label,
+        risk_level,
+        metrics,
+        trend_prediction,
+        current_features,
+        trend_model_bundle=trend_model_bundle,
+    )
+
+
+def _therapy_suggestions(label, risk_level, metrics, trend_prediction, current_features, trend_model_bundle=None):
     suggestions = []
 
     if label == 'sospetta aritmia':
@@ -207,19 +391,15 @@ def _therapy_suggestions(label, risk_level, metrics, trend_prediction):
             'details': 'Non emergono interventi prioritari; mantenere trend analysis e confronto con baseline del paziente.',
         })
 
-    expected = 'stabilità clinica attesa'
-    if trend_prediction['label'] == 'miglioramento':
-        expected = 'probabile miglioramento nel breve termine se il contesto resta invariato'
-    elif trend_prediction['label'] == 'peggioramento':
-        expected = 'probabile peggioramento nel breve termine; raccomandato incremento del monitoraggio'
-
-    if risk_level == 'high':
-        expected = 'alto rischio di deterioramento: indicata escalation clinica e revisione terapeutica rapida'
-
-    return {
-        'items': suggestions[:3],
-        'expected_outcome': expected,
-    }
+    return _build_therapy_plan(
+        suggestions,
+        label,
+        risk_level,
+        metrics,
+        trend_prediction,
+        current_features,
+        trend_model_bundle=trend_model_bundle,
+    )
 
 
 def build_ai_assessment(patient, session_obj, measurements, historical_sessions, alerts=None):
@@ -341,9 +521,8 @@ def build_ai_assessment(patient, session_obj, measurements, historical_sessions,
     if not rationale:
         rationale.append('Il pattern non mostra deviazioni clinicamente rilevanti rispetto al baseline disponibile.')
 
-    trend_prediction = _train_trend_model(patient, session_obj, current_features, historical_sessions)
-    if trend_prediction is None:
-        trend_prediction = _rule_based_trend(current_features)
+    trend_model_bundle = _fit_trend_model()
+    trend_prediction = _predict_trend_with_fallback(current_features, trend_model_bundle)
 
     therapy_plan = _therapy_suggestions(label, forecast_risk, {
         'hr_mean': hr_mean,
@@ -353,7 +532,7 @@ def build_ai_assessment(patient, session_obj, measurements, historical_sessions,
         'temp_mean': temp_mean,
         'temp_max': temp_max,
         'activity_mean': activity_mean,
-    }, trend_prediction)
+    }, trend_prediction, current_features, trend_model_bundle=trend_model_bundle)
 
     audit_features = {
         'hr_mean': round(hr_mean, 3),

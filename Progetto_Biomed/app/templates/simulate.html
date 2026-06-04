@@ -53,6 +53,9 @@
               <option value="sleep">🌙 Sonno</option>
               <option value="arrhythmia">🔴 Aritmia simulata</option>
             </select>
+            <div class="form-text" id="patientScenarioHint">
+              Lo scenario verra allineato al profilo clinico del paziente selezionato.
+            </div>
           </div>
 
           <div class="row g-3 mb-3">
@@ -130,6 +133,7 @@
 {% block scripts %}
 <script>
 const deviceProfiles = {{ device_profiles | tojson }};
+const patientProfiles = {{ patient_profiles | tojson }};
 
 function updatePreview() {
   const dur = parseInt(document.getElementById('duration').value) || 60;
@@ -146,10 +150,39 @@ function updateDeviceInfo() {
     `${profile.supports_ecg ? 'ECG disponibile' : 'ECG non disponibile'} · ` +
     `intervalli supportati: ${profile.sampling_options.join(', ')} s`;
 }
+
+function updatePatientClinicalDefaults() {
+  const patientId = document.getElementById('patient_id').value;
+  const profile = patientProfiles[patientId];
+  const hint = document.getElementById('patientScenarioHint');
+  if (!profile) {
+    hint.textContent = 'Seleziona un paziente per caricare scenario e dispositivo consigliati.';
+    return;
+  }
+
+  const scenarioSelect = document.getElementById('scenario');
+  const deviceSelect = document.getElementById('device_id');
+  const allowed = new Set(profile.allowed_scenarios || []);
+  Array.from(scenarioSelect.options).forEach(option => {
+    option.disabled = !allowed.has(option.value);
+  });
+  if (allowed.has(profile.default_scenario)) {
+    scenarioSelect.value = profile.default_scenario;
+  }
+  if (profile.preferred_device && deviceProfiles[profile.preferred_device]) {
+    deviceSelect.value = profile.preferred_device;
+  }
+  hint.textContent =
+    `Profilo ${profile.label}: scenari coerenti ${profile.allowed_scenarios.join(', ')} · ` +
+    `storico atteso ${profile.trajectory.join(' → ')}.`;
+  updateDeviceInfo();
+}
 document.getElementById('duration').addEventListener('input', updatePreview);
 document.getElementById('interval').addEventListener('change', updatePreview);
 document.getElementById('device_id').addEventListener('change', updateDeviceInfo);
+document.getElementById('patient_id').addEventListener('change', updatePatientClinicalDefaults);
 updatePreview();
 updateDeviceInfo();
+updatePatientClinicalDefaults();
 </script>
 {% endblock %}

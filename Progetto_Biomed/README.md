@@ -2,7 +2,7 @@
 
 Applicazione web per telemonitoraggio biomedico con supporto decisionale clinico, sviluppata come elaborato progettuale per il corso di Informatica Biomedica.
 
-Il sistema non si limita a visualizzare parametri simulati: acquisisce sessioni di monitoraggio da simulatori o CSV, le memorizza su database, esegue analisi dei segnali, produce alert contestuali, propone una diagnosi assistita, suggerisce azioni terapeutiche coerenti con il contesto clinico e stima l'evoluzione a breve termine con un componente di machine learning.
+Il sistema non si limita a visualizzare parametri simulati: acquisisce sessioni di monitoraggio da simulatori, CSV o dataset pubblici reali, le memorizza su database, esegue analisi dei segnali, produce alert contestuali, propone una diagnosi assistita, suggerisce azioni terapeutiche coerenti con il contesto clinico e stima l'evoluzione a breve termine con un componente di machine learning.
 
 ## Obiettivo del progetto
 
@@ -22,21 +22,21 @@ Il progetto si colloca nel filone del telemonitoraggio remoto del paziente e dei
 
 | Area | Implementazione |
 |---|---|
-| Gestione pazienti | Anagrafica, BMI, note cliniche, storico sessioni |
-| Acquisizione dati | Simulazione contestuale o upload CSV |
+| Gestione pazienti | Anagrafica, BMI, note cliniche, profilo clinico inferito, storico sessioni |
+| Acquisizione dati | Simulazione patient-aware, upload CSV, import PhysioNet |
 | Dispositivi | Catalogo device selezionabili con capacità diverse |
-| Segnali | FC, SpO₂, temperatura, attività, ECG sintetico per device supportati |
-| Analisi | Smoothing, statistiche, distribuzioni, confronto con baseline storico |
+| Segnali | FC, SpO₂, temperatura, attività, ECG sintetico, ECG reale, PPG reale, respirazione reale |
+| Analisi | Smoothing, statistiche, distribuzioni, confronto con baseline storico, HRV, quality assessment, artefatti |
 | Alert | Alert contestuali e aggregati per episodio, non per singolo campione |
 | Diagnosi AI | Classificazione explainable del pattern clinico prevalente |
-| Terapie suggerite | Raccomandazioni contestuali non prescrittive |
+| Terapie suggerite | Raccomandazioni contestuali con scenari controfattuali ML-guidati |
 | Timeline terapeutica | Evoluzione longitudinale del paziente nel tempo |
 | Forecast | Previsione a 30 minuti dei parametri e trend ML di esito |
-| Visualizzazione | Dashboard, time series, box plot, pie chart, strip ECG |
-| Database | SQLite relazionale con assessment persistiti, ECG e query di esempio |
+| Visualizzazione | Dashboard, time series, box plot, pie chart, waveform downsampled, rolling metrics |
+| Database | SQLite relazionale con assessment persistiti, ECG, waveform multi-segnale e query di esempio |
 | Audit completo | Feature estratte e forecast numerici persistiti in tabelle dedicate |
 | Reportistica | Export PDF della timeline terapeutica e del report di sessione |
-| API | Endpoint JSON per statistiche e dati di sessione |
+| API | Endpoint JSON per statistiche, dati di sessione e job asincroni di import |
 
 ## Stack tecnologico
 
@@ -104,6 +104,7 @@ erDiagram
       SESSIONS ||--o{ MEASUREMENTS : contains
       SESSIONS ||--o{ ALERTS : generates
       SESSIONS ||--o{ ECG_SAMPLES : stores
+      SESSIONS ||--o{ WAVEFORM_SAMPLES : stores
       SESSIONS ||--|| SESSION_ASSESSMENTS : summarizes
       SESSION_ASSESSMENTS ||--|| SESSION_FEATURE_SNAPSHOTS : audits
       SESSION_ASSESSMENTS ||--|| SESSION_FORECAST_SNAPSHOTS : forecasts
@@ -158,6 +159,17 @@ erDiagram
             int sample_index
             float offset_seconds
             float value
+      }
+
+      WAVEFORM_SAMPLES {
+            int id PK
+            int session_id FK
+            string signal_type
+            int sample_index
+            float offset_seconds
+            float value
+            float sampling_hz
+            string unit
       }
 
       SESSION_ASSESSMENTS {
@@ -236,6 +248,10 @@ Il modulo di processamento implementa:
 - estrazione di feature cliniche di sessione
 - generazione di un tracciato ECG sintetico coerente con FC, variabilità e device
 - confronto con il baseline storico del paziente
+- analisi ECG reale con filtraggio, rilevamento picchi e HRV
+- analisi PPG reale con pulse detection, perfusion proxy e quality score
+- rilevazione di artefatti, clipping, flatline e rumore impulsivo
+- metriche waveform su finestre scorrevoli
 
 ## Alert clinici
 
@@ -278,6 +294,15 @@ Inoltre il sistema salva nel database, per ogni sessione:
 - raccomandazioni terapeutiche persistite come entità separate
 - feature estratte persistite come snapshot auditabile
 - forecast numerici persistiti come snapshot auditabile
+- waveform reali persistiti quando disponibili
+
+Per ogni trattamento suggerito il sistema produce anche uno scenario controfattuale sintetico:
+
+- rischio previsto se il trattamento viene applicato
+- variazione dello score di rischio
+- probabilità stimata di risposta
+- metriche proiettate su FC, SpO₂ e temperatura
+- trend previsto post-intervento: miglioramento, stabile o peggioramento
 
 ## Machine learning per il trend clinico
 
@@ -303,9 +328,10 @@ La pagina dedicata consente di:
 
 - selezionare un paziente già presente nel sistema
 - scegliere un record reale del dataset ECG o di vital signs
-- importare una finestra temporale del segnale
+- importare finestre estese del segnale
 - persistire nel database sia le misurazioni derivate sia l'eventuale waveform disponibile
 - riutilizzare lo stesso workflow di alert, diagnosi AI, terapie e trend ML
+- mostrare progresso dell'import via job asincrono con barra percentuale
 
 ```mermaid
 flowchart LR
@@ -339,13 +365,16 @@ flowchart LR
 
 ## Dataset demo
 
-Il seed iniziale genera un dataset longitudinale utile per dimostrare la parte AI.
+Il seed iniziale genera un dataset longitudinale pensato per dare senso clinico allo storico e al modello di trend.
 
 - 18 pazienti
-- 58 sessioni
-- 6 dispositivi differenti incluse 2 sorgenti PhysioNet
-- oltre 12.000 misurazioni
-- scenari misti: normale, stress, sonno, esercizio, aritmia
+- profilo clinico inferito dalle note del paziente
+- traiettorie longitudinali coerenti con il problema prevalente
+- almeno 100 misurazioni per ogni paziente
+- oltre 12.000 misurazioni complessive
+- uso di dispositivi preferenziali coerenti con il profilo clinico
+
+Se la rete verso PhysioNet e disponibile, il seed prova anche ad aggiungere sessioni reali ECG/PPG; se il download fallisce, il dataset resta completamente sintetico ma patient-aware.
 
 ## Struttura del progetto
 
@@ -446,9 +475,11 @@ Ogni paziente dispone di una pagina dedicata che mostra:
 Permette di:
 
 - scegliere il paziente
-- scegliere lo scenario clinico
+- usare scenario e dispositivo coerenti con il profilo clinico inferito
+- limitare gli scenari a quelli compatibili con il problema di salute del paziente
 - selezionare il dispositivo medico
 - definire durata e frequenza di campionamento
+- costruire sessioni sintetiche non casuali ma coerenti con la traiettoria del paziente
 
 ### Carica CSV
 
@@ -470,13 +501,19 @@ La pagina sessione espone:
 - grafici interattivi dei segnali
 - ECG sintetico se il device lo supporta
 - ECG reale persistito quando la sessione deriva da dataset pubblico
+- PPG reale e respirazione reale quando disponibili
+- quality assessment del waveform
+- metriche rolling ECG/PPG
 - feature estratte e forecast numerici persistiti per audit completo
+- scenari controfattuali per i trattamenti suggeriti
 - tabella dettagliata degli alert
 - export PDF del report clinico di sessione
 
 ### Dataset pubblici
 
 La pagina dedicata ai dataset pubblici permette l'import diretto di sessioni ECG reali da PhysioNet MIT-BIH e di sessioni vital-sign reali da PhysioNet BIDMC, riducendo la dipendenza dalla simulazione sintetica.
+
+L'import e asincrono: il browser mostra pallino di stato, barra di avanzamento, percentuale e messaggi di fase mentre il backend scarica, processa e persiste i dati.
 
 ### Export PDF
 
@@ -491,6 +528,8 @@ Il sistema espone due export server-side:
 |---|---|---|
 | `/api/session/<id>/data` | GET | restituisce le misurazioni della sessione |
 | `/api/stats` | GET | restituisce statistiche aggregate del sistema |
+| `/api/datasets/public/import-jobs` | POST | crea un job asincrono di import da dataset pubblico |
+| `/api/datasets/public/import-jobs/<job_id>` | GET | restituisce stato, progresso e redirect finale del job |
 
 ## Query SQL di esempio
 
@@ -504,19 +543,20 @@ In [database/schema.sql](database/schema.sql) sono incluse query per:
 
 ## Limiti e note metodologiche
 
-- i dati clinici sono sintetici o importati da CSV di test
+- una parte importante del dataset demo resta sintetica, anche se ora e coerente con il profilo clinico del paziente
+- la parte controfattuale dei trattamenti e ML-guidata ma non validata clinicamente su outcome terapeutici reali
 - parte dei dataset pubblici include segnali reali, ma non copre ancora l'intero set di parametri vitali del dominio applicativo
-- il motore AI è adatto a fini didattici e di prototipazione
+- il motore AI e adatto a fini didattici, di prototipazione e di studio di pipeline biomediche
 - i suggerimenti terapeutici non hanno valore prescrittivo
 - il sistema non è destinato all'uso clinico reale
 
 ## Sviluppi futuri consigliati
 
-- addestramento su dataset reali di telemonitoraggio o ECG annotati
-- aggiunta di feature HRV e morfologia ECG
-- validazione sperimentale del classificatore ML
+- addestramento su dataset reali di telemonitoraggio con outcome terapeutici osservati
+- validazione sperimentale separata del modello di trend e del modello controfattuale dei trattamenti
+- aggiunta di morfologia ECG avanzata, SQI e segmentazione piu robusta
 - autenticazione utenti e ruoli clinici
-- aggiunta di waveform respiratori e PPG persistiti come entità dedicate
+- orchestrazione asincrona piu robusta per download lunghi e import massivi
 
 ## Licenza
 

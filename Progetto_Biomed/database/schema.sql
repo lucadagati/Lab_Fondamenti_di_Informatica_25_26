@@ -66,6 +66,19 @@ CREATE TABLE IF NOT EXISTS ecg_samples (
     value           REAL NOT NULL
 );
 
+-- ── Tabella waveform multi-segnale (PPG/respirazione/altro) ──────────────
+CREATE TABLE IF NOT EXISTS waveform_samples (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_id      INTEGER NOT NULL
+                        REFERENCES sessions(id) ON DELETE CASCADE,
+    signal_type     TEXT NOT NULL,
+    sample_index    INTEGER NOT NULL,
+    offset_seconds  REAL NOT NULL,
+    value           REAL NOT NULL,
+    sampling_hz     REAL,
+    unit            TEXT
+);
+
 -- ── Tabella assessment AI persistiti ─────────────────────────
 CREATE TABLE IF NOT EXISTS session_assessments (
     id                       INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -143,6 +156,8 @@ CREATE INDEX IF NOT EXISTS idx_alerts_session ON alerts(session_id);
 CREATE INDEX IF NOT EXISTS idx_alerts_sev     ON alerts(severity);
 CREATE INDEX IF NOT EXISTS idx_sess_patient   ON sessions(patient_id);
 CREATE INDEX IF NOT EXISTS idx_ecg_session    ON ecg_samples(session_id);
+CREATE INDEX IF NOT EXISTS idx_waveform_session ON waveform_samples(session_id);
+CREATE INDEX IF NOT EXISTS idx_waveform_signal  ON waveform_samples(signal_type);
 CREATE INDEX IF NOT EXISTS idx_assess_session ON session_assessments(session_id);
 CREATE INDEX IF NOT EXISTS idx_feature_session ON session_feature_snapshots(session_id);
 CREATE INDEX IF NOT EXISTS idx_forecast_session ON session_forecast_snapshots(session_id);

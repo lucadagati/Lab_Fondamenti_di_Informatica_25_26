@@ -51,6 +51,9 @@ class Session(db.Model):
     ecg_samples = db.relationship(
         'ECGSample', backref='session', lazy=True, cascade='all, delete-orphan'
     )
+    waveform_samples = db.relationship(
+        'WaveformSample', backref='session', lazy=True, cascade='all, delete-orphan'
+    )
     assessment = db.relationship(
         'SessionAssessment', backref='session', uselist=False,
         lazy=True, cascade='all, delete-orphan'
@@ -133,6 +136,24 @@ class ECGSample(db.Model):
 
     def __repr__(self):
         return f'<ECGSample {self.session_id}:{self.sample_index}>'
+
+
+class WaveformSample(db.Model):
+    __tablename__ = 'waveform_samples'
+
+    id = db.Column(db.Integer, primary_key=True)
+    session_id = db.Column(
+        db.Integer, db.ForeignKey('sessions.id'), nullable=False
+    )
+    signal_type = db.Column(db.String(30), nullable=False)
+    sample_index = db.Column(db.Integer, nullable=False)
+    offset_seconds = db.Column(db.Float, nullable=False)
+    value = db.Column(db.Float, nullable=False)
+    sampling_hz = db.Column(db.Float)
+    unit = db.Column(db.String(20))
+
+    def __repr__(self):
+        return f'<WaveformSample {self.session_id}:{self.signal_type}:{self.sample_index}>'
 
 
 class SessionAssessment(db.Model):

@@ -30,11 +30,22 @@ def available_public_datasets():
             'label': 'PhysioNet MIT-BIH Arrhythmia Database',
             'description': 'ECG reale annotato con ritmo cardiaco e battiti da record pubblici PhysioNet.',
             'records': MITDB_RECORDS,
+            'duration_options': [
+                {'value': 60, 'label': '1 minuto'},
+                {'value': 300, 'label': '5 minuti'},
+                {'value': 600, 'label': '10 minuti'},
+                {'value': 1800, 'label': '30 minuti'},
+            ],
         },
         'bidmc': {
             'label': 'PhysioNet BIDMC PPG and Respiration Dataset',
             'description': 'Segnali vitali reali con PPG e respirazione, utili per derivare frequenza cardiaca da sorgente non simulata.',
             'records': BIDMC_RECORDS,
+            'duration_options': [
+                {'value': 300, 'label': '5 minuti'},
+                {'value': 600, 'label': '10 minuti'},
+                {'value': 900, 'label': '15 minuti'},
+            ],
         },
     }
 
@@ -50,16 +61,22 @@ def _instantaneous_hr(samples, fs):
     return beat_seconds[valid], hr[valid]
 
 
-def import_mitdb_session(record_name='100', duration_seconds=30):
+def import_mitdb_session(record_name='100', duration_seconds=30, progress_callback=None):
     if wfdb is None:
         raise RuntimeError('wfdb non installato. Eseguire pip install -r requirements.txt')
 
-    duration_seconds = int(max(10, min(duration_seconds, 120)))
+    duration_seconds = int(max(60, min(duration_seconds, 1800)))
     fs = 360
     total_samples = duration_seconds * fs
+    if progress_callback:
+        progress_callback(10, 'Download annotazioni MIT-BIH')
 
     record = wfdb.rdrecord(record_name, sampfrom=0, sampto=total_samples, pn_dir='mitdb')
+    if progress_callback:
+        progress_callback(38, 'Download waveform ECG MIT-BIH')
     annotation = wfdb.rdann(record_name, 'atr', sampfrom=0, sampto=total_samples, pn_dir='mitdb')
+    if progress_callback:
+        progress_callback(65, 'Estrazione frequenza cardiaca e segmentazione ECG')
 
     signal = record.p_signal[:, 0]
     sample_rate = float(record.fs)
@@ -84,9 +101,8 @@ def import_mitdb_session(record_name='100', duration_seconds=30):
     else:
         hr_series = np.repeat(75.0, len(measurement_seconds))
 
-    downsample_step = max(1, int(sample_rate // 125))
-    ecg_values = signal[::downsample_step]
-    ecg_offsets = np.arange(len(ecg_values)) * (downsample_step / sample_rate)
+    ecg_values = signal
+    ecg_offsets = np.arange(len(ecg_values)) / sample_rate
 
     session_start = datetime.utcnow() - timedelta(seconds=duration_seconds)
     measurements = [
@@ -107,6 +123,8 @@ def import_mitdb_session(record_name='100', duration_seconds=30):
         }
         for index, (offset, value) in enumerate(zip(ecg_offsets, ecg_values))
     ]
+    if progress_callback:
+        progress_callback(84, 'Waveform ECG pronto per l’importazione')
 
     return {
         'source_type': 'public_dataset',
@@ -117,6 +135,7 @@ def import_mitdb_session(record_name='100', duration_seconds=30):
         'end_time': measurements[-1]['timestamp'],
         'measurements': measurements,
         'ecg_samples': ecg_samples,
+        'waveform_samples': [],
         'notes': f'Import da dataset pubblico PhysioNet MIT-BIH, record {record_name}',
     }
 
@@ -170,14 +189,18 @@ def _derive_hr_from_ppg(ppg_signal, sample_rate, duration_seconds):
     return measurement_seconds, hr_series
 
 
-def import_bidmc_vitals_session(record_name='bidmc01', duration_seconds=60):
+def import_bidmc_vitals_session(record_name='bidmc01', duration_seconds=60, progress_callback=None):
     if wfdb is None:
         raise RuntimeError('wfdb non installato. Eseguire pip install -r requirements.txt')
 
-    duration_seconds = int(max(30, min(duration_seconds, 180)))
+    duration_seconds = int(max(300, min(duration_seconds, 900)))
+    if progress_callback:
+        progress_callback(10, 'Lettura metadati BIDMC')
     probe = wfdb.rdrecord(record_name, sampfrom=0, sampto=1, pn_dir='bidmc')
     sample_rate = float(probe.fs)
     total_samples = int(duration_seconds * sample_rate)
+    if progress_callback:
+        progress_callback(35, 'Download PPG e respirazione BIDMC')
     record = wfdb.rdrecord(record_name, sampfrom=0, sampto=total_samples, pn_dir='bidmc')
 
     signal_names = list(record.sig_name)
@@ -188,12 +211,41 @@ def import_bidmc_vitals_session(record_name='bidmc01', duration_seconds=60):
         raise RuntimeError('Il record BIDMC selezionato non contiene un canale PPG riconoscibile.')
 
     ppg_signal = record.p_signal[:, ppg_idx]
+    if progress_callback:
+        progress_callback(63, 'Derivazione pulse rate da PPG')
     measurement_seconds, hr_series = _derive_hr_from_ppg(ppg_signal, sample_rate, duration_seconds)
+    ppg_offsets = np.arange(len(ppg_signal)) / sample_rate
+
+    waveform_samples = [
+        {
+            'signal_type': 'ppg',
+            'sample_index': index,
+            'offset_seconds': round(float(offset), 4),
+            'value': round(float(value), 6),
+            'sampling_hz': round(float(sample_rate), 3),
+            'unit': 'a.u.',
+        }
+        for index, (offset, value) in enumerate(zip(ppg_offsets, ppg_signal))
+    ]
 
     resp_mean = None
     if resp_idx is not None:
         resp_signal = record.p_signal[:, resp_idx]
         resp_mean = round(float(np.nanmean(resp_signal)), 4)
+        resp_offsets = np.arange(len(resp_signal)) / sample_rate
+        waveform_samples.extend([
+            {
+                'signal_type': 'respiration',
+                'sample_index': index,
+                'offset_seconds': round(float(offset), 4),
+                'value': round(float(value), 6),
+                'sampling_hz': round(float(sample_rate), 3),
+                'unit': 'a.u.',
+            }
+            for index, (offset, value) in enumerate(zip(resp_offsets, resp_signal))
+        ])
+    if progress_callback:
+        progress_callback(84, 'Waveform PPG/respirazione pronto per l’importazione')
 
     session_start = datetime.utcnow() - timedelta(seconds=duration_seconds)
     measurements = [
@@ -216,6 +268,7 @@ def import_bidmc_vitals_session(record_name='bidmc01', duration_seconds=60):
         'end_time': measurements[-1]['timestamp'],
         'measurements': measurements,
         'ecg_samples': [],
+        'waveform_samples': waveform_samples,
         'notes': (
             f'Import da dataset pubblico PhysioNet BIDMC, record {record_name}. '
             f'Frequenza cardiaca derivata da PPG reale'

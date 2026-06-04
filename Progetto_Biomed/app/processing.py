@@ -11,6 +11,13 @@ Pipeline:
 import numpy as np
 from scipy.signal import savgol_filter
 
+from app.devices import get_device_profile
+from app.waveform_analysis import (
+    analyze_ecg_waveform,
+    analyze_ppg_waveform,
+    summarize_respiration_waveform,
+)
+
 # ── Clinical thresholds ───────────────────────────────────────────────────────
 HR_CRITICAL_LOW = 40
 HR_WARNING_LOW = 50
@@ -408,6 +415,72 @@ def detect_zscore_anomalies(values, timestamps, threshold=3.0):
     return anomalies
 
 
+def _real_ecg_samples(session_obj):
+    return [
+        {
+            'sample_index': sample.sample_index,
+            'offset_seconds': sample.offset_seconds,
+            'value': sample.value,
+        }
+        for sample in sorted(session_obj.ecg_samples, key=lambda item: item.sample_index)
+    ]
+
+
+def _waveform_samples_by_type(session_obj, signal_type):
+    return [
+        {
+            'sample_index': sample.sample_index,
+            'offset_seconds': sample.offset_seconds,
+            'value': sample.value,
+            'sampling_hz': sample.sampling_hz,
+            'unit': sample.unit,
+        }
+        for sample in sorted(session_obj.waveform_samples, key=lambda item: item.sample_index)
+        if sample.signal_type == signal_type
+    ]
+
+
+def _build_waveform_analysis(session_obj, measurements):
+    ecg_samples = _real_ecg_samples(session_obj)
+    if ecg_samples:
+        return analyze_ecg_waveform(ecg_samples)
+
+    ppg_samples = _waveform_samples_by_type(session_obj, 'ppg')
+    if ppg_samples:
+        analysis = analyze_ppg_waveform(ppg_samples)
+        respiration_samples = _waveform_samples_by_type(session_obj, 'respiration')
+        if respiration_samples:
+            analysis['respiration'] = summarize_respiration_waveform(respiration_samples)
+        return analysis
+
+    device_profile = get_device_profile(session_obj.device_id)
+    if device_profile.get('supports_ecg'):
+        preview = generate_ecg_preview(measurements)
+        if preview:
+            return {
+                'signal_type': 'ecg',
+                'source': 'synthetic',
+                'sampling_hz': preview.get('sampling_hz'),
+                'waveform': {
+                    'timestamps': preview.get('timestamps', []),
+                    'values': preview.get('values', []),
+                    'filtered': preview.get('values', []),
+                    'peak_timestamps': [],
+                    'peak_values': [],
+                },
+                'features': {
+                    'dominant_hr_bpm': None,
+                    'qrs_peak_count': None,
+                    'qrs_amplitude_p95': None,
+                    'duration_seconds': preview.get('duration_seconds'),
+                },
+                'hrv': {},
+                'artifacts': {'flags': ['synthetic_preview']},
+                'quality': {'score': None, 'label': 'synthetic', 'beat_coverage': None},
+            }
+    return {}
+
+
 # ── Session-level analysis ────────────────────────────────────────────────────
 
 def analyze_session(measurements):
@@ -423,7 +496,8 @@ def analyze_session(measurements):
     temp = [m.temperature for m in measurements]
     activity = [m.activity_level for m in measurements]
     timestamps = [m.timestamp.strftime('%Y-%m-%dT%H:%M:%S') for m in measurements]
-    device_supports_ecg = bool(getattr(measurements[0].session, 'device_id', None) in ('chest_strap_ecg', 'bedside_monitor', 'home_patch'))
+    session_obj = measurements[0].session
+    waveform_analysis = _build_waveform_analysis(session_obj, measurements)
 
     return {
         'timestamps': timestamps,
@@ -447,5 +521,6 @@ def analyze_session(measurements):
             'stats': compute_statistics(activity),
         },
         'features': extract_session_features(measurements),
-        'ecg_preview': generate_ecg_preview(measurements) if device_supports_ecg else {},
+        'waveform_analysis': waveform_analysis,
+        'ecg_preview': waveform_analysis.get('waveform', {}) if waveform_analysis else {},
     }

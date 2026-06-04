@@ -167,6 +167,22 @@
           <div class="small text-uppercase text-muted mb-1">{{ item.category }}</div>
           <div class="fw-semibold mb-2">{{ item.title }}</div>
           <div class="small text-muted">{{ item.details }}</div>
+          {% if item.scenario %}
+          <hr />
+          <div class="small fw-semibold mb-2">Scenario atteso se applicato</div>
+          <div class="d-flex flex-wrap gap-2 mb-2">
+            <span class="badge bg-light text-dark border">rischio {{ item.scenario.projected_risk_level }}</span>
+            <span class="badge bg-light text-dark border">delta score {{ '%+.3f'|format(item.scenario.risk_score_delta) }}</span>
+            <span class="badge bg-light text-dark border">risposta {{ (item.scenario.response_probability * 100) | round(0) }}%</span>
+          </div>
+          <div class="small text-muted mb-2">{{ item.scenario.summary }}</div>
+          <div class="small d-flex flex-wrap gap-2">
+            <span class="badge bg-white text-dark border">HR {{ item.scenario.projected_metrics.heart_rate }}</span>
+            <span class="badge bg-white text-dark border">SpO₂ {{ item.scenario.projected_metrics.spo2 }}</span>
+            <span class="badge bg-white text-dark border">Temp {{ item.scenario.projected_metrics.temperature }}</span>
+            <span class="badge bg-white text-dark border text-capitalize">{{ item.scenario.trend_prediction.label }}</span>
+          </div>
+        {% endif %}
         </div>
       </div>
       {% endfor %}
@@ -217,6 +233,53 @@
     </div>
   </div>
 
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+  <div class="card-header bg-white d-flex align-items-center">
+    <i class="bi bi-broadcast-pin text-danger me-2"></i>
+    <span class="fw-semibold">Analisi avanzata ECG/PPG</span>
+    <span class="badge bg-light text-dark border ms-auto" id="waveform-badge">nessun waveform reale</span>
+  </div>
+  <div class="card-body">
+    <div class="row g-3 small">
+      <div class="col-lg-4">
+        <div class="border rounded-3 p-3 h-100 bg-light-subtle">
+          <div class="fw-semibold mb-2">Quality assessment</div>
+          <div class="d-flex flex-wrap gap-2" id="waveform-quality-badges">
+            <span class="badge bg-light text-dark border">Non disponibile</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="border rounded-3 p-3 h-100 bg-light-subtle">
+          <div class="fw-semibold mb-2">Feature extraction</div>
+          <div class="d-flex flex-wrap gap-2" id="waveform-feature-badges">
+            <span class="badge bg-light text-dark border">Non disponibile</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="border rounded-3 p-3 h-100 bg-light-subtle">
+          <div class="fw-semibold mb-2">HRV e artefatti</div>
+          <div class="d-flex flex-wrap gap-2" id="waveform-hrv-badges">
+            <span class="badge bg-light text-dark border">Non disponibile</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+  <div class="card-header bg-white d-flex align-items-center small">
+    <i class="bi bi-graph-up text-primary me-2"></i>
+    <span class="fw-semibold">Metriche waveform su finestre scorrevoli</span>
+    <span class="ms-auto text-muted" id="rolling-metrics-note">analisi non disponibile</span>
+  </div>
+  <div class="card-body p-2">
+    <div id="chart-waveform-rolling" style="height:260px"></div>
+  </div>
 </div>
 
 <!-- ── Charts ── -->
@@ -290,8 +353,8 @@
     <div class="chart-card card shadow-sm">
       <div class="card-header bg-white d-flex align-items-center small">
         <i class="bi bi-heart-pulse text-danger me-2"></i>
-        <span class="fw-semibold">ECG sintetico mono-derivazione</span>
-        <span class="ms-auto text-muted">derivato dal profilo della sessione e dal device</span>
+        <span class="fw-semibold" id="waveform-chart-title">Waveform</span>
+        <span class="ms-auto text-muted" id="waveform-chart-subtitle">analisi avanzata del segnale</span>
       </div>
       <div class="card-body p-2">
         <div id="chart-ecg" style="height:240px"></div>
@@ -366,6 +429,19 @@ const config = { responsive: true, displayModeBar: false };
 
 function refLine(x0, x1, y, color, dash='dash') {
   return { type:'line', x0, x1, y0:y, y1:y, line:{ color, dash, width:1 } };
+}
+
+function setBadgeGroup(id, items, emptyLabel='Non disponibile') {
+  const root = document.getElementById(id);
+  if (!root) return;
+  if (!items || !items.length) {
+    root.innerHTML = `<span class="badge bg-light text-dark border">${emptyLabel}</span>`;
+    return;
+  }
+  root.innerHTML = items
+    .filter(Boolean)
+    .map(item => `<span class="badge bg-light text-dark border">${item}</span>`)
+    .join('');
 }
 
 // ── Heart Rate ──────────────────────────────────────────────────────────────
@@ -455,22 +531,154 @@ if (A.timestamps && A.activity) {
 }
 
 // ── ECG preview ─────────────────────────────────────────────────────────────
-if (A.ecg_preview && A.ecg_preview.values && A.ecg_preview.values.length) {
-  Plotly.newPlot('chart-ecg', [{
-    x: A.ecg_preview.timestamps,
-    y: A.ecg_preview.values,
+const W = A.waveform_analysis || {};
+const waveform = W.waveform || {};
+const waveformSource = W.source || 'none';
+const signalType = W.signal_type || 'signal';
+const signalLabel = signalType === 'ppg' ? 'PPG reale' : signalType === 'ecg' ? (waveformSource === 'synthetic' ? 'ECG sintetico' : 'ECG reale') : 'Waveform';
+
+document.getElementById('waveform-chart-title').textContent = signalLabel;
+document.getElementById('waveform-chart-subtitle').textContent =
+  waveformSource === 'synthetic'
+    ? 'preview sintetico derivato dal profilo sessione'
+    : waveformSource === 'real'
+      ? 'feature extraction, HRV e quality assessment su dati reali'
+      : 'nessun modulo waveform disponibile';
+
+if (W && Object.keys(W).length) {
+  const quality = W.quality || {};
+  const features = W.features || {};
+  const hrv = W.hrv || {};
+  const artifacts = W.artifacts || {};
+  document.getElementById('waveform-badge').textContent =
+    waveformSource === 'synthetic' ? 'preview simulato' : `${signalLabel} · ${quality.label || 'analysis'}`;
+  const displayMode = waveform.display_mode === 'recent_window_downsampled'
+    ? `finestra recente ${waveform.display_window_seconds || ''} s`
+    : 'segnale completo';
+  document.getElementById('rolling-metrics-note').textContent =
+    W.rolling_metrics && W.rolling_metrics.length
+      ? `${W.rolling_metrics.length} finestre · ${displayMode}`
+      : 'analisi non disponibile';
+
+  setBadgeGroup('waveform-quality-badges', [
+    quality.score !== undefined && quality.score !== null ? `Score ${quality.score}/100` : null,
+    quality.label ? `Quality ${quality.label}` : null,
+    quality.beat_coverage !== undefined && quality.beat_coverage !== null ? `Beat coverage ${(quality.beat_coverage * 100).toFixed(0)}%` : null,
+    W.sampling_hz ? `Fs ${W.sampling_hz} Hz` : null,
+  ]);
+
+  setBadgeGroup('waveform-feature-badges', [
+    features.dominant_hr_bpm ? `HR ${features.dominant_hr_bpm} bpm` : null,
+    features.pulse_rate_bpm ? `Pulse ${features.pulse_rate_bpm} bpm` : null,
+    features.qrs_peak_count ? `QRS ${features.qrs_peak_count}` : null,
+    features.pulse_peak_count ? `Pulse peaks ${features.pulse_peak_count}` : null,
+    features.qrs_amplitude_p95 ? `QRS p95 ${features.qrs_amplitude_p95}` : null,
+    features.pulse_amplitude_mean ? `Pulse amp ${features.pulse_amplitude_mean}` : null,
+    features.perfusion_index_proxy ? `PI proxy ${features.perfusion_index_proxy}` : null,
+    features.duration_seconds ? `Durata ${features.duration_seconds}s` : null,
+    waveform.display_mode === 'recent_window_downsampled' ? `View ${waveform.display_window_seconds}s` : 'View full',
+    W.respiration && W.respiration.resp_rate_bpm ? `Resp ${W.respiration.resp_rate_bpm}/min` : null,
+  ]);
+
+  setBadgeGroup('waveform-hrv-badges', [
+    hrv.sdnn_ms ? `SDNN ${hrv.sdnn_ms} ms` : null,
+    hrv.rmssd_ms ? `RMSSD ${hrv.rmssd_ms} ms` : null,
+    hrv.pnn50 !== undefined && hrv.pnn50 !== null ? `pNN50 ${(hrv.pnn50 * 100).toFixed(0)}%` : null,
+    hrv.lf_hf_ratio ? `LF/HF ${hrv.lf_hf_ratio}` : null,
+    ...(artifacts.flags || []).map(flag => `Artifact ${flag}`),
+  ], 'Nessun indice HRV/artefatto');
+}
+
+if (waveform && waveform.values && waveform.values.length) {
+  const traces = [{
+    x: waveform.timestamps,
+    y: waveform.values,
     mode: 'lines',
-    line: { color: '#b91c1c', width: 1.4 },
-    name: 'ECG',
-  }], {
+    line: { color: signalType === 'ppg' ? '#0f766e' : '#b91c1c', width: 1.2 },
+    name: signalLabel + ' raw',
+  }];
+  if (waveform.filtered && waveform.filtered.length) {
+    traces.push({
+      x: waveform.timestamps,
+      y: waveform.filtered,
+      mode: 'lines',
+      line: { color: signalType === 'ppg' ? '#14b8a6' : '#ef4444', width: 1.5 },
+      name: signalLabel + ' filtered',
+    });
+  }
+  if (waveform.peak_timestamps && waveform.peak_timestamps.length) {
+    traces.push({
+      x: waveform.peak_timestamps,
+      y: waveform.peak_values,
+      mode: 'markers',
+      marker: { color: '#f59e0b', size: 5 },
+      name: signalType === 'ppg' ? 'Pulse peaks' : 'QRS peaks',
+    });
+  }
+
+  Plotly.newPlot('chart-ecg', traces, {
     ...baseLayout,
     xaxis: { title: 'Tempo (s)' },
-    yaxis: { title: 'mV' },
-    showlegend: false,
+    yaxis: { title: signalType === 'ppg' ? 'Ampiezza (a.u.)' : 'mV' },
+    showlegend: true,
   }, config);
 } else {
   document.getElementById('chart-ecg').innerHTML =
-    '<div class="text-center text-muted py-5">Il dispositivo selezionato non dispone di modulo ECG.</div>';
+    '<div class="text-center text-muted py-5">Nessun waveform ECG/PPG disponibile per questa sessione.</div>';
+}
+
+// ── Rolling waveform metrics ───────────────────────────────────────────────
+if (W.rolling_metrics && W.rolling_metrics.length) {
+  const metricKey = signalType === 'ppg' ? 'pulse_rate_bpm' : 'mean_hr_bpm';
+  Plotly.newPlot('chart-waveform-rolling', [
+    {
+      x: W.rolling_metrics.map(item => item.t_center),
+      y: W.rolling_metrics.map(item => item[metricKey]),
+      mode: 'lines+markers',
+      name: signalType === 'ppg' ? 'Pulse rate' : 'Heart rate',
+      line: { color: signalType === 'ppg' ? '#0f766e' : '#dc2626', width: 2 },
+      marker: { size: 5 },
+    },
+    {
+      x: W.rolling_metrics.map(item => item.t_center),
+      y: W.rolling_metrics.map(item => item.sdnn_ms),
+      mode: 'lines',
+      name: 'SDNN',
+      yaxis: 'y2',
+      line: { color: '#2563eb', width: 1.6 },
+    },
+    {
+      x: W.rolling_metrics.map(item => item.t_center),
+      y: W.rolling_metrics.map(item => item.quality_score),
+      mode: 'lines',
+      name: 'Quality score',
+      yaxis: 'y3',
+      line: { color: '#7c3aed', width: 1.4, dash: 'dot' },
+    },
+  ], {
+    ...baseLayout,
+    xaxis: { title: 'Centro finestra (s)' },
+    yaxis: { title: signalType === 'ppg' ? 'Pulse bpm' : 'HR bpm' },
+    yaxis2: {
+      title: 'SDNN (ms)',
+      overlaying: 'y',
+      side: 'right',
+      showgrid: false,
+    },
+    yaxis3: {
+      title: 'Quality',
+      overlaying: 'y',
+      side: 'right',
+      position: 0.94,
+      range: [0, 100],
+      showgrid: false,
+    },
+    legend: { orientation: 'h', y: -0.28 },
+    margin: { t: 10, r: 72, b: 50, l: 55 },
+  }, config);
+} else {
+  document.getElementById('chart-waveform-rolling').innerHTML =
+    '<div class="text-center text-muted py-5">Lo storico waveform non e sufficiente per le finestre scorrevoli.</div>';
 }
 
 // ── Box plots ───────────────────────────────────────────────────────────────
